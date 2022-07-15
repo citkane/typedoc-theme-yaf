@@ -134,7 +134,6 @@ function makeOptions(): devOptions {
 			throw new Error(`watcher: path "${optionPath}" for option "${key}" does not exists`);
 		}
 	})
-	console.log(options);
 	return options
 }
 
