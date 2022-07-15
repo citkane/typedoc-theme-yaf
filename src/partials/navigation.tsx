@@ -40,8 +40,8 @@ function renderNavTree(menu: menuNode, depth: number) {
 			const childLen = Object.keys(menu[key].children).length;
 			let classes = '';
 			if (i===0) classes += 'first';
-			if(i===keys.length-1) classes += 'last';
-			if(childLen > 0) classes+= 'parent';
+			if(i===keys.length-1) classes += ' last';
+			if(childLen > 0) classes+= ' parent';
 			return (
 				<li class={classes}>
 					<a	id={key} href={ item.url }

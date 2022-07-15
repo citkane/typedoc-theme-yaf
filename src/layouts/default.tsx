@@ -16,8 +16,9 @@ export const defaultLayout = (context: YafThemeRenderContext) => (props: PageEve
             <meta name="description" content={"Documentation for " + props.project.name} />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-            <link rel="stylesheet" href={context.relativeURL("assets/style.css")} />
-            <link rel="stylesheet" href={context.relativeURL("assets/highlight.css")} />
+            <link rel="stylesheet" href={context.relativeURL("assets/reset.css")} />
+            <link rel="stylesheet" href={context.relativeURL("assets/yaf.css")} />
+            <link rel="stylesheet" href={context.relativeURL("assets/fonts/fonts.css")} />
             {context.options.getValue("customCss") && (
                 <link rel="stylesheet" href={context.relativeURL("assets/custom.css")} />
             )}
@@ -29,28 +30,22 @@ export const defaultLayout = (context: YafThemeRenderContext) => (props: PageEve
             <script>
 				<JSX.Raw html='document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"' />
             </script>
-            {context.toolbar(props)}
+            {/*context.toolbar(props)*/}
 
-            <div class="container container-main">
-				<div class="col-4 yaf">
+            <div id="main">
+				<div id="menu">
                     {context.hook("navigation.begin")}
                     {context.navigation(props)}
                     {context.hook("navigation.end")}
                 </div>
-                <div class="col-8 col-content">
+                <div id="content">
                     {context.hook("content.begin")}
                     {context.header(props)}
                     {props.template(props)}
                     {context.hook("content.end")}
                 </div>
             </div>
-
-            {context.footer()}
-
-            <div class="overlay"></div>
             <script src={context.relativeURL("assets/main.js")}></script>
-
-            {context.analytics()}
             {context.hook("body.end")}
         </body>
     </html>
