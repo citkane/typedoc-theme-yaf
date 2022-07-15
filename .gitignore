@@ -1,10 +1,5 @@
-*
-!assets
-!dev
-!src
-!.gitignore
-!package-lock.json
-!package.json
-!README.md
-!tsconfig.json
-!typedoc.json
+node_modules
+dist
+devOptions.json
+.*
+*.gitignore
