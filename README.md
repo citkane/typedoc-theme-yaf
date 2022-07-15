@@ -9,7 +9,7 @@ You can run a hot development environment with `npm run build:watch`.
 This will open a hot browser window which will update with your changes to code and assets.
 
 The default mode is to target the documentation of this module itself, but you can also target an external project by creating a `devOptions.json` file in this project root, eg:
-```json
+```jsonc
 {
 	"thatDocDir": "./docs", //external document directory
 	"thatCwdPath": "../path/to/other/project"
@@ -37,7 +37,7 @@ npm remove typedoc
 npm i -D typedoc
 ```
 and fix package.json with:
-```json
+```jsonc
 	"peerDependencies": {
 		"typedoc": "^0.23.0" //or whatever version is relevant
 	}
