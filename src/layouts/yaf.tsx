@@ -2,7 +2,7 @@ import { PageEvent, Reflection, JSX } from "typedoc";
 
 import { YafThemeRenderContext } from "../themes/YafThemeRenderContext";
 
-export const defaultLayout = (context: YafThemeRenderContext) => (props: PageEvent<Reflection>) => (
+export const yafLayout = (context: YafThemeRenderContext) => (props: PageEvent<Reflection>) => (
     <html class="default" lang={context.options.getValue("htmlLang")}>
         <head>
             <meta charSet="utf-8" />
@@ -28,15 +28,20 @@ export const defaultLayout = (context: YafThemeRenderContext) => (props: PageEve
         <body>
             {context.hook("body.begin")}
             <script>
-				<JSX.Raw html='document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"' />
+                <JSX.Raw html='document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"' />
             </script>
             {/*context.toolbar(props)*/}
 
             <div id="main">
-				<div id="menu">
-                    {context.hook("navigation.begin")}
-                    {context.navigation(props)}
-                    {context.hook("navigation.end")}
+                <div id="sidebar">
+                    <div id="menuHeader">
+                        {context.menuHeader(props)}
+                    </div>
+                    <div id="menu">
+                        {context.hook("navigation.begin")}
+                        {context.navigation(props)}
+                        {context.hook("navigation.end")}
+                    </div>
                 </div>
                 <div id="content">
                     {context.hook("content.begin")}
@@ -45,7 +50,7 @@ export const defaultLayout = (context: YafThemeRenderContext) => (props: PageEve
                     {context.hook("content.end")}
                 </div>
             </div>
-            <script src={context.relativeURL("assets/main.js")}></script>
+            <script src={context.relativeURL("assets/yaf.js")}></script>
             {context.hook("body.end")}
         </body>
     </html>
