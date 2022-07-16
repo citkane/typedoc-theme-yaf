@@ -1,0 +1,9 @@
+{
+	"extends": "./base.json",
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"resolveJsonModule": true
+	}
+}

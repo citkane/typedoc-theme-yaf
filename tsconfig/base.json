@@ -1,0 +1,11 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"compilerOptions": {
+		"composite": true,
+		"incremental": true,
+		"declarationMap": true
+	},
+	"exclude": [
+		"./node_modules"
+	]
+}

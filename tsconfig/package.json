@@ -1,0 +1,8 @@
+{
+	"name": "@typedoc-theme-yaf/tsconfig",
+	"files": [
+		"./base.json",
+		"./commonjs.json",
+		"./es6.json"
+	]
+}

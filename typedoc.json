@@ -13,6 +13,6 @@
 	"excludeProtected": true,
 	"excludeNotDocumented": true,
 	"logLevel": "Verbose",
-	"plugin": ["./dist/src"],
+	"plugin": ["./dist/index.js"],
 	"theme": "yaf"
 }

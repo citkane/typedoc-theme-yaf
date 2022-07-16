@@ -16,8 +16,7 @@ export const yafLayout = (context: YafThemeRenderContext) => (props: PageEvent<R
             <meta name="description" content={"Documentation for " + props.project.name} />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-            <link rel="stylesheet" href={context.relativeURL("assets/reset.css")} />
-            <link rel="stylesheet" href={context.relativeURL("assets/yaf.css")} />
+            <link rel="stylesheet" href={context.relativeURL("assets/css/style.css")} />
             <link rel="stylesheet" href={context.relativeURL("assets/fonts/fonts.css")} />
             {context.options.getValue("customCss") && (
                 <link rel="stylesheet" href={context.relativeURL("assets/custom.css")} />
