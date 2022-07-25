@@ -25,7 +25,7 @@
 		"fs-extra": "^10.1.0",
 		"sass": "^1.53.0",
 		"typedoc": "file:../yaf-scaffold/node_modules/typedoc",
-		"typedoc-plugin-hot-dev": "^0.0.3",
+		"typedoc-plugin-hot-dev": "file:../typedoc-plugin-hot-dev",
 		"typescript": "^4.7.4"
 	}
 }

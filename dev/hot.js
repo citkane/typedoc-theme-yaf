@@ -11,7 +11,9 @@ new Promise((resolve, reject) => {
 })
 .then(() => {
 	const sass = spawner('npm', ['run', 'build:css:watch']);
-	init()
+	init({
+		"targetCwd": "../yaf-scaffold"
+	})
 })
 .catch(err => {throw err;})
 
