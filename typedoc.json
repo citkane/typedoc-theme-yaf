@@ -1,9 +1,8 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
-	"out": "docs",
+	"out": "doc",
 	"entryPoints": [
-		"./src/index.tsx",
-		"./dev/watcher.ts"
+		"./src"
 	],
 	"externalPattern": [
 		"**/node_modules/**"
@@ -12,7 +11,9 @@
 	"excludePrivate": true,
 	"excludeProtected": true,
 	"excludeNotDocumented": true,
+	"media": "./dist/assets",
 	"logLevel": "Verbose",
-	"plugin": ["./dist/index.js"],
+	"plugin": ["./"],
 	"theme": "yaf"
 }
+

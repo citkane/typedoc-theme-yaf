@@ -12,9 +12,6 @@
  * @module
  */
 
-import { TimeLike } from "fs";
-import { resolve } from "path";
-
 const chokidar = require('chokidar');
 const path = require('path');
 const TypeDoc = require("typedoc");
@@ -61,15 +58,15 @@ if (args.length && args[0] === 'spawned') {
 		console.log(`---------------------------------------- ${message}`)
 		if (message === 'buildDocs') buildDocs(app, project, thatDocDir);
 	})
-} else {
+}
+export function init(...tscOptions){
+	if (tscOptions.indexOf('--watch') < 0)  tscOptions.push('--watch');
 	// We are in the local process
-
 	let controller = new AbortController();
 	const { thatDocDir, thisDistPath, thisAssetsPath, thatCwdPath } = makeOptions();
 
-	
-
-	startTsc().then(() => {
+	startTsc().then((resolved) => {
+		resolved = true;
 		let tsdoc: any;
 		let timer: ReturnType<typeof setTimeout>;
 
@@ -140,10 +137,11 @@ function makeOptions(): devOptions {
 function startTsc() {
 	return new Promise((resolve) => {
 		let resolved = false;
-		const tsc = spawn('node_modules/.bin/tsc', ['--watch']);
+		const tsc = spawn('node_modules/.bin/tsc', ['--build', '--watch']);
 		tsc.on('error', (err: Error) => console.error(err));
 		tsc.stdout.on('data', (data: Buffer) => {
 			const message = String(data).trim();
+			console.log(message)
 			if (!resolved && message.endsWith('Watching for file changes.')) resolve(resolved);
 		});
 	});
@@ -174,6 +172,7 @@ function spawnTsDoc (
 	tsdoc.stderr.on('data', (data: Buffer) => { console.error(`stderr: ${data}`) });
 	return { controller, tsdoc }
 }
+
 
 
 

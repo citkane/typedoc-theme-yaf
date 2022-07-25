@@ -10,7 +10,8 @@
 		"docs": "typedoc",
 		"build": "tsc --build",
 		"build:css": "sass src/assets/scss/style.scss:dist/assets/css/style.css --style compressed",
-		"build:hot": "node dist/dev/watcher"
+		"build:css:watch": "sass --watch src/assets/scss/style.scss:dist/assets/css/style.css --style compressed",
+		"build:hot": "node dev/hot"
 	},
 	"author": "Michael Jonker",
 	"license": "MIT",
@@ -24,6 +25,7 @@
 		"fs-extra": "^10.1.0",
 		"sass": "^1.53.0",
 		"typedoc": "file:../yaf-scaffold/node_modules/typedoc",
+		"typedoc-plugin-hot-dev": "^0.0.3",
 		"typescript": "^4.7.4"
 	}
 }

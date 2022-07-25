@@ -1,5 +1,0 @@
-(() => {
-	console.log(window.searchData)
-})();
-
-
