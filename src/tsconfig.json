@@ -3,6 +3,6 @@
 	"include": ["./"],
 	"exclude": ["./assets"],
 	"compilerOptions": {
-		"outDir": "../dist"
+		"outDir": "../dist/src"
 	}
 }

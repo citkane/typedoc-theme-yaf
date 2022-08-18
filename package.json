@@ -2,30 +2,30 @@
 	"name": "typedoc-theme-yaf",
 	"version": "0.0.0",
 	"description": "Typedoc custom theme for YAF-Scaffold",
-	"main": "dist/index",
+	"main": "./src/index",
 	"workspaces": [
 		"tsconfig"
 	],
 	"scripts": {
 		"docs": "typedoc",
-		"build": "tsc --build",
-		"build:css": "sass src/assets/scss/style.scss:dist/assets/css/style.css --style compressed",
-		"build:css:watch": "sass --watch src/assets/scss/style.scss:dist/assets/css/style.css --style compressed",
-		"build:hot": "node dev/hot"
+		"build": "./scripts/build.sh",
+		"build:css": "sass src/assets/scss/style.scss:dist/src/assets/style.css --style compressed",
+		"build:css:watch": "sass --watch src/assets/scss/style.scss:dist/src/assets/style.css --style compressed",
+		"build:webComponents:watch": "./scripts/watchComponents.js"
 	},
 	"author": "Michael Jonker",
 	"license": "MIT",
 	"devDependencies": {
 		"@typedoc-theme-yaf/tsconfig": "*",
-		"@types/chokidar": "^2.1.3",
 		"@types/fs-extra": "^9.0.13",
 		"@types/node": "^18.0.3",
-		"browser-sync": "^2.27.10",
+		"@types/prettier": "^2.7.0",
 		"chokidar": "^3.5.3",
 		"fs-extra": "^10.1.0",
+		"prettier": "^2.7.1",
 		"sass": "^1.53.0",
 		"typedoc": "file:../yaf-scaffold/node_modules/typedoc",
-		"typedoc-plugin-hot-dev": "file:../typedoc-plugin-hot-dev",
+		"typedoc-plugin-hot-dev": "^0.0.10",
 		"typescript": "^4.7.4"
 	}
 }

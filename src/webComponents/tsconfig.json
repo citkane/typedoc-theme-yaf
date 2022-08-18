@@ -1,7 +1,7 @@
 {
 	"extends": "@typedoc-theme-yaf/tsconfig/es6.json",
-	"include":["./"],
+	"include":["./", "index.ts"],
 	"compilerOptions": {
-		"outDir": "../../../dist/assets/js"
+		"outDir": "../../dist/src/webComponents",
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
-	"out": "doc",
+	"out": "docs",
 	"entryPoints": [
 		"./src"
 	],
@@ -11,9 +11,13 @@
 	"excludePrivate": true,
 	"excludeProtected": true,
 	"excludeNotDocumented": true,
-	"media": "./dist/assets",
+	"media": "./dist/src/assets",
 	"logLevel": "Verbose",
-	"plugin": ["./"],
-	"theme": "yaf"
+	"plugin": ["./dist"],
+	"theme": "yaf",
+	"hot-dev": {
+		"targetCwd": "../yaf-scaffold",
+		"npmScripts": ["build:webComponents:watch"]
+	}
 }
 

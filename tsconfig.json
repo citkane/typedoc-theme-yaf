@@ -1,8 +1,7 @@
 {
 	"references": [
-		{"path": "./dev"},
 		{"path": "./src"},
-		{"path": "./src/assets/ts"}
+		{"path": "./src/webComponents"}
 	],
 	"exclude": [
 		"./"

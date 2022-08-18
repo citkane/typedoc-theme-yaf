@@ -1,21 +1,10 @@
 
 const { spawn } = require('node:child_process');
-const path = require('path');
 const {init} = require('typedoc-plugin-hot-dev');
 
-const buildScriptPath = path.join(__dirname, 'scripts/build.sh');
 
-new Promise((resolve, reject) => {
-	const build = spawner('bash', [buildScriptPath]);
-	build.on('close', (code) => code === 0? resolve(true) : reject(code));
-})
-.then(() => {
-	const sass = spawner('npm', ['run', 'build:css:watch']);
-	init({
-		"targetCwd": "../yaf-scaffold"
-	})
-})
-.catch(err => {throw err;})
+const sass = spawner('npm', ['run', 'build:css:watch']);
+init()
 
 function spawner(command, args){
 	const spawned = spawn(command, args);

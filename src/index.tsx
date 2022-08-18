@@ -4,8 +4,8 @@
  * @module
  */
 
-import { Application, JSX } from "typedoc";
-import { YafTheme } from "./themes/YafTheme";
+import { Application } from "typedoc";
+import { YafTheme } from "./preprocessor/YafTheme";
 
 export function load(app: Application) {
     app.renderer.defineTheme("yaf", YafTheme);
