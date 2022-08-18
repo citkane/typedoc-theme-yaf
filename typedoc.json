@@ -1,12 +1,8 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
 	"out": "docs",
-	"entryPoints": [
-		"./src"
-	],
-	"externalPattern": [
-		"**/node_modules/**"
-	],
+	"entryPoints": ["./src"],
+	"externalPattern": ["**/node_modules/**"],
 	"excludeExternals": true,
 	"excludePrivate": true,
 	"excludeProtected": true,
@@ -20,4 +16,3 @@
 		"npmScripts": ["build:webComponents:watch"]
 	}
 }
-

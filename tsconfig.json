@@ -1,9 +1,4 @@
 {
-	"references": [
-		{"path": "./src"},
-		{"path": "./src/webComponents"}
-	],
-	"exclude": [
-		"./"
-	]
+	"references": [{ "path": "./src" }, { "path": "./src/webComponents" }],
+	"exclude": ["./"]
 }

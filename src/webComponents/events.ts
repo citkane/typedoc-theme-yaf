@@ -1,5 +1,5 @@
 export const yafEvents = {
 	content: {
-		setLocation: 'yaf.content.setLocation'
-	}
-}
+		setLocation: 'yaf.content.setLocation',
+	},
+};

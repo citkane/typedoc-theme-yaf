@@ -1,13 +1,25 @@
-import { DefaultThemeRenderContext, JSX, Options } from "typedoc";
-import { yafModel } from "../types";
-import { BrowserDataCache, menuHeader, navigationMenuTree, yafIndex, yafPartial } from "./";
-import { YafTheme } from "./YafTheme";
+import {
+	DefaultThemeRenderContext,
+	JSX,
+	Options,
+	PageEvent,
+	Reflection,
+} from 'typedoc';
+import { yafModel } from '../types';
+import {
+	BrowserDataCache,
+	menuHeader,
+	navigationMenuTree,
+	yafIndex,
+	yafPartial,
+} from './';
+import { YafTheme } from './YafTheme';
 
 export class YafThemeRenderContext extends DefaultThemeRenderContext {
-	menuHeader
+	menuHeader;
 	yaf: yafModel;
 	browserDataCache: BrowserDataCache;
-	partialLayout: Function;
+	partialLayout: (props: PageEvent<Reflection>) => JSX.Element;
 	constructor(theme: YafTheme, options: Options) {
 		super(theme, options);
 		this.defaultLayout = yafIndex(this);
@@ -16,10 +28,10 @@ export class YafThemeRenderContext extends DefaultThemeRenderContext {
 		this.yaf = {
 			navigation: {
 				menu: {
-					tree: navigationMenuTree
-				}	
-			}
-		}
+					tree: navigationMenuTree,
+				},
+			},
+		};
 		this.menuHeader = menuHeader(this);
 	}
 }

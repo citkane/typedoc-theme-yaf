@@ -1,29 +1,32 @@
-import { componentName, contentLocation, contentFragment, contentHash, html, treeMenuRoot } from "../types.js";
-import { YAFElement } from "../YAFElement.js";
-import { yafEvents } from "../events.js";
-import { timeStamp } from "console";
+import { componentName, html, treeMenuRoot } from '../types.js';
+import { YAFElement } from '../YAFElement.js';
 
 const componentName: componentName = 'yaf-navigation-menu-tree';
-const body = document.querySelector('body') as HTMLBodyElement;
 
 export class NavigationMenuTree extends YAFElement {
+	shadow: ShadowRoot;
 	constructor() {
 		super(componentName);
+		this.shadow = this.attachShadow({ mode: 'closed' });
 	}
 	async connectedCallback() {
 		const html = await this.getHtml(componentName);
 		const css = await this.getCss(componentName);
+
 		const innerHtml = this.makeElement(html);
 		const innerCss = this.makeElement(css);
+		const homeLink = document.createElement('yaf-navigation-link');
+		homeLink.innerHTML = 'HOME';
+		homeLink.setAttribute('href', '/');
+		const tree = innerHtml.querySelector(
+			'yaf-navigation-menu-tree-branch'
+		) as Element & { props: treeMenuRoot };
+		tree.props = window.yaf.navigation.menu.tree;
 
-		const tree = innerHtml.querySelector('yaf-navigation-menu-tree-branch');
-		(<any>tree).props = window.yaf.navigation.menu.tree;
-
-		const shadow = this.attachShadow({mode: 'closed'});
-		shadow.appendChild(innerCss);
-		shadow.appendChild(innerHtml);
+		this.shadow.appendChild(innerCss);
+		this.shadow.appendChild(homeLink);
+		this.shadow.appendChild(innerHtml);
 	}
-
 }
 customElements.define(componentName, NavigationMenuTree);
 
@@ -39,28 +42,17 @@ export class NavigationMenuTreeBranch extends YAFElement {
 	async connectedCallback() {
 		const innerHtml = `<ul id="${this.parentId}" ></ul>` as html;
 		const menuNode = this.makeElement(innerHtml);
-		
-		for(const [id, branch] of Object.entries(this.props)) {
+		for (const [id, branch] of Object.entries(this.props)) {
 			const li = document.createElement('li');
-			const a = document.createElement('a');
-			a.innerHTML = branch.name;
-			a.href = this.getUrl(branch.url);
-			a.addEventListener('click', e => {
-				e.preventDefault();
-				const url = new URL(a.href);
-				console.log(url);
-				const fragment = url.searchParams.get('fragment') as contentFragment;
-				const detail: contentLocation = {
-					fragment,
-					hash: url.hash as contentHash
-				}
-				const changeLocationEvent = new CustomEvent(yafEvents.content.setLocation, { detail })
-				body.dispatchEvent(changeLocationEvent);
-			})
-			li.appendChild(a);
-			if(branch.children && Object.keys(branch.children).length) {
-				const newBranch = this.makeElement(`<${componentName2} parentId="${id}" />`);
-				(<any>newBranch).props = branch.children;
+			const link = document.createElement('yaf-navigation-link');
+			link.innerHTML = branch.name;
+			link.setAttribute('href', `?partial=${branch.url}`);
+			li.appendChild(link);
+			if (branch.children && Object.keys(branch.children).length) {
+				const newBranch = this.makeElement(
+					`<${componentName2} parentId="${id}" />`
+				) as Element & { props: treeMenuRoot };
+				newBranch.props = branch.children;
 				li.appendChild(newBranch);
 			}
 			menuNode.appendChild(li);
@@ -69,4 +61,3 @@ export class NavigationMenuTreeBranch extends YAFElement {
 	}
 }
 customElements.define(componentName2, NavigationMenuTreeBranch);
-
