@@ -1,4 +1,5 @@
 {
+	"extends": "@typedoc-theme-yaf/tsconfig/commonJsTsx.json",
 	"references": [{ "path": "./src" }, { "path": "./src/webComponents" }],
 	"exclude": ["./"]
 }

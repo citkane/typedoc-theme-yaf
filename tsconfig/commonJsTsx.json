@@ -4,7 +4,8 @@
 		"jsx": "react",
 		"jsxFactory": "JSX.createElement",
 		"jsxFragmentFactory": "JSX.Fragment",
-		"target": "es2020",
+		"target": "esnext",
+		"module": "commonJs",
 		"forceConsistentCasingInFileNames": true,
 		"strict": true
 	}
