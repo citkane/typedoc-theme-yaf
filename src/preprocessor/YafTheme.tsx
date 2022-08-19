@@ -13,6 +13,8 @@ import {
 import { YafThemeRenderContext } from './YafThemeRenderContext';
 import fs from 'fs-extra';
 import path from 'path';
+import prettier from 'prettier';
+import { dotName } from '../types';
 
 export class YafTheme extends DefaultTheme {
 	private _contextCache?: YafThemeRenderContext;
@@ -108,4 +110,55 @@ export class YafTheme extends DefaultTheme {
 }
 function hasReadme(readme: string) {
 	return !readme.endsWith('none');
+}
+
+/**
+ * Takes data from this backend document parser and injects it
+ * into a .js file for consumption by the web frontend
+ *
+ * @param componentDotName
+ * @param replacementVarName
+ * @param data
+ */
+export function saveDataToFile(
+	componentDotName: dotName,
+	data: unknown,
+	fileRoot: string = path.join(__dirname, '../webComponents/components')
+) {
+	const filePath = path.join(fileRoot, `${componentDotName}.data.js`);
+	const replacementVarName = toCamelCase(componentDotName);
+	const initDataString = fs.readFileSync(filePath, 'utf-8');
+	if (initDataString.indexOf(replacementVarName) === -1)
+		throw new Error(
+			`Expected var "${replacementVarName}" to exist in "${componentDotName}"`
+		);
+
+	const dataJson = JSON.stringify(data);
+
+	const dataArray = initDataString.split(replacementVarName);
+	if (dataArray[1].indexOf(';') === -1)
+		throw new Error(
+			`Var "${replacementVarName}" declaration must end with a ";" in file "${filePath}".`
+		);
+
+	const afterDataArray = dataArray[1].split(';');
+	afterDataArray.shift();
+	const afterData = afterDataArray.join(';');
+
+	let jsString = `${dataArray[0]}${replacementVarName}=${dataJson};${afterData}`;
+	jsString = prettier.format(jsString, {
+		tabWidth: 4,
+		useTabs: true,
+		singleQuote: true,
+		parser: 'babel',
+	});
+
+	fs.writeFileSync(filePath, jsString, 'utf-8');
+}
+
+export function toCamelCase(dotName: dotName) {
+	const varNameArray = dotName.split('.').map((item, i) => {
+		return i ? `${item.charAt(0).toUpperCase()}${item.slice(1)}` : item;
+	});
+	return varNameArray.join('');
 }

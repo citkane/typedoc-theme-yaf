@@ -1,5 +1,6 @@
 import { componentName, html, treeMenuRoot } from '../types.js';
 import { YAFElement } from '../YAFElement.js';
+import { yafNavigationMenu } from './yaf.navigation.menu.data.js';
 
 const componentName: componentName = 'yaf-navigation-menu-tree';
 
@@ -21,7 +22,7 @@ export class NavigationMenuTree extends YAFElement {
 		const tree = innerHtml.querySelector(
 			'yaf-navigation-menu-tree-branch'
 		) as Element & { props: treeMenuRoot };
-		tree.props = window.yaf.navigation.menu.tree;
+		tree.props = yafNavigationMenu;
 
 		this.shadow.appendChild(innerCss);
 		this.shadow.appendChild(homeLink);

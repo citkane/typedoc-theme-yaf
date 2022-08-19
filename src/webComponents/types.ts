@@ -36,3 +36,4 @@ export type contentUrl = {
 
 export type html = `<${string}>${string}</${string}>` | `<${string} />`;
 export type css = `${string}{${string}}`;
+export type dotName = `${string}.${string}`;
