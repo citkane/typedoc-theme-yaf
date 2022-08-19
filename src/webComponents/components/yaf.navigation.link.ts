@@ -31,7 +31,6 @@ export class NavigationLink extends YAFElement {
 	linkRouter = (e: Event) => {
 		if (this.link.getAttribute('target') === '_blank') return; //execute link if external
 		const origin = this.link.href.split('?')[0];
-		console.log(this.targetURL().href);
 		if (origin && !window.location.href.startsWith(origin)) return; //execute link if different document set
 		e.preventDefault(); //use internal routing for document partials
 		window.history.pushState({ path: this.link.href }, '', this.link.href);

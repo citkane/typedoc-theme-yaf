@@ -42,7 +42,6 @@ export class yafContent extends YAFElement {
 			'partial'
 		) as fragmentUrl;
 		!partial && (partial = 'home.html');
-		console.log(partial);
 		this.fetchLocationDetail(partial, window.location.hash as contentHash);
 	};
 }
