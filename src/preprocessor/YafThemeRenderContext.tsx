@@ -1,37 +1,27 @@
+import { DefaultThemeRenderContext, Options } from 'typedoc';
+import { cacheItem } from '../types';
 import {
-	DefaultThemeRenderContext,
-	JSX,
-	Options,
-	PageEvent,
-	Reflection,
-} from 'typedoc';
-import { yafModel } from '../types';
-import {
-	BrowserDataCache,
-	menuHeader,
-	navigationMenuTree,
+	yafNavigationMenuHeader,
+	yafNavigationMenuTree,
+	yafContent,
 	yafIndex,
-	yafPartial,
+	yafReflectionTemplate,
+	yafContentHeader,
 } from './';
 import { YafTheme } from './YafTheme';
 
 export class YafThemeRenderContext extends DefaultThemeRenderContext {
-	menuHeader;
-	yaf: yafModel;
-	browserDataCache: BrowserDataCache;
-	partialLayout: (props: PageEvent<Reflection>) => JSX.Element;
+	frontEndDataCache: cacheItem;
 	constructor(theme: YafTheme, options: Options) {
 		super(theme, options);
-		this.defaultLayout = yafIndex(this);
-		this.partialLayout = yafPartial(this);
-		this.browserDataCache = new BrowserDataCache(this);
-		this.yaf = {
-			navigation: {
-				menu: {
-					tree: navigationMenuTree,
-				},
-			},
-		};
-		this.menuHeader = menuHeader(this);
+		this.frontEndDataCache = [];
 	}
+	defaultLayout = yafIndex(this);
+	partialLayout = yafContent(this);
+
+	reflectionTemplate = yafReflectionTemplate(this);
+
+	yafNavigationMenuTree = yafNavigationMenuTree(this);
+	yafNavigationMenuHeader = yafNavigationMenuHeader(this);
+	yafContentHeader = yafContentHeader(this);
 }

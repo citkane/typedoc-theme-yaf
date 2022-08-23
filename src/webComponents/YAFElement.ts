@@ -1,4 +1,5 @@
 import { componentName, css, fragmentUrl, html } from './types.js';
+import { yafRoot } from './components/yaf.root.data.js';
 
 export class YAFElement extends HTMLElement {
 	component: componentName;
@@ -36,7 +37,7 @@ export class YAFElement extends HTMLElement {
 			''
 		) as fragmentUrl;
 		const pathname = window.location.pathname;
-		let subPath = window.yaf.rootSubPaths.find(
+		let subPath = yafRoot.find(
 			(subPath) => pathname.indexOf(`/${subPath}`) > -1
 		);
 		subPath = pathname.split(`${subPath}/`)[0];

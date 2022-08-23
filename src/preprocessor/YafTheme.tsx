@@ -14,10 +14,10 @@ import { YafThemeRenderContext } from './YafThemeRenderContext';
 import fs from 'fs-extra';
 import path from 'path';
 import prettier from 'prettier';
-import { dotName } from '../types';
+import { cacheItem, dotName } from '../types';
 
 export class YafTheme extends DefaultTheme {
-	private _contextCache?: YafThemeRenderContext;
+	private context?: YafThemeRenderContext;
 	constructor(renderer: Renderer) {
 		super(renderer);
 		const rootFolder = path.join(__dirname, '../../../');
@@ -36,19 +36,63 @@ export class YafTheme extends DefaultTheme {
 				.filter((file) =>
 					fs.statSync(path.join(outDir, file)).isDirectory()
 				);
-			this._contextCache?.browserDataCache.setCacheItem(
-				'yaf.rootSubPaths',
-				rootSubPaths
-			);
-			this._contextCache?.browserDataCache.saveToFile(outDir);
+			this.context?.frontEndDataCache.push([
+				'yaf.root',
+				rootSubPaths,
+				null,
+			]);
+
+			const mergedCache: cacheItem = [];
+			this.context?.frontEndDataCache.forEach((cacheItem) => {
+				const foundItem = mergedCache.find(
+					(i) => i[0] === cacheItem[0] && i[2] === cacheItem[2]
+				);
+				if (!foundItem) {
+					mergedCache.push(cacheItem);
+				} else {
+					if (Array.isArray(foundItem[1])) {
+						if (!Array.isArray(cacheItem[1]))
+							throw new Error(
+								'cannot merge non array data types'
+							);
+						return (foundItem[1] = [
+							...foundItem[1],
+							...(cacheItem[1] as []),
+						]);
+					}
+					if (typeof foundItem[1] === 'object') {
+						if (typeof cacheItem[1] !== 'object')
+							throw new Error(
+								'cannot merge non object data types'
+							);
+						return (foundItem[1] = {
+							...foundItem[1],
+							...(cacheItem[1] as object),
+						});
+					}
+					if (foundItem[1] !== cacheItem[1])
+						throw new Error(`String or number data value for "${cacheItem[0]}" is imuttable.
+					Different values given for ${cacheItem[2]}`);
+				}
+			});
+			mergedCache.forEach((item) => {
+				saveDataToFile(
+					...item,
+					path.join(
+						this.application.options.getValue('out'),
+						'webComponents/data'
+					)
+				);
+			});
 		});
 	}
+
 	public override getRenderContext(): YafThemeRenderContext {
-		this._contextCache ||= new YafThemeRenderContext(
+		this.context ||= new YafThemeRenderContext(
 			this,
 			this.application.options
 		);
-		return this._contextCache;
+		return this.context;
 	}
 
 	override getUrls(project: ProjectReflection): UrlMapping[] {
@@ -117,35 +161,46 @@ function hasReadme(readme: string) {
  * into a .js file for consumption by the web frontend
  *
  * @param componentDotName
- * @param replacementVarName
  * @param data
+ * @param id
+ * @param fileRoot
  */
 export function saveDataToFile(
 	componentDotName: dotName,
 	data: unknown,
-	fileRoot: string = path.join(__dirname, '../webComponents/components')
+	id: number | null,
+	fileRoot: string
 ) {
+	componentDotName =
+		id === null ? componentDotName : `${componentDotName}.${id}`;
 	const filePath = path.join(fileRoot, `${componentDotName}.data.js`);
 	const replacementVarName = toCamelCase(componentDotName);
-	const initDataString = fs.readFileSync(filePath, 'utf-8');
-	if (initDataString.indexOf(replacementVarName) === -1)
-		throw new Error(
-			`Expected var "${replacementVarName}" to exist in "${componentDotName}"`
-		);
 
 	const dataJson = JSON.stringify(data);
 
-	const dataArray = initDataString.split(replacementVarName);
-	if (dataArray[1].indexOf(';') === -1)
-		throw new Error(
-			`Var "${replacementVarName}" declaration must end with a ";" in file "${filePath}".`
-		);
+	let jsString: string;
+	if (fs.existsSync(filePath)) {
+		const initDataString = fs.readFileSync(filePath, 'utf-8');
+		if (initDataString.indexOf(replacementVarName) === -1)
+			throw new Error(
+				`Expected var "${replacementVarName}" to exist in "${componentDotName}"`
+			);
+		const dataArray = initDataString.split(replacementVarName);
+		if (dataArray[1].indexOf(';') === -1)
+			throw new Error(
+				`Var "${replacementVarName}" declaration must end with a ";" in file "${filePath}".`
+			);
 
-	const afterDataArray = dataArray[1].split(';');
-	afterDataArray.shift();
-	const afterData = afterDataArray.join(';');
+		const afterDataArray = dataArray[1].split(';');
+		afterDataArray.shift();
+		const afterData = afterDataArray.join(';');
 
-	let jsString = `${dataArray[0]}${replacementVarName}=${dataJson};${afterData}`;
+		jsString = `${dataArray[0]}${replacementVarName}=${dataJson};${afterData}`;
+	} else {
+		fs.ensureDirSync(fileRoot);
+		jsString = `const ${replacementVarName} = ${dataJson}`;
+	}
+
 	jsString = prettier.format(jsString, {
 		tabWidth: 4,
 		useTabs: true,

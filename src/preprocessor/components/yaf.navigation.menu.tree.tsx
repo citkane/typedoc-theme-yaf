@@ -1,4 +1,3 @@
-import path from 'path';
 import {
 	PageEvent,
 	Reflection,
@@ -8,8 +7,6 @@ import {
 } from 'typedoc';
 import { fragmentUrl, treeMenuRoot } from '../../types';
 import { YafThemeRenderContext } from '../YafThemeRenderContext';
-import fs from 'fs-extra';
-import { saveDataToFile } from '../YafTheme';
 
 function buildNavTree(
 	menuNode: treeMenuRoot,
@@ -33,11 +30,9 @@ function buildNavTree(
 	return menuNode;
 }
 
-export const navigationMenuTree = (
-	context: YafThemeRenderContext,
-	props: PageEvent<Reflection>
-) => {
-	const navTree = buildNavTree({}, props.project, context);
-	saveDataToFile('yaf.navigation.menu', navTree);
-	return <JSX.Raw html={`<yaf-navigation-menu-tree />`} />;
-};
+export const yafNavigationMenuTree =
+	(context: YafThemeRenderContext) => (props: PageEvent<Reflection>) => {
+		const navTree = buildNavTree({}, props.project, context);
+		context.frontEndDataCache.push(['yaf.navigation.menu', navTree, null]);
+		return <JSX.Raw html={`<yaf-navigation-menu-tree />`} />;
+	};
