@@ -33,6 +33,10 @@ function buildNavTree(
 export const yafNavigationMenuTree =
 	(context: YafThemeRenderContext) => (props: PageEvent<Reflection>) => {
 		const navTree = buildNavTree({}, props.project, context);
-		context.frontEndDataCache.push(['yaf.navigation.menu', navTree, null]);
+		context.frontEndDataCache.push([
+			'yaf.navigation.menu.tree',
+			navTree,
+			null,
+		]);
 		return <JSX.Raw html={`<yaf-navigation-menu-tree />`} />;
 	};

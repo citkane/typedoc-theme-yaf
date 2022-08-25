@@ -3,6 +3,10 @@ declare global {
 		searchData: object;
 	}
 }
+declare module 'webComponents/data/*.json' {
+	const value: object;
+	export default value;
+}
 export type componentName = `${string}-${string}`;
 export type treeMenuRoot = {
 	[key: number]: treeMenuBranch;

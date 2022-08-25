@@ -1,5 +1,4 @@
-import { componentName, css, fragmentUrl, html } from './types.js';
-import { yafRoot } from './components/yaf.root.data.js';
+import { componentName, css, fragmentUrl, html, dotName } from './types.js';
 
 export class YAFElement extends HTMLElement {
 	component: componentName;
@@ -7,6 +6,21 @@ export class YAFElement extends HTMLElement {
 		super();
 		this.component = component;
 	}
+
+	protected fetchData = async (
+		componentName = this.component,
+		id?: number
+	): Promise<object> => {
+		const dotName = componentName.replace(/-/g, '.');
+		const fileName =
+			typeof id !== 'undefined'
+				? `${dotName}.${id}.data.json`
+				: `${dotName}.data.json`;
+		const filePath = `webComponents/data/${fileName}`;
+		console.log(filePath);
+		const data = await fetch(filePath).then((stream) => stream.json());
+		return data;
+	};
 	protected makeElement(innerHTML: html): Element {
 		const documentFragment = this.makeContent(innerHTML);
 		return documentFragment.firstElementChild?.cloneNode(true) as Element;
@@ -31,12 +45,13 @@ export class YAFElement extends HTMLElement {
 	 * @param locationPath
 	 * @returns an absolute path to the resource
 	 */
-	protected relToAbsPath = (locationPath: fragmentUrl) => {
+	protected relToAbsPath = async (locationPath: fragmentUrl) => {
 		locationPath = locationPath.replace(
 			/\.\.\/|\.\/|^\//g,
 			''
 		) as fragmentUrl;
 		const pathname = window.location.pathname;
+		const yafRoot = (await this.fetchData('yaf-root')) as string[];
 		let subPath = yafRoot.find(
 			(subPath) => pathname.indexOf(`/${subPath}`) > -1
 		);
@@ -69,10 +84,17 @@ export class YAFElement extends HTMLElement {
 		extension: 'html' | 'css'
 	): Promise<html> => {
 		const locator = component.replace(/-/g, '.');
-		const url = this.relToAbsPath(
+		const url = await this.relToAbsPath(
 			`./webComponents/components/${locator}.${extension}` as fragmentUrl
 		);
 		const html = await this.fetchHtmlOrCss(url);
 		return extension === 'css' ? `<style>${html}</style>` : (html as html);
 	};
+}
+
+export function toCamelCase(dotName: dotName) {
+	const varNameArray = dotName.split('.').map((item, i) => {
+		return i ? `${item.charAt(0).toUpperCase()}${item.slice(1)}` : item;
+	});
+	return varNameArray.join('');
 }

@@ -13,8 +13,9 @@ import {
 import { YafThemeRenderContext } from './YafThemeRenderContext';
 import fs from 'fs-extra';
 import path from 'path';
-import prettier from 'prettier';
+//import prettier from 'prettier';
 import { cacheItem, dotName } from '../types';
+//import { toCamelCase } from '../webComponents/YAFElement';
 
 export class YafTheme extends DefaultTheme {
 	private context?: YafThemeRenderContext;
@@ -173,11 +174,13 @@ export function saveDataToFile(
 ) {
 	componentDotName =
 		id === null ? componentDotName : `${componentDotName}.${id}`;
-	const filePath = path.join(fileRoot, `${componentDotName}.data.js`);
-	const replacementVarName = toCamelCase(componentDotName);
+	const filePath = path.join(fileRoot, `${componentDotName}.data.json`);
+	//const replacementVarName = toCamelCase(componentDotName);
 
-	const dataJson = JSON.stringify(data);
-
+	//const dataJson = JSON.stringify(data);
+	fs.ensureDirSync(fileRoot);
+	fs.writeJSONSync(filePath, data, { spaces: '\t' });
+	/*
 	let jsString: string;
 	if (fs.existsSync(filePath)) {
 		const initDataString = fs.readFileSync(filePath, 'utf-8');
@@ -209,11 +212,5 @@ export function saveDataToFile(
 	});
 
 	fs.writeFileSync(filePath, jsString, 'utf-8');
-}
-
-export function toCamelCase(dotName: dotName) {
-	const varNameArray = dotName.split('.').map((item, i) => {
-		return i ? `${item.charAt(0).toUpperCase()}${item.slice(1)}` : item;
-	});
-	return varNameArray.join('');
+*/
 }

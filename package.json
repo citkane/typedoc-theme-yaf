@@ -7,7 +7,7 @@
 		"tsconfig"
 	],
 	"scripts": {
-		"test": "mocha",
+		"test": "prettier -c . && mocha",
 		"docs": "typedoc",
 		"build": "./scripts/build.sh",
 		"build:css": "sass src/assets/scss/style.scss:dist/src/assets/style.css --style compressed",
@@ -34,9 +34,11 @@
 		"prettier": "2.7.1",
 		"sass": "^1.53.0",
 		"ts-node": "^10.9.1",
-		"typedoc": "file:../yaf-scaffold/node_modules/typedoc",
 		"typedoc-plugin-hot-dev": "^0.0.10",
 		"typescript": "^4.7.4"
+	},
+	"peerDependencies": {
+		"typedoc": "^0.23"
 	},
 	"mocha": {
 		"extension": [
