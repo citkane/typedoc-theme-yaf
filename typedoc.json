@@ -1,18 +1,26 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
 	"out": "docs",
-	"entryPoints": ["./src"],
+	"entryPoints": [
+		"./src/index.ts",
+		"./src/types.d.ts",
+		"./src/webComponents/index.ts",
+		"./src/webComponents/types.d.ts"
+	],
 	"externalPattern": ["**/node_modules/**"],
 	"excludeExternals": true,
-	"excludePrivate": true,
-	"excludeProtected": true,
-	"excludeNotDocumented": true,
+	"excludePrivate": false,
+	"excludeProtected": false,
+	"excludeNotDocumented": false,
 	"media": "./dist/src/assets",
 	"logLevel": "Verbose",
-	"plugin": ["./dist"],
+	"plugin": [
+		"typedoc-theme-yaf",
+		"typedoc-plugin-versions",
+		"typedoc-plugin-hot-dev"
+	],
 	"theme": "yaf",
 	"hot-dev": {
-		"targetCwd": "../yaf-scaffold",
 		"npmScripts": ["build:webComponents:watch"]
 	}
 }

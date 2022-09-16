@@ -10,8 +10,8 @@
 		"test": "prettier -c . && mocha",
 		"docs": "typedoc",
 		"build": "./scripts/build.sh",
-		"build:css": "sass src/assets/scss/style.scss:dist/src/assets/style.css --style compressed",
-		"build:css:watch": "sass --watch src/assets/scss/style.scss:dist/src/assets/style.css --style compressed",
+		"build:css": "sass src/assets/scss/yafStyle.scss:dist/src/assets/yafStyle.css --style compressed",
+		"build:css:watch": "sass --watch src/assets/scss/yafStyle.scss:dist/src/assets/yafStyle.css --style compressed",
 		"build:webComponents:watch": "./scripts/watchComponents.js"
 	},
 	"author": "Michael Jonker",
@@ -29,13 +29,20 @@
 		"chokidar": "^3.5.3",
 		"eslint": "^8.22.0",
 		"eslint-config-prettier": "^8.5.0",
-		"fs-extra": "^10.1.0",
 		"mocha": "^10.0.0",
 		"prettier": "2.7.1",
 		"sass": "^1.53.0",
 		"ts-node": "^10.9.1",
 		"typedoc-plugin-hot-dev": "^0.0.10",
+		"typedoc-plugin-versions": "^0.1.1",
+		"typedoc-theme-yaf": "file:dist",
 		"typescript": "^4.7.4"
+	},
+	"dependencies": {
+		"@wooorm/starry-night": "^1.3.0",
+		"fs-extra": "^10.1.0",
+		"hast-util-to-html": "^8.0.3",
+		"typedoc": "^0.23"
 	},
 	"peerDependencies": {
 		"typedoc": "^0.23"
