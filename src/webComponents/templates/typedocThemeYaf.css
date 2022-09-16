@@ -1,0 +1,80 @@
+* {
+    box-sizing: border-box;
+}
+:root{
+    --dim-header-height: 2.5rem;
+    --dim-footer-height: 1.5rem;
+    --dim-menu-width: 300px;
+    --col-background-light: GhostWhite;
+    --col-background-dark: darkgray;
+    --col-line-light: hsla(0, 0%, 0%, 0.5);
+    --col-line-dark: hsla(0, 0%, 100%, 0.5);
+    --col-text-light:  hsla(0, 0%, 0%, 0.5);
+    --col-text-dark: hsla(0, 0%, 100%, 0.5);
+}
+:root .lightTheme {
+    --bg-colour: var(--col-background-light);
+    --col-line: var(--col-line-light);
+    --col-text: var(--col-text-light);
+}
+:root .darkTheme {
+    --bg-colour: var(--col-background-dark);
+    --col-line: var(--col-line-dark);
+    --col-text: var(--col-text-dark);
+}
+
+typedoc-theme-yaf {
+    display: block;
+    background: var(--col-line); 
+    height:100vh;
+    width:100vw;
+    position: relative;
+}
+
+yaf-chrome-left,
+yaf-chrome-content
+{
+    display: block;
+    background: var(--bg-colour);
+    position: absolute;
+    overflow:scroll;
+    height: 100%;
+    top:0;
+}
+yaf-chrome-left {
+    width: var(--dim-menu-width);
+    left:0;
+    overflow: hidden;
+    border-right: 1px solid var(--col-line);
+
+}
+yaf-chrome-content {
+    width: calc(100vw - var(--dim-menu-width));
+    right: 0
+}
+@media screen and (max-width: 900px){
+    yaf-chrome-left {
+        display: none;
+    }
+}
+
+:root {
+    font-family: 'open_sansregular', Arial, Helvetica, sans-serif;
+    color: var(--col-text);
+}
+
+h1,h2,h3,h4,h5 {
+    font-family: 'open_sansbold';
+}
+h1 {
+    font-family: 'open_sanslight';
+    font-size: 3rem;
+}
+h3 {
+    font-size: 1.2em;
+}
+yaf-content-flag {
+    padding:.1rem .25rem;
+    margin: 0 .5rem;
+    border: 1px solid var(--col-line);
+}
