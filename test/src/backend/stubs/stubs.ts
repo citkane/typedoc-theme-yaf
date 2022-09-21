@@ -19,9 +19,7 @@ export const tmpDirTestDocs = path.join(rootDir, 'test', 'docs');
 export const expectedThemeAssets = {
 	assets: mapDirStructure(path.join(rootDir, 'dist/src/assets')),
 	files: ['index.html'],
-	webComponents: mapDirStructure(
-		path.join(rootDir, 'dist/src/webComponents')
-	),
+	frontend: mapDirStructure(path.join(rootDir, 'dist/src/frontend')),
 };
 
 export const menuBranchKeys = ['name', 'query', 'hash', 'children'];

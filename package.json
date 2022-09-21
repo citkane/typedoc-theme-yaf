@@ -7,18 +7,19 @@
 		"tsconfig"
 	],
 	"scripts": {
-		"test": "tsc --build && nyc mocha",
+		"test": "tsc --build && nyc mocha && wtr --playwright",
 		"test:backend": "tsc --build && nyc mocha",
-		"test:frontend": "tsc --build && wtr test/dist/frontend/**/*.spec.js --node-resolve --coverage --playwright --browsers firefox",
+		"test:frontend": "tsc --build && wtr --watch",
 		"docs": "typedoc",
-		"build": "./scripts/build.sh",
+		"build": "tsc --build && npm run build:css && node ./scripts/build.js",
 		"build:css": "sass src/assets/scss/yafStyle.scss:dist/src/assets/yafStyle.css --style compressed",
 		"build:css:watch": "sass --watch src/assets/scss/yafStyle.scss:dist/src/assets/yafStyle.css --style compressed",
-		"build:webComponents:watch": "./scripts/watchComponents.js"
+		"build:frontend:watch": "npm run build && ./scripts/watchComponents.js"
 	},
 	"author": "Michael Jonker",
 	"license": "MIT",
 	"devDependencies": {
+		"@esm-bundle/chai-as-promised": "^7.1.1",
 		"@open-wc/testing": "^3.0.0-next.5",
 		"@typedoc-theme-yaf/tsconfig": "*",
 		"@types/chai": "^4.3.3",
@@ -34,6 +35,7 @@
 		"@web/test-runner-puppeteer": "^0.10.5",
 		"chai": "^4.3.6",
 		"chai-as-promised": "^7.1.1",
+		"chai-as-promised-esm": "npm:@esm-bundle/chai-as-promised@^7.1.1",
 		"chokidar": "^3.5.3",
 		"eslint": "^8.22.0",
 		"eslint-config-prettier": "^8.5.0",
@@ -68,7 +70,7 @@
 			"text",
 			"html"
 		],
-		"report-dir": "test/coverage",
+		"report-dir": "test/coverage/backend",
 		"temp-dir": "test/.nyc_output"
 	}
 }

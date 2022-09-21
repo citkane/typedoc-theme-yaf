@@ -5,9 +5,9 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const rootPath = path.join(__dirname, '../');
-const sourceCss = path.join(rootPath, './src/webComponents/templates/*.css');
-const sourceHtml = path.join(rootPath, './src/webComponents/templates/*.html');
-const target = path.join(rootPath, './dist/src/webComponents/templates');
+const sourceCss = path.join(rootPath, './src/frontend/templates/*.css');
+const sourceHtml = path.join(rootPath, './src/frontend/templates/*.html');
+const target = path.join(rootPath, './dist/src/frontend/templates');
 
 console.log(`[watchComponent] ${sourceCss}`);
 console.log(`[watchComponent] ${sourceHtml}`);

@@ -1,8 +1,0 @@
-{
-	"extends": "@typedoc-theme-yaf/tsconfig/commonJs.json",
-	"include": ["./"],
-	"exclude": ["./assets", "./webComponents"],
-	"compilerOptions": {
-		"outDir": "../dist/src"
-	}
-}

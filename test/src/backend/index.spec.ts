@@ -6,9 +6,8 @@ import {
 	highlighttest,
 	tmpDirTestDocs,
 } from './stubs/stubs';
-import * as lib from '../../../dist/src/preProcessor/lib';
-import chai, { assert } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import * as lib from '../../../dist/src/backend/lib';
+import { assert } from 'chai';
 import path from 'path';
 import fs from 'fs-extra';
 import {
@@ -22,8 +21,6 @@ import {
 } from 'typedoc';
 import { bootstrapApp, mapDirStructure } from './stubs/utils';
 import { highlighter, YAFDataObject } from '../../../dist/src/types';
-
-chai.use(chaiAsPromised);
 
 describe('Server side pre-processor', function () {
 	let theme: YafTheme,
@@ -126,7 +123,7 @@ describe('Server side pre-processor', function () {
 			} as unknown as YAFDataObject);
 			fileLocation = path.join(
 				tmpDirTestDocs,
-				'webComponents/data/testData.json'
+				'frontend/data/testData.json'
 			);
 			assert.isTrue(
 				fs.existsSync(fileLocation),
@@ -225,7 +222,6 @@ describe('Server side pre-processor', function () {
 				project as ProjectReflection & DeclarationReflection,
 				context
 			);
-			//console.log(extendedObject);
 			['is', 'location', 'text', 'has'].forEach((key) => {
 				assert.isObject(
 					extendedObject[key],
@@ -243,15 +239,15 @@ describe('Server side pre-processor', function () {
 			);
 			const files = mapDirStructure(tmpDirTestDocs);
 
-			assert.hasAllKeys(files, ['assets', 'files', 'webComponents']);
-			assert.hasAllKeys(files['webComponents'], [
+			assert.hasAllKeys(files, ['assets', 'files', 'frontend']);
+			assert.hasAllKeys(files['frontend'], [
 				'components',
 				'data',
 				'files',
 				'lib',
 				'templates',
 			]);
-			assert.deepEqual(files['webComponents']['data']['files'], [
+			assert.deepEqual(files['frontend']['data']['files'], [
 				'StubClass.json',
 				'index.json',
 				'reflectionMap.json',

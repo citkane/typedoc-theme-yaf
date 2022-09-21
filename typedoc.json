@@ -4,8 +4,8 @@
 	"entryPoints": [
 		"./src/index.ts",
 		"./src/types.d.ts",
-		"./src/webComponents/index.ts",
-		"./src/webComponents/types.d.ts"
+		"./src/frontend/index.ts",
+		"./src/frontend/types.d.ts"
 	],
 	"externalPattern": ["**/node_modules/**"],
 	"excludeExternals": true,
@@ -17,6 +17,6 @@
 	"plugin": ["./dist", "typedoc-plugin-versions", "typedoc-plugin-hot-dev"],
 	"theme": "yaf",
 	"hot-dev": {
-		"npmScripts": ["build:webComponents:watch"]
+		"npmScripts": ["build:frontend:watch"]
 	}
 }

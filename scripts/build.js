@@ -1,34 +1,26 @@
 const fs = require('fs-extra');
 const path = require('path');
+const rootDir = path.join(__dirname, '..');
 
-fs.copySync('src/assets/fonts', 'dist/src/assets/fonts');
-fs.copyFileSync('src/assets/logo.svg', 'dist/src/assets/logo.svg');
-fs.readdirSync('src/webComponents/components').forEach((fileName) => {
-	const ext = path.extname(fileName);
-	if (ext === '.html' || ext === '.css') {
-		fs.copyFileSync(
-			path.join('src/webComponents/components', fileName),
-			path.join('dist/src/webComponents/components', fileName)
-		);
+const makeAllOsPath = (linuxPath) => {
+	console.log(linuxPath);
+	const pathArray = [rootDir, ...linuxPath.split('/')];
+	console.log(path.join(...pathArray));
+	return path.join(...pathArray);
+};
+const copySync = (src, dest) =>
+	fs.copySync(makeAllOsPath(src), makeAllOsPath(dest));
+
+copySync('src/assets/fonts', 'dist/src/assets/fonts');
+copySync('src/assets/logo.svg', 'dist/src/assets/logo.svg');
+
+fs.readdirSync(makeAllOsPath('src/assets')).forEach((fileName) => {
+	if (fileName !== 'scss' && !fileName.endsWith('.md')) {
+		copySync(`src/assets/${fileName}`, `dist/src/assets/${fileName}`);
 	}
 });
-//fs.copyFileSync('src/webComponents/components/*.css', 'dist/src/webComponents/components/');
-//fs.copyFileSync('src/webComponents/components/*.html', 'dist/src/webComponents/components/');
-fs.copyFileSync('LICENSE', 'dist/LICENSE');
-fs.copyFileSync('package.json', 'dist/package.json');
-//fs.copyFileSync('.npmignore', 'dist/.npmignore');
-fs.copyFileSync('README.md', 'dist/README.md');
-/*
-#! /bin/bash
 
-./node_modules/.bin/tsc --build;
-npm run build:css;
-rsync -a ./src/assets/ ./dist/src/assets/ --exclude 'scss' --exclude 'ts' --exclude '*.md';
-cp ./src/webComponents/components/*.css ./dist/src/webComponents/components/;
-cp ./src/webComponents/components/*.html ./dist/src/webComponents/components/;
-cp ./LICENSE ./dist/LICENSE;
-cp ./package.json ./dist/package.json;
-cp ./.npmignore ./dist/.npmignore;
-cp ./README.md ./dist/README.md;
-
-*/
+copySync('src/frontend/templates', 'dist/src/frontend/templates');
+copySync('LICENSE', 'dist/LICENSE');
+copySync('package.json', 'dist/package.json');
+copySync('README.md', 'dist/README.md');

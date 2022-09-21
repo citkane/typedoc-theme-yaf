@@ -50,8 +50,6 @@ export type YAFDataObject = YAFDataExtension &
 	JSONOutput.DeclarationReflection &
 	JSONOutput.ProjectReflection &
 	JSONOutput.ContainerReflection;
-//| (JSONOutput.DeclarationReflection & YAFDataExtension)
-//| (JSONOutput.ProjectReflection & YAFDataExtension);
 
 export type treeMenuRoot = {
 	[key: number]: treeMenuBranch;
