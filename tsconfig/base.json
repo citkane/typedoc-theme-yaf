@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"composite": true,
 		"incremental": true,
-		"declarationMap": true,
+		"sourceMap": true,
 		"esModuleInterop": true
 	},
 	"exclude": ["./node_modules"]

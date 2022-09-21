@@ -14,11 +14,7 @@
 	"excludeNotDocumented": false,
 	"media": "./dist/src/assets",
 	"logLevel": "Verbose",
-	"plugin": [
-		"typedoc-theme-yaf",
-		"typedoc-plugin-versions",
-		"typedoc-plugin-hot-dev"
-	],
+	"plugin": ["./dist", "typedoc-plugin-versions", "typedoc-plugin-hot-dev"],
 	"theme": "yaf",
 	"hot-dev": {
 		"npmScripts": ["build:webComponents:watch"]

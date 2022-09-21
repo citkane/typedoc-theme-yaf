@@ -1,8 +1,0 @@
-{
-	"extends": "@typedoc-theme-yaf/tsconfig/es6.json",
-	"include": ["./**/*", "../types.d.ts"],
-	"compilerOptions": {
-		"outDir": "../../dist/src/webComponents",
-		"moduleResolution": "Node"
-	}
-}

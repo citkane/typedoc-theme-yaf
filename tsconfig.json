@@ -1,5 +1,10 @@
 {
-	"extends": "@typedoc-theme-yaf/tsconfig/commonJsTsx.json",
-	"references": [{ "path": "./src" }, { "path": "./src/webComponents" }],
+	"extends": "@typedoc-theme-yaf/tsconfig/commonJs.json",
+	"references": [
+		{ "path": "./src/tsconfig.preProcessor.json" },
+		{ "path": "./src/tsconfig.webComponents.json" },
+		{ "path": "./test/src/backend" },
+		{ "path": "./test/src/frontend" }
+	],
 	"exclude": ["./"]
 }
