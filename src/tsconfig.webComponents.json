@@ -1,0 +1,9 @@
+{
+	"extends": "@typedoc-theme-yaf/tsconfig/es6.json",
+	"include": ["./"],
+	"exclude": ["./assets", "./preProcessor", "./index.ts"],
+	"compilerOptions": {
+		"outDir": "../dist/src",
+		"moduleResolution": "Node"
+	}
+}

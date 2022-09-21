@@ -1,0 +1,13 @@
+.*
+!./
+!.gitignore
+!.npmignore
+!.eslint*
+!.prettier*
+
+./dist
+./docs
+./node_modules
+
+./test
+!./test/src
