@@ -3,6 +3,7 @@
 	"include": ["./", "stubs"],
 	"compilerOptions": {
 		"outDir": "../../dist/frontend",
-		"moduleResolution": "node"
+		"moduleResolution": "node",
+		"module": "ESNext"
 	}
 }

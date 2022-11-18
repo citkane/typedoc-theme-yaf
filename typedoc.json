@@ -3,9 +3,10 @@
 	"out": "docs",
 	"entryPoints": [
 		"./src/index.ts",
-		"./src/types.d.ts",
+		"./src/types.ts",
 		"./src/frontend/index.ts",
-		"./src/frontend/types.d.ts"
+		"./src/frontend/types.ts",
+		"./src/examples/index.ts"
 	],
 	"externalPattern": ["**/node_modules/**"],
 	"excludeExternals": true,
@@ -15,8 +16,8 @@
 	"media": "./dist/src/assets",
 	"logLevel": "Verbose",
 	"plugin": ["./dist", "typedoc-plugin-versions", "typedoc-plugin-hot-dev"],
-	"theme": "yaf",
+	"theme": "default",
 	"hot-dev": {
-		"npmScripts": ["build:frontend:watch"]
+		"npmScripts": ["build:frontend:watch", "build:css:watch"]
 	}
 }

@@ -1,0 +1,71 @@
+yaf-widget-counter {
+	font-weight: 300;
+	user-select: none;
+	.count {
+		font-weight: 600;
+	}
+}
+
+yaf-widget-kind {
+	width: 0.95rem;
+	height: 0.95rem;
+	display: inline-block;
+	font-size: 0.7rem;
+	position: relative;
+	margin-right: 0.25rem;
+	user-select: none;
+	> span {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	color: var(--color-canvas-default);
+	&.accessor {
+		background: var(--color-prettylights-syntax-entity-tag);
+		border-radius: 50%;
+	}
+	&.class {
+		background: var(--color-prettylights-syntax-entity);
+	}
+	&.constructor {
+		background: var(--color-prettylights-syntax-entity);
+		border-radius: 50%;
+	}
+	&.enumerator {
+		background: var(--color-prettylights-syntax-entity-tag);
+	}
+	&.function {
+		background: var(--color-prettylights-syntax-constant);
+		border-radius: 50%;
+	}
+	&.interface {
+		background: var(--color-prettylights-syntax-entity);
+	}
+	&.method {
+		background: var(--color-prettylights-syntax-string);
+		border-radius: 50%;
+	}
+	&.namespace {
+		background: var(--color-accent-fg);
+	}
+	&.property {
+		background: var(--color-prettylights-syntax-variable);
+		border-radius: 50%;
+	}
+	&.reference {
+		background: var(--color-prettylights-syntax-entity);
+	}
+	&.variable {
+		background: var(--color-prettylights-syntax-variable);
+		border-radius: 50%;
+	}
+	&.typealias {
+		background: var(--color-prettylights-syntax-variable);
+		border-radius: 50%;
+	}
+	&.module {
+		background: var(--color-accent-fg);
+	}
+}

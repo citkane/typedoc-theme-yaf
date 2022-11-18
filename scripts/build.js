@@ -3,9 +3,7 @@ const path = require('path');
 const rootDir = path.join(__dirname, '..');
 
 const makeAllOsPath = (linuxPath) => {
-	console.log(linuxPath);
 	const pathArray = [rootDir, ...linuxPath.split('/')];
-	console.log(path.join(...pathArray));
 	return path.join(...pathArray);
 };
 const copySync = (src, dest) =>

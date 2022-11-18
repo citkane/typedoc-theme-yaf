@@ -4,7 +4,7 @@
  * Unlike the default theme, this theme produces .json data files instead of .html for consumption by the front-end.
  * All templating is moved to the front-end within native web components.
  *
- * @module preprocessor
+ * @module backend
  */
 
 import { Application } from 'typedoc';

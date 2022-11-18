@@ -1,30 +1,17 @@
 /**
- * @module preprocessor/types
+ * @module types/backend
  */
-import { JSONOutput } from 'typedoc';
+import { JSONOutput, ProjectReflection, Reflection } from 'typedoc';
 
-export type allTypes = JSONOutput.ArrayType &
-	JSONOutput.ConditionalType &
-	JSONOutput.IndexedAccessType &
-	JSONOutput.InferredType &
-	JSONOutput.IntersectionType &
-	JSONOutput.IntrinsicType &
-	JSONOutput.OptionalType &
-	JSONOutput.PredicateType &
-	JSONOutput.QueryType &
-	JSONOutput.ReferenceType &
-	JSONOutput.ReflectionType &
-	JSONOutput.RestType &
-	JSONOutput.LiteralType &
-	JSONOutput.TupleType &
-	JSONOutput.NamedTupleMemberType &
-	JSONOutput.TemplateLiteralType &
-	JSONOutput.MappedType &
-	JSONOutput.TypeOperatorType &
-	JSONOutput.UnionType &
-	JSONOutput.UnknownType;
+export interface YAFDataReflection extends Reflection {
+	readme?: ProjectReflection['readme'];
+}
 
-type YAFDataExtension = {
+export interface YAFDataObject
+	extends JSONOutput.SignatureReflection,
+		JSONOutput.DeclarationReflection,
+		JSONOutput.ProjectReflection,
+		JSONOutput.ContainerReflection {
 	version: string;
 	children?: YAFDataObject[];
 	is: {
@@ -33,6 +20,7 @@ type YAFDataExtension = {
 		declaration: boolean;
 		memberDeclaration: boolean;
 		reflection: boolean;
+		referenceReflection: boolean;
 	};
 	location: {
 		query: string;
@@ -44,12 +32,58 @@ type YAFDataExtension = {
 	};
 	has: {
 		typeParameters: boolean;
+		getterOrSetter: boolean;
+		comment: boolean;
 	};
+	signatures: YafSignatureReflection[];
+	getSignature: YafSignatureReflection;
+	setSignature: YafSignatureReflection;
+	typeParameter: YafTypeParameterReflection[];
+	parameters: YafParameterReflection[];
+}
+
+export interface YafDeclarationReflection
+	extends JSONOutput.DeclarationReflection {
+	parameters?: YafParameterReflection[];
+	typeParameters?: YafTypeParameterReflection[] | undefined;
+	text: {
+		readme?: htmlString;
+		comment?: htmlString;
+	};
+	type: JSONOutput.ReflectionType;
+}
+export interface YafSignatureReflection extends JSONOutput.SignatureReflection {
+	parameters?: YafParameterReflection[];
+	typeParameter?: YafTypeParameterReflection[];
+	text: {
+		readme?: htmlString;
+		comment?: htmlString;
+	};
+	sources?: YafDeclarationReflection['sources'];
+	implementedBy?: YafDeclarationReflection['implementedBy'];
+}
+export interface YafParameterReflection extends JSONOutput.ParameterReflection {
+	text: {
+		readme?: htmlString;
+		comment?: htmlString;
+	};
+}
+export interface YafTypeParameterReflection
+	extends JSONOutput.TypeParameterReflection {
+	text: {
+		readme?: htmlString;
+		comment?: htmlString;
+	};
+}
+
+export type YAFReflectionLink = {
+	name: string;
+	fileName: string;
+	level: number;
 };
-export type YAFDataObject = YAFDataExtension &
-	JSONOutput.DeclarationReflection &
-	JSONOutput.ProjectReflection &
-	JSONOutput.ContainerReflection;
+export type abnormalSigTypes =
+	| { type: 'named-tuple-member' }
+	| { type: 'template-literal' };
 
 export type treeMenuRoot = {
 	[key: number]: treeMenuBranch;
@@ -58,6 +92,8 @@ export type treeMenuBranch = {
 	name: string;
 	query: string;
 	hash: string | '';
+	kind: number;
+	id: number;
 	children: treeMenuRoot;
 };
 export type dataLocation = {
@@ -68,7 +104,7 @@ export type dataLocation = {
 export type htmlString = `<${string}>${string}</${string}>` | `<${string} />`;
 
 export type reflectionMap = {
-	[key: number]: { fileName: string; level: number };
+	[key: number]: YAFReflectionLink;
 };
 
 export interface highlighter {
@@ -76,6 +112,8 @@ export interface highlighter {
 	flagToScope: (lang: string) => string;
 	highlight: (text: string, scope: string) => object;
 }
+
+export type anyObject = Record<string | number | symbol, any>;
 /*
 export declare const TypeContext: {
 	readonly none: 'none';
@@ -104,3 +142,9 @@ export declare const TypeContext: {
 };
 export declare type TypeContext = typeof TypeContext[keyof typeof TypeContext];
 */
+export interface kindSymbol {
+	className: string;
+	symbol: string;
+}
+
+export type kindSymbols = { [key: number]: kindSymbol };

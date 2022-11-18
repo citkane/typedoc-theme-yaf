@@ -12,9 +12,13 @@
 		"test:frontend": "tsc --build && wtr --watch",
 		"docs": "typedoc",
 		"build": "tsc --build && npm run build:css && node ./scripts/build.js",
-		"build:css": "sass src/assets/scss/yafStyle.scss:dist/src/assets/yafStyle.css --style compressed",
-		"build:css:watch": "sass --watch src/assets/scss/yafStyle.scss:dist/src/assets/yafStyle.css --style compressed",
+		"build:css": "sass src/assets/scss/index.scss:dist/src/assets/index.css --style compressed",
+		"build:css:watch": "sass --watch src/assets/scss/index.scss:dist/src/assets/index.css --style compressed",
 		"build:frontend:watch": "npm run build && ./scripts/watchComponents.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/citkane/typedoc-theme-yaf.git"
 	},
 	"author": "Michael Jonker",
 	"license": "MIT",
@@ -43,6 +47,7 @@
 		"nyc": "^15.1.0",
 		"prettier": "2.7.1",
 		"sass": "^1.53.0",
+		"sinon": "^14.0.0",
 		"source-map-support": "^0.5.21",
 		"typedoc-plugin-hot-dev": "^0.0.10",
 		"typedoc-plugin-versions": "^0.1.1",
