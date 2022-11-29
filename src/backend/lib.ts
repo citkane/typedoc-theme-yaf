@@ -17,7 +17,7 @@ import {
 	htmlString,
 	highlighter,
 	kindSymbols,
-} from '../types';
+} from '../types/types';
 import { serialize } from './serializer';
 
 /**
@@ -40,14 +40,13 @@ const hasOwnPage = [
  * @param outDir The absolute path to the root documentation out directory
  */
 export const copyThemeFiles = (rootDir: string, outDir: string) => {
-	const assetsDest = path.join(outDir, 'assets');
-	const assetsSrc = path.join(rootDir, 'dist', 'src', 'assets');
-	const frontendDest = path.join(outDir, 'frontend');
+	const assetsSrc = path.join(rootDir, 'dist', 'src', 'frontend', 'assets');
 	const indexSrc = path.join(assetsSrc, 'index.html');
-	const indexDest = path.join(outDir, 'index.html');
 	const frontendSrc = path.join(rootDir, 'dist', 'src', 'frontend');
 
-	fs.copySync(assetsSrc, assetsDest);
+	const frontendDest = path.join(outDir, 'frontend');
+	const indexDest = path.join(outDir, 'index.html');
+
 	fs.copySync(frontendSrc, frontendDest);
 	fs.copySync(indexSrc, indexDest);
 };

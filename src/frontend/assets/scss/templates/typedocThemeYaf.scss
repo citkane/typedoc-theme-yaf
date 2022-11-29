@@ -28,10 +28,12 @@ typedoc-theme-yaf {
 	.yaf-parent-drawer.closed {
 		> .yaf-drawer {
 			max-height: 0 !important;
+			opacity: 0;
 		}
 	}
 	.yaf-parent-drawer.rendered > .yaf-drawer {
-		transition: max-height var(--transition-drawer);
+		transition-property: opacity, max-height;
+		transition-duration: var(--transition-drawer);
 	}
 	.icon {
 		user-select: none;
@@ -50,4 +52,8 @@ typedoc-theme-yaf {
 	&.md-48 {
 		font-size: 48px;
 	}
+}
+
+yaf-member-group-reflection {
+	display: block;
 }

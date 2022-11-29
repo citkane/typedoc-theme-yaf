@@ -1,4 +1,7 @@
-import { YAFDataObject, YafDeclarationReflection } from '../../types.js';
+import {
+	YAFDataObject,
+	YafDeclarationReflection,
+} from '../../../types/types.js';
 import { YafElement } from '../../YafElement.js';
 import { YafMemberDeclaration } from './YafMemberDeclaration.js';
 import { YafFlags } from '../YafFlags.js';
@@ -13,31 +16,35 @@ export class YafMember extends YafElement {
 	connectedCallback() {
 		if (this.debounce()) return;
 
-		const { name, signatures, flags, comment, has, is, children, groups } =
+		const { name, signatures, flags, comment, has, is, groups } =
 			this.props;
 
-		const flagsElement: YafFlags = this.makeElement('<yaf-flags />');
+		const flagsElement: YafFlags = this.makeElement('yaf-flags');
 		flagsElement.props = { flags, comment };
 
-		const header = this.makeElement('<h3 />');
-		header.classList.add('header');
-		header.appendChild(this.makeSpan(name));
+		const header = this.makeElement('h3', 'header');
+
+		const nameElement = this.makeNameSpan('');
+		nameElement.appendChild(this.makeNameSpan(name));
+		nameElement.appendChild(this.makeIconSpan('link'));
+
+		header.appendChild(nameElement);
 		header.appendChild(flagsElement);
 
 		this.appendChild(header);
 
-		const inner = this.makeElement('<div />');
+		const inner = this.makeElement('div');
 		inner.classList.add('inner');
 
 		if (signatures) {
 			const signaturesElement: YafMemberSignatures = this.makeElement(
-				'<yaf-member-signatures />'
+				'yaf-member-signatures'
 			);
 			signaturesElement.props = signatures;
 			inner.appendChild(signaturesElement);
 		} else if (has.getterOrSetter) {
 			const getterSetter: YafMemberGetterSetter = this.makeElement(
-				'<yaf-member-getter-setter />'
+				'yaf-member-getter-setter'
 			);
 			getterSetter.props = this.props;
 			inner.appendChild(getterSetter);
@@ -45,7 +52,7 @@ export class YafMember extends YafElement {
 			console.error(this.props);
 		} else {
 			const declaration: YafMemberDeclaration = this.makeElement(
-				'<yaf-member-declaration />'
+				'yaf-member-declaration'
 			);
 			declaration.props = this.props as YafDeclarationReflection;
 			inner.appendChild(declaration);

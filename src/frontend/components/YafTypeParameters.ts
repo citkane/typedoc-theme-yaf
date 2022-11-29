@@ -12,17 +12,21 @@ export class YafTypeParameters extends YafElement {
 		if (this.debounce()) return;
 
 		if (!this.props || !this.props.length) return;
-		this.appendChild(this.makeSpan('<', 'symbol'));
+		this.appendChild(this.makeSymbolSpan('<'));
 		this.props.forEach((parameter, i) => {
 			if (parameter.varianceModifier)
 				this.appendChild(
-					this.makeSpan(`${parameter.varianceModifier} `)
+					this.makeElement(
+						'span',
+						null,
+						`${parameter.varianceModifier} `
+					)
 				);
-			this.appendChild(this.makeSpan(parameter.name, 'type'));
+			this.appendChild(this.makeTypeSpan(parameter.name));
 			if (i < this.props!.length - 1)
-				this.appendChild(this.makeSpan(', ', 'symbol'));
+				this.appendChild(this.makeSymbolSpan(', '));
 		});
-		this.appendChild(this.makeSpan('>', 'symbol'));
+		this.appendChild(this.makeSymbolSpan('>'));
 	}
 }
 const yafTypeParameters = 'yaf-type-parameters';

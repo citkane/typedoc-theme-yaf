@@ -17,19 +17,18 @@ export class YafTypeArguments extends YafElement {
 
 		const { args } = this.props;
 		if (!args || !args.length) return;
-		this.appendChild(this.makeSpan('<', 'symbol'));
+		this.appendChild(this.makeSymbolSpan('<'));
 		args.forEach((argument, i) => {
-			const signature: YafSignature =
-				this.makeElement('<yaf-signature />');
+			const signature: YafSignature = this.makeElement('yaf-signature');
 			signature.props = {
 				type: argument,
 				context: 'referenceTypeArgument',
 			};
 			this.appendChild(signature);
 			if (i < args!.length - 1)
-				this.appendChild(this.makeSpan(', ', 'symbol'));
+				this.appendChild(this.makeSymbolSpan(', '));
 		});
-		this.appendChild(this.makeSpan('>', 'symbol'));
+		this.appendChild(this.makeSymbolSpan('>'));
 	}
 }
 const yafTypeArguments = 'yaf-type-arguments';

@@ -1,4 +1,4 @@
-import { componentName, YAFDataObject } from '../types.js';
+import { componentName, YAFDataObject } from '../../types/types.js';
 import { YafElement } from '../YafElement.js';
 import { JSONOutput } from 'typedoc';
 import { YafFlags } from './YafFlags.js';
@@ -21,18 +21,17 @@ export class YafContentHeader extends YafElement {
 			signatures,
 		} = this.props;
 
-		const titleElement = this.makeElement(`<h1 />`);
+		const titleElement = this.makeElement('h1');
 		if (!is.project) {
-			const kindElement = this.makeSpan(kindString || 'unknown', 'kind');
+			const kindElement = this.makeKindSpan(kindString || 'unknown');
 			titleElement.appendChild(kindElement);
 		}
-		const nameElement = this.makeSpan(name, 'name');
+		const nameElement = this.makeNameSpan(name); //this.makeSpan(name, 'name');
 		titleElement.appendChild(nameElement);
 
 		if (typeParameters && typeParameters.length) {
-			const parameterElement = this.makeSpan(
-				this.makeTypeParams(typeParameters),
-				'parameters'
+			const parameterElement = this.makeParametersSpan(
+				this.makeTypeParams(typeParameters)
 			);
 			titleElement.appendChild(parameterElement);
 		}
@@ -54,11 +53,15 @@ export class YafContentHeader extends YafElement {
 		flags: JSONOutput.ReflectionFlags,
 		comment: JSONOutput.Comment | undefined
 	) {
-		const flagElement: YafFlags = this.makeElement('<yaf-flags />');
-		flagElement.props = {
-			flags,
-			comment,
-		};
+		const flagElement = this.makeElement<YafFlags, YafFlags['props']>(
+			'yaf-flags',
+			null,
+			null,
+			{
+				flags,
+				comment,
+			}
+		);
 		return flagElement;
 	}
 }

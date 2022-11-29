@@ -1,18 +1,16 @@
 import {
 	componentName,
-	htmlString,
-	localStorageKeys,
 	materialIcon,
 	TypeContext,
 	YAFDataObject,
-} from './types.js';
-import { event } from './lib/eventApi.js';
-import { fetchFile, toCamelCase } from './lib/utils.js';
-import { abnormalSigTypes } from '../types.js';
-import { YafSignature } from './components/YafSignature.js';
+} from '../types/types.js';
 
-const defaultTemplateDir = './frontend/templates/';
-const defaultDataDir = './frontend/data/';
+import { fetchFile, toCamelCase } from './lib/utils.js';
+import { abnormalSigTypes } from '../types/types.js';
+import { YafSignature } from './components/YafSignature.js';
+import { errorHandlers } from './lib/errors.js';
+import { YafNavigationLink } from './components/YafNavigationLink.js';
+
 const iconClass = 'material-icons-sharp';
 
 /**
@@ -28,115 +26,91 @@ const iconClass = 'material-icons-sharp';
 export class YafElement extends HTMLElement {
 	/** The name of the component in the form `yaf-component-name` */
 	componentName: componentName;
-	/** The default subdirectory under the web root for web component templates */
-	templateDir: string;
-	/** The default subdirectory under the web root for documentation data */
-	dataDir: string;
 	/** The `props` of the component used for passing data objects into. This is not HTML attributes.*/
 	props: unknown;
-	constructor(
-		component: componentName,
-		templateDir = defaultTemplateDir,
-		dataDir = defaultDataDir
-	) {
+
+	errorHandlers = errorHandlers;
+
+	constructor(component: componentName) {
 		super();
 		this.componentName = component;
-		this.templateDir = templateDir;
-		this.dataDir = dataDir;
 	}
-	count = 0;
-	test<T>() {
-		const foo: T | string = 'foo';
-		console.log(foo);
-	}
-	/**
-	 * The document body which typedoc-theme-yaf uses as the common root for most events.
-	 */
-	body = document.querySelector('body') as HTMLBodyElement;
+
 	/**
 	 * Creates a new HTML element from a string
 	 * @param html
 	 * @returns
 	 */
-	makeElement = <T = HTMLElement>(html: htmlString) => {
-		const documentFragment = this.makeContent(html);
-		return documentFragment.firstChild as T;
+	makeElement = <T = HTMLElement, P = Record<string, unknown> | string>(
+		tagName: string,
+		className?: string | null,
+		innerText?: string | null,
+		props?: P,
+		is?: componentName
+	) => {
+		const element = is
+			? document.createElement(tagName, { is })
+			: document.createElement(tagName);
+		if (className)
+			className.split(' ').forEach((c) => element.classList.add(c));
+		if (innerText) element.innerText = innerText;
+		if (props) (<any>element).props = props;
+
+		return element as T;
 	};
-	/**
-	 * Creates a new HTML document fragment from a string
-	 * @param innerHtml
-	 * @returns
-	 */
-	makeContent = (innerHtml: htmlString): DocumentFragment => {
-		const template = document.createElement('template');
-		template.innerHTML = innerHtml.trim();
-		return template.content;
-	};
+
+	makeSymbolSpan = (text: string) => this.makeElement('span', 'symbol', text);
+	makeNameSpan = (text: string) => this.makeElement('span', 'name', text);
+	makeTypeSpan = (text: string) => this.makeElement('span', 'type', text);
+	makeTitleSpan = (text: string) => this.makeElement('span', 'title', text);
+	makeKindSpan = (text: string) => this.makeElement('span', 'kind', text);
+	makeValueSpan = (text: string) => this.makeElement('span', 'value', text);
+	makeParametersSpan = (text: string) =>
+		this.makeElement('span', 'parameters', text);
+	makeLiteralSpan = (text: string) =>
+		this.makeElement('span', 'literal', text);
+
 	/**
 	 * Creates a fontset based icon in a span
-	 * @param icon
+	 * @param iconInnerHtml
 	 * @param size
 	 * @returns
 	 */
-	makeIcon = (icon: materialIcon, size: 18 | 24 | 36 | 48 = 24): Element => {
-		return this.makeSpan(icon, `${iconClass} md-${size}`);
-	};
-
-	/**
-	 * @param inner Convenenience method for create a HTML span Element with a class name.
-	 * @param className
-	 * @returns
-	 */
-	makeSpan = (inner: string, className?: string) => {
-		return this.makeElement<HTMLElement>(
-			className
-				? `<span class="${className}">${inner}</span>`
-				: `<span>${inner}</span>`
+	makeIconSpan = (
+		iconInnerHtml: materialIcon,
+		size: 18 | 24 | 36 | 48 = 24
+	): Element => {
+		return this.makeElement(
+			'span',
+			`${iconClass} md-${size} yaficon`,
+			iconInnerHtml
 		);
 	};
-	/**
-	 * A convenience method for creating and appending a HTML span Element with class name into a parent Element
-	 * @param inner
-	 * @param className
-	 * @param parent
-	 */
-	appendSpanTo = (
-		inner: string,
+	makeLinkElement = (
+		href: string,
 		className?: string,
-		parent: Element = this
+		innerText?: string
 	) => {
-		parent.appendChild(this.makeSpan(inner, className));
+		const link = this.makeElement<YafNavigationLink>(
+			'a',
+			className,
+			innerText,
+			undefined,
+			'yaf-navigation-link'
+		);
+		link.setAttribute('href', href);
+		return link;
 	};
 
-	/**
-	 * Fetches the HTML or CSS template for the given component
-	 */
-	fetchTemplate = async (
-		extension: 'html' | 'css',
-		componentName = this.componentName,
-		dir = this.templateDir
-	): Promise<htmlString> => {
-		const url = `${dir}${toCamelCase(componentName)}.${extension}`;
-		try {
-			const dataString = await fetchFile(url, 'text');
-			return extension === 'css'
-				? `<style>${dataString}</style>`
-				: (dataString as htmlString);
-		} catch (err) {
-			return this.errors.template(err);
-		}
-	};
-
-	/**
-	 * Fetches a .json data file
-	 * @param fileName
-	 * @returns reflection data
-	 */
-	fetchData = async <returnType>(fileName: string, dir = this.dataDir) => {
-		fileName = fileName.replace(/.JSON$/i, '.json');
-		fileName = fileName.endsWith('.json') ? fileName : `${fileName}.json`;
-		const filePath = `${dir}${fileName}`;
-		return fetchFile(filePath, 'json') as returnType;
+	getHtmlTemplate = () => {
+		const template = <HTMLTemplateElement>(
+			document.getElementById(this.componentName)
+		);
+		return template
+			? template.content
+			: this.errorHandlers.notFound(
+					`Could not find the HTMLTemplate for ${this.componentName}.`
+			  );
 	};
 
 	/**
@@ -149,16 +123,18 @@ export class YafElement extends HTMLElement {
 	 * @param id
 	 * @returns reflection data
 	 */
+
+	/*
 	fetchReflectionById = (id: number): Promise<YAFDataObject> => {
 		return new Promise((resolve) => {
 			this.body.dispatchEvent(
-				event.fetch.reflectionById(id, (reflection) =>
+				action.fetch.reflectionById(id, (reflection) =>
 					resolve(reflection)
 				)
 			);
 		});
 	};
-
+*/
 	/**
 	 * Does this web component need to be wrapped in parenthesis?
 	 *
@@ -173,8 +149,8 @@ export class YafElement extends HTMLElement {
 		type: YAFDataObject['type'] | abnormalSigTypes,
 		context: TypeContext
 	) => {
-		if (!type) return this.makeSpan('any', 'value');
-		const signature: YafSignature = this.makeElement('<yaf-signature />');
+		if (!type) return this.makeElement('span', null, 'value');
+		const signature = this.makeElement<YafSignature>('yaf-signature');
 		signature.props = {
 			type,
 			context,
@@ -182,25 +158,10 @@ export class YafElement extends HTMLElement {
 		return signature;
 	};
 
-	errors = {
-		template: (err: unknown): htmlString =>
-			`<yaf-error>${(<{ message: string }>err).message}</yaf-error>`,
-		data: (err: unknown) => {
-			console.error(err);
-			return err;
-		},
-		notFound: (message: string) => console.error(message),
-		localStorage: (key: localStorageKeys) => {
-			console.error(
-				`There was a problem with "localStorage.${key}. It is being removed.`
-			);
-			window.localStorage.removeItem('key');
-		},
-	};
-
+	count = 0;
 	debounce = () => {
 		if (this.count) {
-			//console.warn(`${this.constructor.name} was debounced`);
+			//console.debug(`${this.constructor.name} was debounced`);
 			return true;
 		}
 		this.count++;

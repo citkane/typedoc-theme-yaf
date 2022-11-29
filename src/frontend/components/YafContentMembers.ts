@@ -1,5 +1,6 @@
 import { JSONOutput } from 'typedoc';
-import { YAFDataObject, YAFReflectionLink } from '../types.js';
+import { YAFDataObject, YAFReflectionLink } from '../../types/types.js';
+import appState from '../lib/AppState.js';
 import { YafElement } from '../YafElement.js';
 import { YafMember } from './members/YafMember.js';
 import {
@@ -8,7 +9,6 @@ import {
 } from './members/YafMemberGroups.js';
 
 export * from './members/index.js';
-const { yaf } = window;
 
 /**
  *
@@ -70,34 +70,39 @@ export class YafContentMembers extends YafElement {
 	) => {
 		const constructor = children.find((child) => child.id === childId);
 		if (constructor) {
-			const member: YafMember = this.makeElement('<yaf-member />');
-			member.props = constructor;
+			const member = this.makeElement<YafMember, YafMember['props']>(
+				'yaf-member',
+				null,
+				null,
+				constructor
+			);
+			member.id = 'constructor';
 			this.appendChild(member);
 		} else {
-			this.errors.notFound(
+			this.errorHandlers.notFound(
 				`Could not find reflection id: ${childId} in group ${group.title}`
 			);
 		}
 	};
 	makeLinkGroup = (group: JSONOutput.ReflectionGroup) => {
-		const linkGroup = this.makeElement<YafMemberGroupLink>(
-			'<yaf-member-group-link />'
-		);
 		const children = group.children
 			?.map((id) => {
-				const child = yaf.reflectionMap[id];
+				const child = appState.reflectionMap[id];
 				!child &&
-					this.errors.notFound(
+					this.errorHandlers.notFound(
 						`Did not find reflectionMap id: ${id}`
 					);
-				return yaf.reflectionMap[id] ? child : undefined;
+				return appState.reflectionMap[id] ? child : undefined;
 			})
 			.filter((child) => !!child);
 
-		linkGroup.props = {
+		const linkGroup = this.makeElement<
+			YafMemberGroupLink,
+			YafMemberGroupLink['props']
+		>('yaf-member-group-link', null, null, {
 			title: group.title,
 			children: <YAFReflectionLink[]>children || [],
-		};
+		});
 
 		this.appendChild(linkGroup);
 	};
@@ -105,21 +110,24 @@ export class YafContentMembers extends YafElement {
 		group: JSONOutput.ReflectionGroup,
 		children: YAFDataObject[]
 	) => {
-		const reflectionGroup = this.makeElement<YafMemberGroupReflection>(
-			'<yaf-member-group-reflection />'
-		);
 		const groupChildren = group.children
 			?.map((id) => {
 				const child = children?.find((child) => child.id === id);
 				!child &&
-					this.errors.notFound(`Did not find reflection id: ${id}`);
+					this.errorHandlers.notFound(
+						`Did not find reflection id: ${id}`
+					);
 				return child;
 			})
 			.filter((child) => !!child);
-		reflectionGroup.props = {
+
+		const reflectionGroup = this.makeElement<
+			YafMemberGroupReflection,
+			YafMemberGroupReflection['props']
+		>('yaf-member-group-reflection', null, null, {
 			title: group.title,
 			children: <YAFDataObject[]>groupChildren || [],
-		};
+		});
 		this.appendChild(reflectionGroup);
 	};
 }

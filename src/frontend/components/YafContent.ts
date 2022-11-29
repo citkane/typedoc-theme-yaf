@@ -1,4 +1,3 @@
-import { event, trigger } from '../lib/eventApi.js';
 import {
 	componentName,
 	YAFDataObject,
@@ -6,7 +5,7 @@ import {
 	YafDeclarationReflection,
 	YafTypeParameterReflection,
 	YafSignatureReflection,
-} from '../types';
+} from '../../types/types';
 import { YafElement } from '../YafElement.js';
 import { YafMemberDeclaration } from './members/YafMemberDeclaration.js';
 import {
@@ -17,55 +16,52 @@ import {
 import { YafContentHeader } from './YafContentHeader.js';
 import { YafContentMarked } from './YafContentMarked.js';
 import { YafTypeParameters } from './YafTypeParameters.js';
-import { TypeParameterReflection } from 'typedoc';
 
-const componentName: componentName = 'yaf-content';
+import events from '../lib/events/eventApi.js';
+import appState from '../lib/AppState.js';
+const { trigger, action } = events;
 
 export class YafContent extends YafElement {
 	constructor() {
-		super(componentName);
+		super(yafContent);
 	}
 
 	connectedCallback() {
 		if (this.debounce()) return;
-		this.body.addEventListener(
-			trigger.content.setLocation,
-			this.fetchLocationData as EventListener
-		);
-		window.addEventListener(
-			'popstate',
-			this.fetchLocationData as EventListener
-		);
+		events.on(trigger.content.setLocation, this.fetchLocationData);
+		events.on(trigger.get.pageContentId, this.returnPageId);
+		events.on('popstate', this.fetchLocationData, window);
+
 		this.fetchLocationData();
 	}
 	disconnectedCallback() {
-		this.body.removeEventListener(
-			trigger.content.setLocation,
-			this.fetchLocationData as EventListener
-		);
-		window.removeEventListener(
-			'popstate',
-			this.fetchLocationData as EventListener
-		);
+		events.off(trigger.content.setLocation, this.fetchLocationData);
+		events.off(trigger.get.pageContentId, this.returnPageId);
+		events.off('popstate', this.fetchLocationData, window);
 	}
 
-	fetchLocationData = async () => {
-		const getParam = new URL(window.location.href).searchParams;
+	fetchLocationData = () => {
+		const url = new URL(window.location.href);
+		const getParam = url.searchParams;
 		let page = getParam.get('page');
 		page = decodeURIComponent(page || '');
-		const data = await this.fetchData<YAFDataObject>(page || 'index');
-		this.renderPageContent(data);
-
-		this.body.dispatchEvent(event.content.scrollTo(0));
+		appState.pageDataCache(page || 'index').then((data) => {
+			this.renderPageContent(data);
+			events.dispatch(
+				action.content.scrollTo(
+					url.hash ? url.hash.replace('#', '') : 0
+				)
+			);
+		});
 	};
 	renderPageContent(data: YAFDataObject) {
 		this.innerHTML = '';
-		const { kindString, typeParameter, signatures, text, has } = data;
+		this.id = String(data.id);
 
-		if (
-			['Variable', 'Type alias'].includes(kindString!) &&
-			data.is.declaration
-		) {
+		const { kind, typeParameter, signatures, text, has } = data;
+		const { Variable, TypeAlias } = appState.reflectionKind;
+
+		if ([Variable, TypeAlias].includes(kind) && data.is.declaration) {
 			this.makeContentHeader(data);
 			this.makeMemberDeclaration(data as YafDeclarationReflection);
 			return;
@@ -90,61 +86,63 @@ export class YafContent extends YafElement {
 		this.makeMemberGroups(data);
 	}
 	makeContentHeader(data: YAFDataObject) {
-		const header = this.makeElement<YafContentHeader>(
-			'<yaf-content-header />'
-		);
-		header.props = data;
+		const header = this.makeElement<
+			YafContentHeader,
+			YafContentHeader['props']
+		>('yaf-content-header', null, null, data);
 		this.appendChild(header);
 	}
 
 	makeContentMarked(html: htmlString) {
-		const marked: YafContentMarked = this.makeElement(
-			`<yaf-content-marked />`
-		);
+		const marked: YafContentMarked = this.makeElement('yaf-content-marked');
 		marked.props = html;
 		this.appendChild(marked);
 	}
 
 	makeMemberDeclaration(data: YafDeclarationReflection) {
-		const declaration = this.makeElement<YafMemberDeclaration>(
-			'<yaf-member-declaration />'
-		);
-		declaration.props = data;
+		const declaration = this.makeElement<
+			YafMemberDeclaration,
+			YafMemberDeclaration['props']
+		>('yaf-member-declaration', null, null, data);
 
 		this.appendChild(declaration);
 	}
 
 	makeMemberGroups(data: YAFDataObject) {
-		const pageGroups = this.makeElement<YafContentMembers>(
-			'<yaf-content-members />'
-		);
-		pageGroups.props = {
+		const pageGroups = this.makeElement<
+			YafContentMembers,
+			YafContentMembers['props']
+		>('yaf-content-members', null, null, {
 			groups: data.groups,
 			children: data.children,
-		};
+		});
 		this.appendChild(pageGroups);
 	}
 	makeTypeParamters(typeParameter: YafTypeParameterReflection[]) {
-		const typeParameterElement: YafTypeParameters = this.makeElement(
-			'<yaf-type-parameters />'
-		);
-		typeParameterElement.props = typeParameter;
+		const typeParameterElement = this.makeElement<
+			YafTypeParameters,
+			YafTypeParameters['props']
+		>('yaf-type-parameters', null, null, typeParameter);
 		this.appendChild(typeParameterElement);
 	}
 	makeMemberSignatures(signatures: YafSignatureReflection[]) {
 		const signaturesElement: YafMemberSignatures = this.makeElement(
-			'<yaf-member-signatures />'
+			'yaf-member-signatures'
 		);
 		signaturesElement.props = signatures;
 		this.appendChild(signaturesElement);
 	}
 	makeSources(data: YafDeclarationReflection) {
-		console.warn(data);
-		const sourcesElement: YafMemberSources = this.makeElement(
-			'<yaf-member-sources />'
-		);
-		sourcesElement.props = data;
+		const sourcesElement = this.makeElement<
+			YafMemberSources,
+			YafMemberSources['props']
+		>('yaf-member-sources', null, null, data);
 		this.appendChild(sourcesElement);
 	}
+
+	returnPageId = (e: ReturnType<typeof action.get.pageContentId>) =>
+		e.detail.callBack(this.id);
 }
-customElements.define(componentName, YafContent);
+
+const yafContent: componentName = 'yaf-content';
+customElements.define(yafContent, YafContent);

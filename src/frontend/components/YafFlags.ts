@@ -22,7 +22,9 @@ export class YafFlags extends YafElement {
 			allFlags = [...allFlags, ...comment.modifierTags];
 
 		allFlags.forEach((flag) => {
-			this.appendChild(this.makeSpan(flag.replace(/^@/, ''), 'flag'));
+			this.appendChild(
+				this.makeElement('span', 'flag', flag.replace(/^@/, ''))
+			);
 		});
 	}
 }

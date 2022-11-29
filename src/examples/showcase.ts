@@ -46,15 +46,9 @@
  * > steel,-- Will they not hear? What, ho! you men, you beasts, That quench the
  * > fire of your pernicious rage With purple fountains issuing from your veins
  *
- * ## An Image
- *
- * <img src="media://typescript-logo.svg" width="120" />
- *
- * This requires the [media option](https://typedoc.org/guides/options/#media)
- * to be set.
  */
 export function markdownShowcase(): void {
-    // does nothing
+	// does nothing
 }
 
 /**
@@ -115,5 +109,5 @@ export function markdownShowcase(): void {
  * You can also get this list by running `typedoc --help`.
  */
 export function syntaxHighlightingShowcase(): void {
-    // does nothing
+	// does nothing
 }

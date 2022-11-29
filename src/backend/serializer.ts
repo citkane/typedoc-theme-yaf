@@ -2,21 +2,18 @@ import {
 	CommentDisplayPart,
 	DeclarationReflection,
 	DefaultThemeRenderContext,
-	JSONOutput,
 	ProjectReflection,
 	ReferenceReflection,
 	ReflectionKind,
 	ReflectionType,
-	SignatureReflection,
 } from 'typedoc';
 import {
 	htmlString,
 	YAFDataObject,
-	YAFDataReflection,
 	YafDeclarationReflection,
 	YafParameterReflection,
 	YafSignatureReflection,
-} from '../types';
+} from '../types/types';
 import { formatReflectionLocation } from './lib';
 
 /**
@@ -56,7 +53,7 @@ export const serialize = (
 
 	object.version = reflection.version;
 
-	parseReadme(object, reflection, context);
+	if (reflection.readme) parseReadme(object, reflection, context);
 	parseComment(object, context);
 
 	if (object.getSignature) parseComment(object.getSignature, context);
@@ -71,7 +68,7 @@ export const serialize = (
 
 const parseReadme = (
 	object: YAFDataObject,
-	reflection: YAFDataReflection,
+	reflection: ProjectReflection | DeclarationReflection,
 	context: DefaultThemeRenderContext
 ) => {
 	if (!object.text) object.text = {};

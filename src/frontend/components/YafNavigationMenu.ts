@@ -1,11 +1,13 @@
-import { ObjectConstant } from '../../examples/variables.js';
-import { trigger } from '../lib/eventApi.js';
 import { treeBranchSort } from '../lib/utils.js';
-import { componentName, treeMenuBranch, treeMenuRoot } from '../types.js';
+import { componentName, treeMenuBranch } from '../../types/types.js';
 import { YafElement } from '../YafElement.js';
 import { YafElementDrawers } from '../YafElementDrawers.js';
-import { YafNavigationLink } from './YafNavigationLink.js';
 import { YafWidgetCounter, YafWidgetKind } from './YafWidgets.js';
+
+import events from '../lib/events/eventApi.js';
+import appState from '../lib/AppState.js';
+
+const { trigger } = events;
 
 /**
  *
@@ -14,32 +16,33 @@ export class YafNavigationMenu extends YafElement {
 	constructor() {
 		super(yafNavigationMenu);
 	}
-	async connectedCallback() {
-		const menuData = await this.fetchData<treeMenuRoot>(
-			'yafNavigationMenu'
-		);
-		const nav = this.makeElement('<nav />');
-		const ul = this.makeElement('<ul />');
+	connectedCallback() {
+		const menuData = appState.navigationMenu;
+		const nav = this.makeElement('nav');
+		const ul = this.makeElement('ul');
 
 		const menuEntries = treeBranchSort(Object.values(menuData));
 		menuEntries.forEach((branch) => {
 			const menu = this.makeElement<YafNavigationMenuBranch>(
-				'<yaf-navigation-menu-branch root />'
+				'yaf-navigation-menu-branch'
 			);
 			menu.props = branch;
+			menu.setAttribute('root', '');
+
 			ul.appendChild(menu);
 		});
 		nav.appendChild(ul);
 		this.appendChild(nav);
 
-		this.scrollTop = window.yaf.menuState.scrollTop || 0;
-		this.addEventListener('scroll', this.recordScrollTop);
+		this.scrollTop = appState.drawers.menuTop();
+		events.on('scroll', this.recordScrollTop, this);
 	}
 	disconnectedCallback() {
-		this.removeEventListener('scroll', this.recordScrollTop);
+		events.off('scroll', this.recordScrollTop, this);
 	}
+
 	recordScrollTop() {
-		window.yaf.menuState.scrollTop = this.scrollTop;
+		appState.setDrawers.menuTop(this.scrollTop);
 	}
 }
 const yafNavigationMenu: componentName = 'yaf-navigation-menu';
@@ -51,74 +54,52 @@ customElements.define(yafNavigationMenu, YafNavigationMenu);
 export class YafNavigationMenuBranch extends YafElementDrawers {
 	props!: treeMenuBranch;
 	childDrawers: YafNavigationMenuBranch[] = [];
+	childCount!: number;
+	drawerHeader!: HTMLElement;
+
 	constructor() {
 		super(yafNavigationBranch);
-
-		const drawer = this.makeElement('<ul />');
-		const drawerParent = this.makeElement('<li />');
-		const drawerTrigger = this.makeSpan('', 'trigger');
-
-		this.drawerInit(
-			drawerParent,
-			drawer,
-			drawerTrigger,
-			this.props.id,
-			'menu'
-		);
 	}
 
 	connectedCallback() {
 		if (this.debounce()) return;
 
-		const { query, hash, children, name, kind } = this.props;
+		const { children, id } = this.props;
 
-		const header = this.makeSpan('', 'header');
-		const headerLink = this.makeHeaderLink(
-			this.makeHref(query, hash),
-			name,
-			kind
+		this.id = String(id);
+		this.childCount = Object.keys(children).length;
+
+		this.drawerTrigger = this.makeElement('span', 'trigger');
+		this.appendChild(this.makeDrawerheader());
+
+		this.initDrawer(
+			this,
+			this.makeElement('ul'),
+			this.drawerTrigger,
+			`menu_${this.props.id})`,
+			'menu'
 		);
-		header.appendChild(headerLink);
-		this.drawerParent.appendChild(header);
 
-		const childCount = Object.keys(children).length;
-		if (childCount) {
-			this.extendHeader(childCount, header);
+		if (this.childCount) {
 			const submenuEntries = treeBranchSort(Object.values(children));
 			submenuEntries.forEach((branch) => this.addBranch(branch));
 		}
-
-		this.parentNode?.replaceChild(this.drawerParent, this);
-
-		if (childCount) {
-			this.drawerHasConnected();
-		}
 		if (this.hasAttribute('root')) {
-			this.body.addEventListener(
-				trigger.content.rollMenuDown,
-				this.rollMenuDown
-			);
-			this.body.addEventListener(
-				trigger.content.rollMenuUp,
-				this.rollMenuUp
-			);
+			events.on(trigger.content.rollMenuDown, this.rollMenuDown);
+			events.on(trigger.content.rollMenuUp, this.rollMenuUp);
 		}
+		this.renderDrawer();
 	}
 
 	disconnectedCallback() {
 		this.drawerHasDisconnected();
-		this.body.removeEventListener(
-			trigger.content.rollMenuDown,
-			this.rollMenuDown
-		);
-		this.body.removeEventListener(
-			trigger.content.rollMenuUp,
-			this.rollMenuUp
-		);
+		events.off(trigger.content.rollMenuDown, this.rollMenuDown);
+		events.off(trigger.content.rollMenuUp, this.rollMenuUp);
 	}
+
 	rollMenuDown = () => {
 		if (this.drawerParent.classList.contains('closed'))
-			this.drawerToggleState();
+			this.toggleDrawerState();
 
 		this.childDrawers.forEach((drawer) => {
 			drawer.rollMenuDown();
@@ -126,70 +107,63 @@ export class YafNavigationMenuBranch extends YafElementDrawers {
 	};
 	rollMenuUp = () => {
 		if (this.drawerParent.classList.contains('open'))
-			this.drawerToggleState();
+			this.toggleDrawerState();
 
 		this.childDrawers.forEach((drawer) => {
 			drawer.rollMenuUp();
 		});
 	};
 
-	private makeHref = (query: string, hash: string) => {
+	private addBranch = (branch: treeMenuBranch) => {
+		const menuBranch = this.makeElement<YafNavigationMenuBranch>(
+			'yaf-navigation-menu-branch'
+		);
+
+		menuBranch.props = branch;
+
+		this.drawer.appendChild(menuBranch);
+		this.childDrawers.push(menuBranch);
+	};
+
+	private makeDrawerheader = () => {
+		const { query, hash, name, kind } = this.props;
 		let href = `?page=${query}`;
 		if (hash) href += `#${hash}`;
-		return href;
-	};
-	private makeHeaderLink = (
-		href: string,
-		name: string,
-		kind: number | undefined
-	): HTMLElement => {
-		const link = this.makeElement<YafNavigationLink>(
-			'<yaf-navigation-link />'
-		);
-		link.setAttribute('href', href);
-		const linkName = this.makeSpan(name, 'name');
-		link.appendChild(linkName);
 
-		if (typeof kind !== undefined) {
-			const linkWrapper = this.makeSpan('', 'wrapper');
-			if (Object.keys(this.props.children).length)
-				linkWrapper.onclick = () => this.drawerToggleState('open');
-			const linkSymbol = this.makeElement<YafWidgetKind>(
-				`<yaf-widget-kind kind="${kind}" />`
-			);
-			linkWrapper.appendChild(linkSymbol);
-			linkWrapper.appendChild(link);
-			return linkWrapper;
-		} else {
-			return link;
-		}
-	};
-	private extendHeader = (childCount: number, header: HTMLElement) => {
-		const countWidget = this.makeElement<YafWidgetCounter>(
-			'<yaf-widget-counter />'
+		const header = this.makeElement(
+			'span',
+			this.childCount ? 'header parent' : 'header'
 		);
+		const headerLink = this.makeLinkElement(href);
+		const linkName = this.makeNameSpan(name);
+		const linkSymbol = this.makeElement<
+			YafWidgetKind,
+			YafWidgetKind['props']
+		>('yaf-widget-kind', null, null, { kind: String(kind) });
+
+		headerLink.appendChild(linkSymbol);
+		headerLink.appendChild(linkName);
+		header.appendChild(headerLink);
+
+		if (this.childCount) return this.extendHeader(header);
+		return header;
+	};
+
+	private extendHeader = (header: HTMLElement) => {
+		const countWidget =
+			this.makeElement<YafWidgetCounter>('yaf-widget-counter');
 		countWidget.props = {
-			count: childCount,
+			count: this.childCount,
 			fontSize: '.8rem',
 		};
-		const icon = this.makeSpan('', 'icon');
-		icon.appendChild(this.makeIcon('expand_less'));
+		const icon = this.makeElement('span', 'icon');
+		icon.appendChild(this.makeIconSpan('expand_less'));
 
 		this.drawerTrigger.appendChild(countWidget);
 		this.drawerTrigger.appendChild(icon);
 		header.appendChild(this.drawerTrigger);
-	};
-	private addBranch = (branch: treeMenuBranch) => {
-		const menuBranch = this.makeElement<YafNavigationMenuBranch>(
-			Object.keys(branch.children).length
-				? '<yaf-navigation-menu-branch />'
-				: '<yaf-navigation-menu-branch leaf />'
-		);
-		menuBranch.props = branch;
-		menuBranch.parentDrawer = this;
 
-		this.drawer.appendChild(menuBranch);
-		this.childDrawers.push(menuBranch);
+		return header;
 	};
 }
 const yafNavigationBranch: componentName = 'yaf-navigation-menu-branch';

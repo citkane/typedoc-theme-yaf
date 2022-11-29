@@ -2,7 +2,7 @@ import {
 	componentName,
 	YAFDataObject,
 	YafDeclarationReflection,
-} from '../../types';
+} from '../../../types/types';
 import { YafElement } from '../../YafElement.js';
 import { YafContentMarked } from '../YafContentMarked';
 import { YafSignature } from '../YafSignature';
@@ -20,35 +20,27 @@ export class YafMemberDeclaration extends YafElement {
 	}
 	props!: YafDeclarationReflection;
 	async connectedCallback() {
-		const {
-			name,
-			typeParameters,
-			parameters,
-			type,
-			flags,
-			defaultValue,
-			text,
-		} = this.props;
-		const pre = this.makeElement('<pre />');
-		const title = this.makeSpan(name, 'title');
+		const { name, typeParameters, type, flags, defaultValue, text } =
+			this.props;
+		const pre = this.makeElement('pre');
+		const title = this.makeElement('element', 'title', name);
 		pre.classList.add('highlight');
 		pre.appendChild(title);
 
 		if (typeParameters && typeParameters.length) {
-			const typeParamsElement: YafTypeParams = this.makeElement(
-				'<yaf-type-params />'
-			);
+			const typeParamsElement =
+				this.makeElement<YafTypeParams>('yaf-type-params');
 			typeParamsElement.props = {
 				typeParameters,
 			};
 			pre.appendChild(typeParamsElement);
 		}
 		if (type) {
-			const optional = flags.isOptional ? '?' : '';
-			this.appendSpanTo(`${optional}: `, 'symbol', pre);
-			const signatureType: YafSignature = this.makeElement(
-				'<yaf-signature></yaf-signature>'
-			);
+			const optional = this.makeSymbolSpan(flags.isOptional ? '?' : '');
+			pre.appendChild(optional);
+
+			const signatureType =
+				this.makeElement<YafSignature>('yaf-signature');
 			signatureType.props = {
 				type,
 				context: 'none',
@@ -57,29 +49,28 @@ export class YafMemberDeclaration extends YafElement {
 		}
 
 		if (defaultValue) {
-			this.appendSpanTo(' = ', 'symbol', pre);
-			this.appendSpanTo(defaultValue, 'value', pre);
+			pre.appendChild(this.makeSymbolSpan(' = '));
+			pre.appendChild(this.makeValueSpan(defaultValue));
 		}
 		this.appendChild(pre);
 
 		if (text?.comment) {
-			const commentElement: YafContentMarked = this.makeElement(
-				'<yaf-content-marked />'
-			);
+			const commentElement: YafContentMarked =
+				this.makeElement('yaf-content-marked');
 			commentElement.props = text.comment;
 			this.appendChild(commentElement);
 		}
 
 		if (typeParameters) {
 			const typeParameterElement: YafMemberParametersType =
-				this.makeElement('<yaf-member-parameters-type />');
+				this.makeElement('yaf-member-parameters-type');
 			typeParameterElement.props = typeParameters;
 			this.appendChild(typeParameterElement);
 		}
 
 		if (type?.type === 'reflection') {
 			const parametersElement: YafMemberParameters = this.makeElement(
-				'<yaf-member-parameters />'
+				'yaf-member-parameters'
 			);
 			parametersElement.props = type.declaration
 				?.children as YafDeclarationReflection[];
@@ -101,17 +92,25 @@ export class YafTypeParams extends YafElement {
 	connectedCallback() {
 		if (this.debounce()) return;
 		const params = (this.props.typeParameters || []).flatMap((param) => {
-			const span = this.makeSpan(
-				param.name,
-				`type ${param.kindString ? ` ${param.kindString}` : ''}`
+			const span = this.makeElement(
+				'span',
+				`type ${param.kindString ? ` ${param.kindString}` : ''}`,
+				param.name
 			);
 			return param.varianceModifier
-				? [this.makeSpan(`${param.varianceModifier}`, 'modifier'), span]
+				? [
+						this.makeElement(
+							'span',
+							'modifier',
+							`${param.varianceModifier}`
+						),
+						span,
+				  ]
 				: span;
 		});
-		this.appendChild(this.makeSpan('<', 'symbol'));
+		this.appendChild(this.makeSymbolSpan('<'));
 		params.forEach((param) => this.appendChild(param));
-		this.appendChild(this.makeSpan('>', 'symbol'));
+		this.appendChild(this.makeSymbolSpan('>'));
 	}
 }
 const yafTypeParams: componentName = 'yaf-type-params';

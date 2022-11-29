@@ -51,6 +51,24 @@ yaf-member {
 		.flag {
 			border-bottom: none;
 		}
+		& > .name {
+			display: flex;
+			align-items: center;
+			.yaficon {
+				padding-left: 0.5rem;
+				opacity: 0;
+				transition: opacity var(--transition-fades);
+				cursor: copy;
+			}
+			.name {
+				cursor: context-menu;
+			}
+		}
+		& > .name:hover {
+			.yaficon {
+				opacity: 0.75;
+			}
+		}
 	}
 
 	pre.highlight {

@@ -1,10 +1,4 @@
-/**
- * Something about events here
- *
- * @module
- */
-
-import { YAFDataObject } from '../types.js';
+import { YAFDataObject } from '../../../types/types.js';
 import { trigger } from './eventApi.js';
 
 /**
@@ -44,6 +38,11 @@ export const getReflectionById = (
 ) =>
 	new CustomEvent(trigger.get.reflectionLinkById, {
 		detail: { id, callBack },
+	});
+
+export const getPageContentId = (callBack: (pageId: string) => void) =>
+	new CustomEvent(trigger.get.pageContentId, {
+		detail: { callBack },
 	});
 
 export const rollMenuDown = () => new Event(trigger.content.rollMenuDown);

@@ -11,16 +11,17 @@ export class YafSignatureTuple extends YafElement {
 		if (this.debounce()) return;
 
 		const { elements } = this.props;
-		this.appendChild(this.makeSpan('[', 'symbol'));
+		this.appendChild(this.makeSymbolSpan('['));
 		elements?.forEach((type, i) => {
-			const signature: YafSignature =
-				this.makeElement('<yaf-signature />');
+			const signature = this.makeElement<YafSignature>('yaf-signature');
 			signature.props = { type, context: 'tupleElement' };
+
 			this.appendChild(signature);
+
 			if (i < elements.length - 1)
-				this.appendChild(this.makeSpan(', ', 'symbol'));
+				this.appendChild(this.makeSymbolSpan(', '));
 		});
-		this.appendChild(this.makeSpan(']', 'symbol'));
+		this.appendChild(this.makeSymbolSpan(']'));
 	}
 }
 

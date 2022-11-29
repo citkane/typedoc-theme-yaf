@@ -1,4 +1,4 @@
-import { YafSignatureReflection } from '../../types.js';
+import { YafSignatureReflection } from '../../../types/types.js';
 import { YafElement } from '../../YafElement.js';
 import { YafFlags } from '../YafFlags.js';
 import { YafSignatureBody } from '../YafSignatureBody.js';
@@ -18,24 +18,21 @@ export class YafMemberSignatures extends YafElement {
 			const { flags, comment } = signature;
 
 			if (this.props.length > 1) {
-				const flagsElement: YafFlags =
-					this.makeElement('<yaf-flags />');
+				const flagsElement: YafFlags = this.makeElement('yaf-flags');
 				flagsElement.props = { flags, comment };
 				this.appendChild(flagsElement);
 			}
 
-			const pre = this.makeElement('<pre />');
-			pre.classList.add('highlight');
-			const title: YafSignatureTitle = this.makeElement(
-				'<yaf-signature-title />'
+			const pre = this.makeElement('pre', 'highlight');
+			const title = this.makeElement<YafSignatureTitle>(
+				'yaf-signature-title'
 			);
 			title.props = signature;
 			pre.appendChild(title);
 			this.appendChild(pre);
 
-			const body: YafSignatureBody = this.makeElement(
-				'<yaf-signature-body />'
-			);
+			const body =
+				this.makeElement<YafSignatureBody>('yaf-signature-body');
 			body.props = signature as YafSignatureReflection;
 			this.appendChild(body);
 		});

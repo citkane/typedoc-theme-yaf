@@ -11,10 +11,11 @@ export class YafSignatureNamedTupleMember extends YafElement {
 		if (this.debounce()) return;
 
 		const { name, isOptional, element } = this.props;
-		this.appendChild(this.makeSpan(name, 'name'));
-		this.appendChild(this.makeSpan(isOptional ? '?:' : ':', 'symbol'));
-		const signature: YafSignature = this.makeElement('<yaf-signature />');
+		this.appendChild(this.makeNameSpan(name));
+		this.appendChild(this.makeSymbolSpan(isOptional ? '?:' : ':'));
+		const signature = this.makeElement<YafSignature>('yaf-signature');
 		signature.props = { type: element, context: 'tupleElement' };
+
 		this.appendChild(signature);
 	}
 }

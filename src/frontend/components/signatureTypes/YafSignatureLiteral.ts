@@ -1,4 +1,4 @@
-import { componentName } from '../../types.js';
+import { componentName } from '../../../types/types.js';
 import { YafElement } from '../../YafElement.js';
 import { JSONOutput } from 'typedoc';
 

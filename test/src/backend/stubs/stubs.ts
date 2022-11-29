@@ -17,7 +17,7 @@ export const tmpDirTest = path.join(rootDir, 'test', 'tmp');
 export const tmpDirTestDocs = path.join(rootDir, 'test', 'docs');
 
 export const expectedThemeAssets = {
-	assets: mapDirStructure(path.join(rootDir, 'dist/src/assets')),
+	//assets: mapDirStructure(path.join(rootDir, 'dist/src/frontend/assets')),
 	files: ['index.html'],
 	frontend: mapDirStructure(path.join(rootDir, 'dist/src/frontend')),
 };

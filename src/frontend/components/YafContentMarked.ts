@@ -1,7 +1,7 @@
 /**
  *
  */
-import { componentName, htmlString } from '../types.js';
+import { componentName, htmlString } from '../../types/types.js';
 import { YafElement } from '../YafElement.js';
 
 export class YafContentMarked extends YafElement {

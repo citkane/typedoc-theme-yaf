@@ -1,48 +1,24 @@
-import { event } from '../lib/eventApi.js';
-import { componentName } from '../types';
-import { YafElement } from '../YafElement.js';
+import { clickEvent, componentName } from '../../types/types';
+import events from '../lib/events/eventApi.js';
+import router from '../lib/router.js';
 
-const componentName: componentName = 'yaf-navigation-link';
-export class YafNavigationLink extends YafElement {
-	link: HTMLAnchorElement;
-	baseUrl: string;
-	constructor() {
-		super(componentName);
-		this.link = document.createElement('a');
-		this.baseUrl = `${window.location.origin}${window.location.pathname}`;
+export class YafNavigationLink extends HTMLAnchorElement {
+	linkElement = document.createElement('a');
 
-		this.classList.forEach((className) =>
-			this.link.classList.add(className)
-		);
-	}
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (this.getAttribute('href') === '/')
+			this.setAttribute('href', router.baseUrl);
 
-		this.getAttribute('href') === '/' &&
-			this.setAttribute('href', this.baseUrl);
-		const targetURL = this.targetURL();
-		targetURL.origin !== window.location.origin &&
-			this.link.setAttribute('target', '_blank');
+		const targetURL = router.getTargetURL(this);
+		if (targetURL.origin !== window.location.origin)
+			this.setAttribute('target', '_blank');
 
-		this.link.innerHTML = this.innerHTML;
-		this.link.setAttribute('href', encodeURI(targetURL.href));
-		this.link.addEventListener('click', (e) => this.linkRouter(e));
-		this.parentNode?.replaceChild(this.link, this);
+		this.setAttribute('href', encodeURI(targetURL.href));
+		events.on('click', (e: clickEvent) => router.route(this, e), this);
 	}
 	disconnectedCallback() {
-		this.link.removeEventListener('click', (e) => this.linkRouter(e));
+		events.off('click', (e: clickEvent) => router.route(this, e), this);
 	}
-	linkRouter = (e: Event) => {
-		if (this.link.getAttribute('target') === '_blank') return; //execute link if external
-		const origin = this.link.href.split('?')[0];
-		if (origin && !window.location.href.startsWith(origin)) return; //execute link if different document set
-		e.preventDefault(); //use internal routing for document partials
-		if (window.location.href === this.link.href) return;
-		window.history.pushState({ path: this.link.href }, '', this.link.href);
-		//const changeLocationEvent = new Event(eventType.content.setLocation);
-		this.body.dispatchEvent(event.content.setLocation());
-	};
-	targetURL = () => new URL(this.getAttribute('href') || '', this.baseUrl);
 }
-
-customElements.define(componentName, YafNavigationLink);
+const yafNavigationLink: componentName = 'yaf-navigation-link';
+customElements.define(yafNavigationLink, YafNavigationLink, { extends: 'a' });

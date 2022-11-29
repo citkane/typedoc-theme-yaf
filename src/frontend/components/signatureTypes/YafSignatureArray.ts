@@ -1,4 +1,4 @@
-import { componentName } from '../../types.js';
+import { componentName } from '../../../types/types.js';
 import { JSONOutput } from 'typedoc';
 import { YafElement } from '../../YafElement.js';
 import { YafSignature } from '../YafSignature.js';
@@ -11,20 +11,16 @@ export class YafContentSignatureArray extends YafElement {
 	connectedCallback() {
 		if (this.debounce()) return;
 		this.classList.add('type');
-		this.needsParenthesis() &&
-			this.appendChild(this.makeSpan('(', 'symbol'));
+		this.needsParenthesis() && this.appendChild(this.makeSymbolSpan('('));
 
-		const signature: YafSignature = this.makeElement(
-			'<yaf-signature></yaf-signature>'
-		);
+		const signature = this.makeElement<YafSignature>('yaf-signature');
 		signature.props = {
 			type: this.props.elementType,
 			context: 'arrayElement',
 		};
 		this.appendChild(signature);
-		this.appendChild(this.makeSpan('[]', 'symbol'));
-		this.needsParenthesis() &&
-			this.appendChild(this.makeSpan(')', 'symbol'));
+		this.appendChild(this.makeSymbolSpan('[]'));
+		this.needsParenthesis() && this.appendChild(this.makeSymbolSpan(')'));
 	}
 }
 const yafContentSignatureArray: componentName = 'yaf-signature-array';

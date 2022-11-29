@@ -2,7 +2,7 @@ import { JSONOutput, SignatureReflection } from 'typedoc';
 import {
 	YafDeclarationReflection,
 	YafSignatureReflection,
-} from '../../types.js';
+} from '../../../types/types.js';
 import { YafElement } from '../../YafElement.js';
 import { YafNavigationLink } from '../YafNavigationLink.js';
 
@@ -16,28 +16,22 @@ export class YafMemberSources extends YafElement {
 	connectedCallback() {
 		if (this.debounce()) return;
 
-		const {
-			sources,
-			implementationOf,
-			implementedBy,
-			inheritedFrom,
-			overwrites,
-		} = this.props;
+		const { sources } = this.props;
 
 		if (sources) {
-			console.log(sources);
-			const header = this.makeElement('<h5 />');
-			header.innerText = 'Defined in:';
+			const header = this.makeElement('h5', null, 'Defined in:');
 			this.appendChild(header);
-			const ul = this.makeElement('<ul />');
+
+			const ul = this.makeElement('ul');
 			sources?.forEach((source) => {
 				const { fileName, line, url } = source;
-				const li = this.makeElement('<li />');
+				const li = this.makeElement('li');
 				if (url) {
-					const link: YafNavigationLink = this.makeElement(
-						'<yaf-navigation-link />'
+					const link = this.makeLinkElement(
+						url,
+						undefined,
+						`${fileName}:${line}`
 					);
-					link.props = url;
 					li.appendChild(link);
 				} else {
 					li.innerText = `${fileName}:${line}`;

@@ -9,8 +9,9 @@ import {
 	Reflection,
 	Renderer,
 	RendererEvent,
+	ReflectionKind,
 } from 'typedoc';
-import { YAFDataObject, reflectionMap, treeMenuRoot } from '../types';
+import { YAFDataObject, reflectionMap, treeMenuRoot } from '../types/types';
 import {
 	buildNavTree,
 	copyThemeFiles,
@@ -111,6 +112,8 @@ export class YafTheme extends DefaultTheme {
 		saveDataFile('yafNavigationMenu', this.docDir, this.menuData);
 		saveDataFile('yafReflectionMap', this.docDir, this.reflectionMapData);
 		saveDataFile('yafKindSymbols', this.docDir, KindSymbols);
+		saveDataFile('yafReflectionKind', this.docDir, ReflectionKind);
+
 		this.reflectionDataObjects.forEach((object) => {
 			const fileName = object.is.project
 				? 'index'

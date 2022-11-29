@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="frontend/assets/index.css" />
+		<script src="frontend/index.js" type="module"></script>
+	</head>
+	<body>
+		<typedoc-theme-yaf />
+	</body>
+	<template id="typedoc-theme-yaf">
+		<yaf-chrome-left></yaf-chrome-left>
+		<yaf-chrome-content></yaf-chrome-content>
+	</template>
+	<template id="yaf-chrome-content">
+		<yaf-chrome-header></yaf-chrome-header>
+		<yaf-content></yaf-content>
+		<yaf-chrome-footer></yaf-chrome-footer>
+	</template>
+	<template id="yaf-chrome-left">
+		<yaf-navigation-header></yaf-navigation-header>
+		<yaf-navigation-menu></yaf-navigation-menu>
+		<yaf-navigation-footer></yaf-navigation-footer>
+	</template>
+</html>

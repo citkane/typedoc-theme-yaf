@@ -2,6 +2,9 @@ const fs = require('fs-extra');
 const path = require('path');
 const rootDir = path.join(__dirname, '..');
 
+const assetSrcPath = 'src/frontend/assets';
+const assetsTargetPath = 'dist/src/frontend/assets';
+
 const makeAllOsPath = (linuxPath) => {
 	const pathArray = [rootDir, ...linuxPath.split('/')];
 	return path.join(...pathArray);
@@ -9,16 +12,15 @@ const makeAllOsPath = (linuxPath) => {
 const copySync = (src, dest) =>
 	fs.copySync(makeAllOsPath(src), makeAllOsPath(dest));
 
-copySync('src/assets/fonts', 'dist/src/assets/fonts');
-copySync('src/assets/logo.svg', 'dist/src/assets/logo.svg');
-
-fs.readdirSync(makeAllOsPath('src/assets')).forEach((fileName) => {
+fs.readdirSync(makeAllOsPath(assetSrcPath)).forEach((fileName) => {
 	if (fileName !== 'scss' && !fileName.endsWith('.md')) {
-		copySync(`src/assets/${fileName}`, `dist/src/assets/${fileName}`);
+		copySync(
+			`${assetSrcPath}/${fileName}`,
+			`${assetsTargetPath}/${fileName}`
+		);
 	}
 });
 
-copySync('src/frontend/templates', 'dist/src/frontend/templates');
 copySync('LICENSE', 'dist/LICENSE');
 copySync('package.json', 'dist/package.json');
 copySync('README.md', 'dist/README.md');

@@ -5,6 +5,7 @@ yaf-chrome-content {
 	overflow: scroll;
 	height: 100%;
 	top: 0;
+	scroll-behavior: smooth;
 }
 yaf-chrome-left {
 	width: var(--dim-menu-width);

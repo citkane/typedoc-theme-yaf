@@ -1,4 +1,4 @@
-import { componentName } from '../../types.js';
+import { componentName } from '../../../types/types.js';
 import { YafElement } from '../../YafElement.js';
 import { JSONOutput } from 'typedoc';
 
@@ -11,10 +11,10 @@ export class YafSignatureTemplateLiteral extends YafElement {
 		if (this.debounce()) return;
 		const { head, tail } = this.props;
 
-		let items = [this.makeSpan('`', 'symbol')];
-		head && items.push(this.makeSpan(head, 'literal'));
+		let items = [this.makeSymbolSpan('`')];
+		head && items.push(this.makeLiteralSpan(head));
 		tail.forEach((item) => {
-			items.push(this.makeSpan('${', 'symbol'));
+			items.push(this.makeSymbolSpan('${'));
 
 			const type = this.renderSignatureType(
 				item[0],
@@ -22,15 +22,15 @@ export class YafSignatureTemplateLiteral extends YafElement {
 			);
 			type.classList.add('type');
 			items.push(type);
-			items.push(this.makeSpan('}', 'symbol'));
+			items.push(this.makeSymbolSpan('}'));
 			if (item[1]) {
-				const span = this.makeSpan('', 'literal');
+				const span = this.makeLiteralSpan('');
 				span.innerText = item[1];
 				items.push(span);
 			}
 		});
 
-		items = [...items, this.makeSpan('`', 'symbol')];
+		items = [...items, this.makeSymbolSpan('`')];
 
 		items.forEach((item) => this.appendChild(item));
 		/*

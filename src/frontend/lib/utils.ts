@@ -1,4 +1,4 @@
-import { parenthesisMap, treeMenuBranch, TypeContext } from '../types';
+import { parenthesisMap, treeMenuBranch, TypeContext } from '../../types/types';
 
 /**
  * Converts a component name of the structure `yaf-component-name` to camelcase, ie `yafComponentName`.
