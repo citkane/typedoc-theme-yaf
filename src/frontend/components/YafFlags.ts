@@ -1,16 +1,14 @@
 import { JSONOutput } from 'typedoc';
-import { YafElement } from '../YafElement.js';
+import yafElement from '../YafElement.js';
 
-export class YafFlags extends YafElement {
+export class YafFlags extends HTMLElement {
 	props!: {
 		flags: JSONOutput.ReflectionFlags;
 		comment?: JSONOutput.Comment;
 	};
-	constructor() {
-		super(yafFlags);
-	}
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		const { flags, comment } = this.props;
 
@@ -23,7 +21,7 @@ export class YafFlags extends YafElement {
 
 		allFlags.forEach((flag) => {
 			this.appendChild(
-				this.makeElement('span', 'flag', flag.replace(/^@/, ''))
+				yafElement.makeElement('span', 'flag', flag.replace(/^@/, ''))
 			);
 		});
 	}

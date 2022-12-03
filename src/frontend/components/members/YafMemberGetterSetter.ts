@@ -1,19 +1,17 @@
 import { YAFDataObject, YafSignatureReflection } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
+import yafElement from '../../YafElement.js';
 import { YafSignatureBody } from '../YafSignatureBody.js';
 import { YafSignatureTitle } from '../YafSignatureTitle.js';
 
-export class YafMemberGetterSetter extends YafElement {
+export class YafMemberGetterSetter extends HTMLElement {
 	props!: YAFDataObject;
-	constructor() {
-		super(yafMemberGetterSetter);
-	}
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		const { getSignature, setSignature } = this.props;
 		if (getSignature) {
-			const wrapper = this.makeElement('div');
+			const wrapper = yafElement.makeElement('div');
 			wrapper.classList.add('wrapper');
 			wrapper.appendChild(this.makeSignature('get', getSignature));
 			wrapper.appendChild(this.makeBody(getSignature));
@@ -21,7 +19,7 @@ export class YafMemberGetterSetter extends YafElement {
 		}
 
 		if (setSignature) {
-			const wrapper = this.makeElement('div');
+			const wrapper = yafElement.makeElement('div');
 			wrapper.classList.add('wrapper');
 			this.appendChild(this.makeSignature('set', setSignature));
 			this.appendChild(this.makeBody(setSignature));
@@ -29,12 +27,12 @@ export class YafMemberGetterSetter extends YafElement {
 		}
 	}
 	makeSignature = (prefix: string, data: YafSignatureReflection) => {
-		const pre = this.makeElement('pre');
+		const pre = yafElement.makeElement('pre');
 		pre.classList.add('highlight');
-		pre.appendChild(this.makeSymbolSpan(`${prefix} `));
-		pre.appendChild(this.makeNameSpan(data.name));
+		pre.appendChild(yafElement.makeSymbolSpan(`${prefix} `));
+		pre.appendChild(yafElement.makeNameSpan(data.name));
 
-		const title: YafSignatureTitle = this.makeElement(
+		const title: YafSignatureTitle = yafElement.makeElement(
 			'yaf-signature-title'
 		);
 		title.props = { ...data, hideName: true };
@@ -43,7 +41,8 @@ export class YafMemberGetterSetter extends YafElement {
 		return pre;
 	};
 	makeBody = (data: YafSignatureReflection) => {
-		const body: YafSignatureBody = this.makeElement('yaf-signature-body');
+		const body: YafSignatureBody =
+			yafElement.makeElement('yaf-signature-body');
 		body.props = data;
 
 		return body;

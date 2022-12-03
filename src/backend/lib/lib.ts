@@ -9,16 +9,9 @@ import {
 	ProjectReflection,
 	ReflectionKind,
 } from 'typedoc';
-import {
-	dataLocation,
-	treeMenuRoot,
-	YAFDataObject,
-	reflectionMap,
-	htmlString,
-	highlighter,
-	kindSymbols,
-} from '../types/types';
-import { serialize } from './serializer';
+import { treeMenuRoot, YAFDataObject, htmlString } from '../../types/types';
+import { serialize } from '../serializer';
+import { dataLocation, highlighter } from '../../types/backendTypes';
 
 /**
  * The kinds of reflections which will generate their own document page in the front-end.
@@ -124,10 +117,13 @@ export const buildNavTree = (
 			kind: reflection.kind,
 			id: reflection.id,
 			children: {},
+			inheritedFrom: reflection.inheritedFrom
+				? reflection.inheritedFrom.qualifiedName
+				: undefined,
 		};
 		reflection.children?.forEach((child) => {
-			if (!child.inheritedFrom)
-				buildNavTree(menuNode[reflection.id].children, child);
+			//if (!child.inheritedFrom)
+			buildNavTree(menuNode[reflection.id].children, child);
 		});
 	}
 	return menuNode;
@@ -164,13 +160,19 @@ const parseProjectToObject = (
 	reflection: ProjectReflection & DeclarationReflection,
 	context: DefaultThemeRenderContext
 ) => {
-	object.children = object.children?.filter((child) => !child.inheritedFrom);
-	if (object.groups)
+	//object.children = object.children?.filter((child) => !child.inheritedFrom);
+	if (object.groups) {
 		object.groups.forEach((group) => {
 			group.children = group.children.filter(
 				(id) => !!object.children.find((child) => child.id === id)
 			);
 		});
+		/*
+		object.groups = object.groups.filter(
+			(group) => group.children.length > 0
+		);
+		*/
+	}
 	object = serialize(object, reflection, context);
 	object.children?.forEach((objectChild) => {
 		const reflectionChild = reflection.children.find(
@@ -207,44 +209,6 @@ const parseProjectObjectToArray = (
 		parseProjectObjectToArray(objects, child);
 	});
 	return objects;
-};
-
-/**
- * Recurses over a reflection and it's children,
- * mutating the given map object to add id key mapped to data.
- * @param reflectionMap the given map object to be mutated
- * @param object
- * @param level is the item a page or a child hash
- */
-const mutateReflectionMap = (
-	reflectionMap: reflectionMap,
-	object: YAFDataObject,
-	level: 0 | 1
-) => {
-	if (reflectionMap[object.id])
-		throw new Error('Reflection ID was already mapped');
-	reflectionMap[object.id] = {
-		name: object.name,
-		fileName: object.location.query,
-		level,
-	};
-	object.children?.forEach((child) => {
-		mutateReflectionMap(reflectionMap, child, 1);
-	});
-};
-/**
- * Creates a key value object map of reflection id's to reflection data file names.
- * @param reflectionDataObjects
- * @returns
- */
-export const makeReflectionMapData = (
-	reflectionDataObjects: YAFDataObject[]
-) => {
-	const reflectionMap: reflectionMap = {};
-	reflectionDataObjects.forEach((reflectionData) => {
-		mutateReflectionMap(reflectionMap, reflectionData, 0);
-	});
-	return reflectionMap;
 };
 
 /**
@@ -304,76 +268,3 @@ export const getHighlighted = (
 	const html = hast ? highlighter.toHtml(hast) : text;
 	return html;
 };
-
-export const KindSymbols: kindSymbols = {
-	[ReflectionKind.Accessor]: {
-		className: 'accessor',
-		symbol: 'A',
-	},
-	[ReflectionKind.Class]: {
-		className: 'class',
-		symbol: 'C',
-	},
-	[ReflectionKind.Constructor]: {
-		className: 'constructor',
-		symbol: 'C',
-	},
-
-	[ReflectionKind.Enum]: {
-		className: 'enumerator',
-		symbol: 'E',
-	},
-	[ReflectionKind.Function]: {
-		className: 'function',
-		symbol: 'F',
-	},
-	[ReflectionKind.Interface]: {
-		className: 'interface',
-		symbol: 'I',
-	},
-	[ReflectionKind.Method]: {
-		className: 'method',
-		symbol: 'M',
-	},
-	[ReflectionKind.Namespace]: {
-		className: 'namespace',
-		symbol: 'N',
-	},
-	[ReflectionKind.Property]: {
-		className: 'property',
-		symbol: 'P',
-	},
-	[ReflectionKind.Reference]: {
-		className: 'reference',
-		symbol: 'R',
-	},
-	[ReflectionKind.Variable]: {
-		className: 'variable',
-		symbol: 'V',
-	},
-	[ReflectionKind.TypeAlias]: {
-		className: 'typealias',
-		symbol: 'T',
-	},
-	[ReflectionKind.Module]: {
-		className: 'module',
-		symbol: 'M',
-	},
-};
-KindSymbols[ReflectionKind.CallSignature] =
-	KindSymbols[ReflectionKind.Function];
-KindSymbols[ReflectionKind.ConstructorSignature] =
-	KindSymbols[ReflectionKind.Constructor];
-KindSymbols[ReflectionKind.EnumMember] = KindSymbols[ReflectionKind.Property];
-KindSymbols[ReflectionKind.GetSignature] = KindSymbols[ReflectionKind.Accessor];
-KindSymbols[ReflectionKind.IndexSignature] =
-	KindSymbols[ReflectionKind.Property];
-// KindSymbols[ReflectionKind.Module] = KindSymbols[ReflectionKind.Namespace];
-KindSymbols[ReflectionKind.ObjectLiteral] =
-	KindSymbols[ReflectionKind.Interface];
-KindSymbols[ReflectionKind.Parameter] = KindSymbols[ReflectionKind.Property];
-KindSymbols[ReflectionKind.Project] = KindSymbols[ReflectionKind.Namespace];
-KindSymbols[ReflectionKind.SetSignature] = KindSymbols[ReflectionKind.Accessor];
-KindSymbols[ReflectionKind.TypeLiteral] = KindSymbols[ReflectionKind.TypeAlias];
-KindSymbols[ReflectionKind.TypeParameter] =
-	KindSymbols[ReflectionKind.TypeAlias];

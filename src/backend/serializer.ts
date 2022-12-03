@@ -14,7 +14,7 @@ import {
 	YafParameterReflection,
 	YafSignatureReflection,
 } from '../types/types';
-import { formatReflectionLocation } from './lib';
+import { formatReflectionLocation } from './lib/lib';
 
 /**
  * Extends the existing typedoc serialization between a `Reflection` and a serialized `JSONOutput.Reflection`.

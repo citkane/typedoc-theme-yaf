@@ -1,32 +1,30 @@
 import { JSONOutput } from 'typedoc';
-import { YafElement } from '../YafElement.js';
+import yafElement from '../YafElement.js';
 
 export * from './signatureTypes/index.js';
 
-export class YafTypeParameters extends YafElement {
-	props!: JSONOutput.TypeParameterReflection[] | undefined; //SignatureReflection['typeParameter'];
-	constructor() {
-		super(yafTypeParameters);
-	}
+export class YafTypeParameters extends HTMLElement {
+	props!: JSONOutput.TypeParameterReflection[] | undefined;
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		if (!this.props || !this.props.length) return;
-		this.appendChild(this.makeSymbolSpan('<'));
+		this.appendChild(yafElement.makeSymbolSpan('<'));
 		this.props.forEach((parameter, i) => {
 			if (parameter.varianceModifier)
 				this.appendChild(
-					this.makeElement(
+					yafElement.makeElement(
 						'span',
 						null,
 						`${parameter.varianceModifier} `
 					)
 				);
-			this.appendChild(this.makeTypeSpan(parameter.name));
+			this.appendChild(yafElement.makeTypeSpan(parameter.name));
 			if (i < this.props!.length - 1)
-				this.appendChild(this.makeSymbolSpan(', '));
+				this.appendChild(yafElement.makeSymbolSpan(', '));
 		});
-		this.appendChild(this.makeSymbolSpan('>'));
+		this.appendChild(yafElement.makeSymbolSpan('>'));
 	}
 }
 const yafTypeParameters = 'yaf-type-parameters';

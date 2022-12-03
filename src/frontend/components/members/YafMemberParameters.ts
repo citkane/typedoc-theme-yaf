@@ -2,52 +2,55 @@ import {
 	YafParameterReflection,
 	YafTypeParameterReflection,
 } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
+import yafElement from '../../YafElement.js';
 import { YafFlags } from '../YafFlags.js';
 import { YafSignature } from '../YafSignature.js';
 
-export class YafMemberParametersType extends YafElement {
+export class YafMemberParametersType extends HTMLElement {
 	props!: YafTypeParameterReflection[] | undefined;
-	constructor() {
-		super(yafMemberParametersType);
-	}
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		if (!this.props) return;
-		this.appendChild(this.makeElement('h5', null, 'Type Parameters:'));
-		const table = this.makeElement('table');
-		const thead = this.makeElement('thead');
-		const headers = this.makeElement('tr');
+		this.appendChild(
+			yafElement.makeElement('h5', null, 'Type Parameters:')
+		);
+		const table = yafElement.makeElement('table');
+		const thead = yafElement.makeElement('thead');
+		const headers = yafElement.makeElement('tr');
 		['name', 'modifier', 'extends', 'default', 'comment'].forEach(
 			(heading) =>
-				headers.appendChild(this.makeElement('th', null, heading))
+				headers.appendChild(yafElement.makeElement('th', null, heading))
 		);
 		thead.appendChild(headers);
 		table.appendChild(thead);
 
-		const tbody = this.makeElement('tbody');
+		const tbody = yafElement.makeElement('tbody');
 		this.props.forEach((parameter) => {
 			const { varianceModifier, name, type, text } = parameter;
 			const defaultValue = parameter.default;
 
-			const row = this.makeElement('tr');
+			const row = yafElement.makeElement('tr');
 
-			let td = this.makeElement('td', null, name);
+			let td = yafElement.makeElement('td', null, name);
 			row.appendChild(td);
 
-			td = this.makeElement('td', null, varianceModifier);
+			td = yafElement.makeElement('td', null, varianceModifier);
 			row.appendChild(td);
 
-			td = this.makeElement('td');
-			if (type) td.appendChild(this.renderSignatureType(type, 'none'));
+			td = yafElement.makeElement('td');
+			if (type)
+				td.appendChild(yafElement.renderSignatureType(type, 'none'));
 			row.appendChild(td);
 
-			td = this.makeElement('td');
+			td = yafElement.makeElement('td');
 			if (defaultValue)
-				td.appendChild(this.renderSignatureType(defaultValue, 'none'));
+				td.appendChild(
+					yafElement.renderSignatureType(defaultValue, 'none')
+				);
 			row.appendChild(td);
 
-			td = this.makeElement('td');
+			td = yafElement.makeElement('td');
 			if (text?.comment) td.innerHTML = text.comment;
 			row.appendChild(td);
 
@@ -61,29 +64,27 @@ export class YafMemberParametersType extends YafElement {
 const yafMemberParametersType = 'yaf-member-parameters-type';
 customElements.define(yafMemberParametersType, YafMemberParametersType);
 
-export class YafMemberParameters extends YafElement {
+export class YafMemberParameters extends HTMLElement {
 	props!: YafParameterReflection[] | undefined;
-	constructor() {
-		super(yafMemberParameters);
-	}
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		if (!this.props) return;
 
-		this.appendChild(this.makeElement('h5', null, 'Parameters:'));
-		const table = this.makeElement('table');
-		const thead = this.makeElement('thead');
+		this.appendChild(yafElement.makeElement('h5', null, 'Parameters:'));
+		const table = yafElement.makeElement('table');
+		const thead = yafElement.makeElement('thead');
 
-		const headers = this.makeElement('tr');
+		const headers = yafElement.makeElement('tr');
 		['flags', 'name', 'type', 'default', 'comment'].forEach((heading) =>
-			headers.appendChild(this.makeElement('th', null, heading))
+			headers.appendChild(yafElement.makeElement('th', null, heading))
 		);
 		thead.appendChild(headers);
 		table.appendChild(thead);
 
-		const tbody = this.makeElement('tbody');
+		const tbody = yafElement.makeElement('tbody');
 		this.props.forEach((parameter) => {
-			const row = this.makeElement('tr');
+			const row = yafElement.makeElement('tr');
 
 			row.appendChild(this.makeFlags(parameter));
 			row.appendChild(this.makeName(parameter));
@@ -100,15 +101,15 @@ export class YafMemberParameters extends YafElement {
 	}
 	makeFlags = (parameter: YafParameterReflection) => {
 		const { flags, comment } = parameter;
-		const td = this.makeElement('td');
-		const flagsElement: YafFlags = this.makeElement('yaf-flags');
+		const td = yafElement.makeElement('td');
+		const flagsElement: YafFlags = yafElement.makeElement('yaf-flags');
 		flagsElement.props = { flags, comment };
 		td.appendChild(flagsElement);
 		return td;
 	};
 	makeName = (parameter: YafParameterReflection) => {
 		const { flags, name } = parameter;
-		const td = this.makeElement(
+		const td = yafElement.makeElement(
 			'td',
 			null,
 			flags.isRest ? `...${name}` : name
@@ -118,10 +119,11 @@ export class YafMemberParameters extends YafElement {
 	makeType = (parameter: YafParameterReflection) => {
 		const { type } = parameter;
 
-		const td = this.makeElement('td', 'type');
-		const pre = this.makeElement('pre', 'highlight');
+		const td = yafElement.makeElement('td', 'type');
+		const pre = yafElement.makeElement('pre', 'highlight');
 
-		const typeSignature = this.makeElement<YafSignature>('yaf-signature');
+		const typeSignature =
+			yafElement.makeElement<YafSignature>('yaf-signature');
 		typeSignature.props = { type, context: 'none' };
 
 		pre.appendChild(typeSignature);
@@ -131,13 +133,13 @@ export class YafMemberParameters extends YafElement {
 	};
 	makeDefault = (parameter: YafParameterReflection) => {
 		const { defaultValue } = parameter;
-		const td = this.makeElement('td', null, defaultValue);
+		const td = yafElement.makeElement('td', null, defaultValue);
 
 		return td;
 	};
 	makeComment = (parameter: YafParameterReflection) => {
 		const { text } = parameter;
-		const td = this.makeElement('td');
+		const td = yafElement.makeElement('td');
 		if (text.comment) td.innerHTML = text.comment;
 
 		return td;

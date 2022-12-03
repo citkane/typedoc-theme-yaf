@@ -1,27 +1,24 @@
-import { componentName } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
+import { componentName } from '../../../types/frontendTypes.js';
+import yafElement from '../../YafElement.js';
 import { JSONOutput } from 'typedoc';
 
-export class YafContentSignatureLiteral extends YafElement {
+export class YafContentSignatureLiteral extends HTMLElement {
 	props!: JSONOutput.LiteralType;
 
-	constructor() {
-		super(componentName);
-	}
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		this.classList.add('type');
-		if (this.needsParenthesis()) {
+		if (yafElement.needsParenthesis(this)) {
 			this.innerHTML = `<span class="symbol>(</span>"${this.props.value}"<span class="symbol>)</span>`;
 		} else {
 			this.innerText = `"${this.props.value}"`;
 		}
 		/*
-		const inner = this.needsParenthesis()
+		const inner = YafElement.needsParenthesis()
 			? `<span class="symbol>(</span>"${this.props.value}"<span class="symbol>)</span>`
 			: `"${this.props.value}"`;
 
-		const newElement = this.makeElement(
+		const newElement = YafElement.makeElement(
 			`<span class="type">${inner}</span>`
 		);
 		this.parentElement?.replaceChild(newElement, this);

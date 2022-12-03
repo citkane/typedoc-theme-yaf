@@ -1,15 +1,12 @@
-import { componentName, YAFDataObject } from '../../types/types.js';
-import { YafElement } from '../YafElement.js';
+import { YAFDataObject } from '../../types/types.js';
+import yafElement from '../YafElement.js';
 import { JSONOutput } from 'typedoc';
-import { YafFlags } from './YafFlags.js';
+import { componentName } from '../../types/frontendTypes.js';
 
-export class YafContentHeader extends YafElement {
-	constructor() {
-		super(yafContentHeader);
-	}
+export class YafContentHeader extends HTMLElement {
 	props!: YAFDataObject;
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		const {
 			typeParameters,
@@ -21,26 +18,28 @@ export class YafContentHeader extends YafElement {
 			signatures,
 		} = this.props;
 
-		const titleElement = this.makeElement('h1');
+		const titleElement = yafElement.makeElement('h1');
 		if (!is.project) {
-			const kindElement = this.makeKindSpan(kindString || 'unknown');
+			const kindElement = yafElement.makeKindSpan(
+				kindString || 'unknown'
+			);
 			titleElement.appendChild(kindElement);
 		}
-		const nameElement = this.makeNameSpan(name); //this.makeSpan(name, 'name');
+		const nameElement = yafElement.makeNameSpan(name); //this.makeSpan(name, 'name');
 		titleElement.appendChild(nameElement);
 
 		if (typeParameters && typeParameters.length) {
-			const parameterElement = this.makeParametersSpan(
+			const parameterElement = yafElement.makeParametersSpan(
 				this.makeTypeParams(typeParameters)
 			);
 			titleElement.appendChild(parameterElement);
 		}
 
-		titleElement.appendChild(this.makeFlags(flags, comment));
+		titleElement.appendChild(yafElement.makeFlags(flags, comment));
 		if (signatures?.length === 1)
 			signatures.forEach((signature) => {
 				titleElement.appendChild(
-					this.makeFlags(signature.flags, signature.comment)
+					yafElement.makeFlags(signature.flags, signature.comment)
 				);
 			});
 
@@ -48,21 +47,6 @@ export class YafContentHeader extends YafElement {
 	}
 	makeTypeParams(params: JSONOutput.TypeParameterReflection[]) {
 		return `&lt;${params.map((param) => param.name).join(', ')}&gt;`;
-	}
-	makeFlags(
-		flags: JSONOutput.ReflectionFlags,
-		comment: JSONOutput.Comment | undefined
-	) {
-		const flagElement = this.makeElement<YafFlags, YafFlags['props']>(
-			'yaf-flags',
-			null,
-			null,
-			{
-				flags,
-				comment,
-			}
-		);
-		return flagElement;
 	}
 }
 

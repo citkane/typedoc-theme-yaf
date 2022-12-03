@@ -1,17 +1,11 @@
-import { componentName } from '../../types/types.js';
-import { YafElement } from '../YafElement.js';
-import events from '../lib/events/eventApi.js';
+import { componentName } from '../../types/frontendTypes.js';
+import yafElement from '../YafElement.js';
 import appState from '../lib/AppState.js';
 
-const { trigger } = events;
 /**
  * The highest level component of the theme, whereunder all other components reside
  */
-export class TypedocThemeYaf extends YafElement {
-	constructor() {
-		super(typedocThemeYaf);
-	}
-
+export class TypedocThemeYaf extends HTMLElement {
 	connectedCallback() {
 		/*
 			this.body.addEventListener(
@@ -24,7 +18,11 @@ export class TypedocThemeYaf extends YafElement {
 			);
 			*/
 
-		appState.init().then(() => this.appendChild(this.getHtmlTemplate()));
+		appState
+			.initCache()
+			.then(() =>
+				this.appendChild(yafElement.getHtmlTemplate(typedocThemeYaf))
+			);
 
 		//events.on(trigger.fetch.reflectionById, this.reflectionById);
 		//events.on(trigger.get.reflectionLinkById, this.reflectionLinkById);

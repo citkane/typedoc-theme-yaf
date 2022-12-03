@@ -1,17 +1,13 @@
-/**
- * @module Frontend
- */
-
-import { clickEvent } from '../../types/types.js';
 import events from './events/eventApi.js';
 import { YafNavigationLink } from '../components/YafNavigationLink.js';
+import { clickEvent } from '../../types/frontendTypes.js';
 
 const { action } = events;
 
-class Router {
-	baseUrl = `${window.location.origin}${window.location.pathname}`;
+export default class Router {
+	static baseUrl = `${window.location.origin}${window.location.pathname}`;
 
-	route = (link: YafNavigationLink, e: clickEvent) => {
+	static route = (link: YafNavigationLink, e: clickEvent) => {
 		const href = link.getAttribute('href');
 		const hrefOrigin = href ? href.split('?')[0] : href;
 		const target = link.getAttribute('target') || undefined;
@@ -27,8 +23,8 @@ class Router {
 		e.preventDefault(); //use internal routing for document partials
 
 		if (
-			this.getHrefWithoutHash(window.location.href) ===
-			this.getHrefWithoutHash(href)
+			Router.getHrefWithoutHash(window.location.href) ===
+			Router.getHrefWithoutHash(href)
 		) {
 			const hash = this.getHash(href);
 			events.dispatch(action.content.scrollTo(hash));
@@ -43,18 +39,15 @@ class Router {
 		}
 	};
 
-	getTargetURL = (link: YafNavigationLink) =>
+	static getTargetURL = (link: YafNavigationLink) =>
 		new URL(link.getAttribute('href') || '', this.baseUrl);
 
-	private getHrefWithoutHash = (href: string | null) =>
+	private static getHrefWithoutHash = (href: string | null) =>
 		href ? href.split('#')[0] : href;
 
-	private getHash = (href: string | null) => {
+	private static getHash = (href: string | null) => {
 		if (!href) return 0;
 		const hash = href.split('#')[1];
 		return hash || 0;
 	};
 }
-
-const router = new Router();
-export default router;

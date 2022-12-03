@@ -76,9 +76,11 @@ yaf-navigation-header {
 	}
 }
 yaf-navigation-menu {
+	//scroll-behavior: smooth;
 	overflow: scroll;
 	flex-grow: 1;
 }
+
 yaf-navigation-footer {
 	display: block;
 	border-top: 1px solid var(--color-border-default);

@@ -1,11 +1,24 @@
+import { yafOptions } from '../../../types/frontendTypes.js';
 import * as actions from './eventFunctions.js';
+
+const options: Record<yafOptions, string> = {
+	showInheritedMembers: 'yaf.options.showInheritedMembers',
+};
 
 export const trigger = {
 	content: {
 		setLocation: 'yaf.content.setLocation',
 		scrollTo: 'yaf.content.scrollTo',
-		rollMenuDown: 'yaf.content.rollMenuDown',
-		rollMenuUp: 'yaf.content.rollMenuUp',
+	},
+	menu: {
+		rollMenuDown: 'yaf.menu.rollMenuDown',
+		rollMenuUp: 'yaf.menu.rollMenuUp',
+		scrollTo: 'yaf.menu.scrollTo',
+	},
+	drawers: {
+		refreshHeight: 'yaf.drawer.refreshHeight',
+		initHeight: 'yaf.drawer.refreshHeight',
+		resetHeight: 'yaf.drawer.resetHeight',
 	},
 	fetch: {
 		reflectionById: 'yaf.fetch.reflectionById',
@@ -14,6 +27,7 @@ export const trigger = {
 		reflectionLinkById: 'yaf.get.reflectionLinkById',
 		pageContentId: 'yaf.get.pageContentId',
 	},
+	options,
 };
 
 class Events {
@@ -21,9 +35,17 @@ class Events {
 	action = {
 		content: {
 			setLocation: actions.contentSetLocation,
-			scrollTo: actions.contentScrollTo,
+			scrollTo: actions.scrollTo.bind(null, 'content'),
+		},
+		menu: {
 			rollMenuDown: actions.rollMenuDown,
 			rollMenuUp: actions.rollMenuUp,
+			scrollTo: actions.scrollTo.bind(null, 'menu'),
+		},
+		drawers: {
+			refreshHeight: actions.sendDrawerHeight.bind(null, 'refreshHeight'),
+			initHeight: actions.sendDrawerHeight.bind(null, 'initHeight'),
+			resetHeight: actions.resetDrawerHeight,
 		},
 		fetch: {
 			reflectionById: actions.fetchReflectionById,
@@ -31,6 +53,12 @@ class Events {
 		get: {
 			reflectionLinkById: actions.getReflectionById,
 			pageContentId: actions.getPageContentId,
+		},
+		options: {
+			showInheritedMembers: actions.options.bind(
+				null,
+				'showInheritedMembers'
+			),
 		},
 	};
 	dispatch = (

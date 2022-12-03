@@ -1,56 +1,71 @@
-import { YafElementDrawers } from '../YafElementDrawers.js';
 import { YafWidgetKind } from './YafWidgets.js';
-
 import events from '../lib/events/eventApi.js';
 import appState from '../lib/AppState.js';
+import YafElementDrawers from '../YafElementDrawers.js';
+import yafElement from '../YafElement.js';
+import { DrawerElement } from '../../types/frontendTypes.js';
 
 const { action } = events;
 
 /**
  *
  */
-export class YafNavigationHeader extends YafElementDrawers {
-	constructor() {
-		super(yafNavigationHeader);
-
-		const infoLink = this.makeElement('span', 'info');
-		infoLink.appendChild(this.makeIconSpan('question_mark', 18));
-		infoLink.appendChild(this.makeIconSpan('highlight_off'));
-
-		this.initDrawer(this, this.makeInfoDrawer(), infoLink, this.id);
-	}
+export class YafNavigationHeader extends HTMLElement {
+	drawers!: YafElementDrawers;
+	drawer!: HTMLElement;
+	drawerTrigger!: HTMLElement;
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
-		const navigationControls = this.makeElement('div');
-		const homeLink = this.makeLinkElement('/', 'button');
+		this.drawerTrigger = yafElement.makeElement('span', 'info');
+		this.drawerTrigger.appendChild(
+			yafElement.makeIconSpan('question_mark', 18)
+		);
+		this.drawerTrigger.appendChild(
+			yafElement.makeIconSpan('highlight_off')
+		);
+
+		this.id = 'yafNavigationHeader';
+		(this.drawer = this.makeInfoDrawer()),
+			(this.drawers = new YafElementDrawers(
+				this as unknown as DrawerElement,
+				this.drawer,
+				this.drawerTrigger,
+				this.id
+			));
+
+		const navigationControls = yafElement.makeElement('div');
+		const homeLink = yafElement.makeLinkElement('/', 'button');
 
 		navigationControls.classList.add('controls-navigation');
 
-		homeLink.appendChild(this.makeIconSpan('home'));
+		homeLink.appendChild(yafElement.makeIconSpan('home'));
 		navigationControls.appendChild(homeLink);
 		navigationControls.appendChild(this.makeMenuRollControls());
 		this.appendChild(navigationControls);
 		this.appendChild(this.drawer);
 
-		this.renderDrawer();
+		this.drawers.renderDrawer();
 	}
 	disconnectedCallback() {
-		this.drawerHasDisconnected();
+		this.drawers.drawerHasDisconnected();
 	}
 	makeMenuRollControls = () => {
-		const openAll = this.makeElement('span', 'open button');
-		const closeAll = this.makeElement('span', 'close button');
-		const drawerControls = this.makeElement('span', 'controls-drawers');
+		const openAll = yafElement.makeElement('span', 'open button');
+		const closeAll = yafElement.makeElement('span', 'close button');
+		const drawerControls = yafElement.makeElement(
+			'span',
+			'controls-drawers'
+		);
 
-		openAll.appendChild(this.makeIconSpan('expand_more'));
-		closeAll.appendChild(this.makeIconSpan('expand_less'));
+		openAll.appendChild(yafElement.makeIconSpan('expand_more'));
+		closeAll.appendChild(yafElement.makeIconSpan('expand_less'));
 		drawerControls.appendChild(this.drawerTrigger);
 		drawerControls.appendChild(openAll);
 		drawerControls.appendChild(closeAll);
 
-		openAll.onclick = () => events.dispatch(action.content.rollMenuDown());
-		closeAll.onclick = () => events.dispatch(action.content.rollMenuUp());
+		openAll.onclick = () => events.dispatch(action.menu.rollMenuDown());
+		closeAll.onclick = () => events.dispatch(action.menu.rollMenuUp());
 
 		return drawerControls;
 	};
@@ -60,17 +75,17 @@ export class YafNavigationHeader extends YafElementDrawers {
 			2,
 		].sort();
 
-		const infoDrawer = this.makeElement('div', 'drawers-info');
-		const inner = this.makeElement('span', 'inner');
+		const infoDrawer = yafElement.makeElement('div', 'drawers-info');
+		const inner = yafElement.makeElement('span', 'inner');
 
 		kinds.forEach((kind) => {
 			let nameString = appState.kindSymbols[kind].className;
 			nameString =
 				nameString.charAt(0).toUpperCase() + nameString.slice(1);
 
-			const widget = this.makeElement('span', 'widget');
-			const name = this.makeNameSpan(nameString);
-			const kindIcon = this.makeElement<
+			const widget = yafElement.makeElement('span', 'widget');
+			const name = yafElement.makeNameSpan(nameString);
+			const kindIcon = yafElement.makeElement<
 				YafWidgetKind,
 				YafWidgetKind['props']
 			>('yaf-widget-kind', null, null, { kind: String(kind) });

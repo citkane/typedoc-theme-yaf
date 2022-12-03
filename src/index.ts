@@ -20,5 +20,5 @@ export function load(app: Application) {
 }
 
 export { YafTheme } from './backend/YafTheme';
-export * as lib from './backend/lib';
+export * as lib from './backend/lib/lib';
 export { serialize } from './backend/serializer';

@@ -1,13 +1,11 @@
 import { JSONOutput } from 'typedoc';
-import { YafElement } from '../../YafElement.js';
+import yafElement from '../../YafElement.js';
 
-export class YafSignatureIndexedAccess extends YafElement {
+export class YafSignatureIndexedAccess extends HTMLElement {
 	props!: JSONOutput.IndexedAccessType;
-	constructor() {
-		super(yafSignatureIndexedAccess);
-	}
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		console.log(this.props);
 	}
 }

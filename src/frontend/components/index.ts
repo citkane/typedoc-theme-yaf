@@ -1,4 +1,5 @@
 export * from './TypedocThemeYaf.js';
+
 export * from './YafWidgets.js';
 export * from './YafFlags.js';
 

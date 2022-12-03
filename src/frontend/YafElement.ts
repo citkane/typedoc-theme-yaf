@@ -1,20 +1,22 @@
+import { YAFDataObject } from '../types/types.js';
 import {
+	abnormalSigTypes,
 	componentName,
 	materialIcon,
 	TypeContext,
-	YAFDataObject,
-} from '../types/types.js';
-
-import { fetchFile, toCamelCase } from './lib/utils.js';
-import { abnormalSigTypes } from '../types/types.js';
+} from '../types/frontendTypes.js';
 import { YafSignature } from './components/YafSignature.js';
-import { errorHandlers } from './lib/errors.js';
+import errorHandlers from './lib/ErrorHandlers.js';
 import { YafNavigationLink } from './components/YafNavigationLink.js';
+import { JSONOutput } from 'typedoc';
+import { YafFlags } from './components/YafFlags.js';
+import YafElementDrawers from './YafElementDrawers.js';
+import ErrorHandlers from './lib/ErrorHandlers.js';
 
 const iconClass = 'material-icons-sharp';
 
 /**
- * The base class upon which all typedoc-theme-yaf web components are built.
+ * The base library upon which all typedoc-theme-yaf web components are built.
  *
  * It provides:
  * - A number of utility methods to construct HTML Elements
@@ -23,25 +25,8 @@ const iconClass = 'material-icons-sharp';
  * - Various utility methods
  *
  */
-export class YafElement extends HTMLElement {
-	/** The name of the component in the form `yaf-component-name` */
-	componentName: componentName;
-	/** The `props` of the component used for passing data objects into. This is not HTML attributes.*/
-	props: unknown;
-
-	errorHandlers = errorHandlers;
-
-	constructor(component: componentName) {
-		super();
-		this.componentName = component;
-	}
-
-	/**
-	 * Creates a new HTML element from a string
-	 * @param html
-	 * @returns
-	 */
-	makeElement = <T = HTMLElement, P = Record<string, unknown> | string>(
+const yafElement = {
+	makeElement: <T = HTMLElement, P = Record<string, unknown> | string>(
 		tagName: string,
 		className?: string | null,
 		innerText?: string | null,
@@ -57,41 +42,38 @@ export class YafElement extends HTMLElement {
 		if (props) (<any>element).props = props;
 
 		return element as T;
-	};
+	},
 
-	makeSymbolSpan = (text: string) => this.makeElement('span', 'symbol', text);
-	makeNameSpan = (text: string) => this.makeElement('span', 'name', text);
-	makeTypeSpan = (text: string) => this.makeElement('span', 'type', text);
-	makeTitleSpan = (text: string) => this.makeElement('span', 'title', text);
-	makeKindSpan = (text: string) => this.makeElement('span', 'kind', text);
-	makeValueSpan = (text: string) => this.makeElement('span', 'value', text);
-	makeParametersSpan = (text: string) =>
-		this.makeElement('span', 'parameters', text);
-	makeLiteralSpan = (text: string) =>
-		this.makeElement('span', 'literal', text);
+	makeSymbolSpan: (text: string) =>
+		yafElement.makeElement('span', 'symbol', text),
+	makeNameSpan: (text: string) =>
+		yafElement.makeElement('span', 'name', text),
+	makeTypeSpan: (text: string) =>
+		yafElement.makeElement('span', 'type', text),
+	makeTitleSpan: (text: string) =>
+		yafElement.makeElement('span', 'title', text),
+	makeKindSpan: (text: string) =>
+		yafElement.makeElement('span', 'kind', text),
+	makeValueSpan: (text: string) =>
+		yafElement.makeElement('span', 'value', text),
+	makeParametersSpan: (text: string) =>
+		yafElement.makeElement('span', 'parameters', text),
 
-	/**
-	 * Creates a fontset based icon in a span
-	 * @param iconInnerHtml
-	 * @param size
-	 * @returns
-	 */
-	makeIconSpan = (
+	makeLiteralSpan: (text: string) =>
+		yafElement.makeElement('span', 'literal', text),
+
+	makeIconSpan: (
 		iconInnerHtml: materialIcon,
 		size: 18 | 24 | 36 | 48 = 24
 	): Element => {
-		return this.makeElement(
+		return yafElement.makeElement(
 			'span',
 			`${iconClass} md-${size} yaficon`,
 			iconInnerHtml
 		);
-	};
-	makeLinkElement = (
-		href: string,
-		className?: string,
-		innerText?: string
-	) => {
-		const link = this.makeElement<YafNavigationLink>(
+	},
+	makeLinkElement: (href: string, className?: string, innerText?: string) => {
+		const link = yafElement.makeElement<YafNavigationLink>(
 			'a',
 			className,
 			innerText,
@@ -100,71 +82,97 @@ export class YafElement extends HTMLElement {
 		);
 		link.setAttribute('href', href);
 		return link;
-	};
-
-	getHtmlTemplate = () => {
-		const template = <HTMLTemplateElement>(
-			document.getElementById(this.componentName)
+	},
+	makeFlags(
+		flags: JSONOutput.ReflectionFlags,
+		comment: JSONOutput.Comment | undefined
+	) {
+		const flagElement = yafElement.makeElement<YafFlags, YafFlags['props']>(
+			'yaf-flags',
+			null,
+			null,
+			{
+				flags,
+				comment,
+			}
 		);
+		return flagElement;
+	},
+
+	getHtmlTemplate: (id: componentName) => {
+		const template = <HTMLTemplateElement>document.getElementById(id);
 		return template
 			? template.content
-			: this.errorHandlers.notFound(
-					`Could not find the HTMLTemplate for ${this.componentName}.`
+			: errorHandlers.notFound(
+					`Could not find the HTMLTemplate for "#${id}".`
 			  );
-	};
+	},
 
-	/**
-	 * Triggers an event to fetch a .json data file which corresponds to the given reflection id.
-	 *
-	 * The event listener is registered ??
-	 *
-	 * @todo document the event registration
-	 *
-	 * @param id
-	 * @returns reflection data
-	 */
+	needsParenthesis: (element: HTMLElement) => {
+		return element.hasAttribute('needsParenthesis');
+	},
 
-	/*
-	fetchReflectionById = (id: number): Promise<YAFDataObject> => {
-		return new Promise((resolve) => {
-			this.body.dispatchEvent(
-				action.fetch.reflectionById(id, (reflection) =>
-					resolve(reflection)
-				)
-			);
-		});
-	};
-*/
-	/**
-	 * Does this web component need to be wrapped in parenthesis?
-	 *
-	 * Used in the context of assembling more complex items, eg. signatures
-	 * @returns
-	 */
-	needsParenthesis = () => {
-		return this.hasAttribute('needsParenthesis');
-	};
-
-	renderSignatureType = (
+	renderSignatureType: (
 		type: YAFDataObject['type'] | abnormalSigTypes,
 		context: TypeContext
 	) => {
-		if (!type) return this.makeElement('span', null, 'value');
-		const signature = this.makeElement<YafSignature>('yaf-signature');
+		if (!type) return yafElement.makeElement('span', null, 'value');
+		const signature = yafElement.makeElement<YafSignature>('yaf-signature');
 		signature.props = {
 			type,
 			context,
 		};
 		return signature;
-	};
+	},
 
-	count = 0;
-	debounce = () => {
-		if (this.count) {
-			//console.debug(`${this.constructor.name} was debounced`);
+	initCap: (text: string) =>
+		`${text.charAt(0).toUpperCase()}${text.slice(1)}`,
+
+	debounce: (self: Record<string, unknown>) => {
+		if (self.debounceCount) {
+			//console.debug(`${self.constructor.name} was debounced`);
 			return true;
 		}
-		this.count++;
+		!self.debounceCount
+			? (self.debounceCount = 1)
+			: (<number>self.debounceCount)++;
 		return false;
-	};
-}
+	},
+
+	getTransitionDuration: (drawer: HTMLElement) => {
+		const animationDelay = getComputedStyle(drawer).getPropertyValue(
+			'transition-duration'
+		);
+		return parseFloat(animationDelay) * 1000;
+	},
+
+	scrollToAnchor: (container: HTMLElement, anchor: string | number) => {
+		if (typeof anchor === 'number') return container.scrollTo(0, 0);
+
+		const targetElement = document.getElementById(anchor);
+		if (targetElement) {
+			const drawerParents =
+				YafElementDrawers.findParentDrawers(targetElement);
+
+			if (!YafElementDrawers.hasClosedDrawers(drawerParents)) {
+				targetElement.scrollIntoView({ behavior: 'smooth' });
+			} else if (drawerParents.length) {
+				drawerParents.forEach((element) =>
+					element.drawers.openDrawer()
+				);
+				setTimeout(
+					() => targetElement.scrollIntoView({ behavior: 'smooth' }),
+					yafElement.getTransitionDuration(
+						drawerParents[0].drawers.drawer
+					) / 2
+				);
+			}
+		} else {
+			return ErrorHandlers.notFound(
+				`Could not find element for "#${anchor}"`
+			);
+		}
+	},
+};
+
+export default yafElement;

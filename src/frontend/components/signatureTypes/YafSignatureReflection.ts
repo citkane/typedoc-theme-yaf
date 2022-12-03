@@ -1,64 +1,69 @@
-import { componentName } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
+import { componentName } from '../../../types/frontendTypes.js';
+import yafElement from '../../YafElement.js';
 import { JSONOutput } from 'typedoc';
 import { YafSignatureTitle } from '../YafSignatureTitle.js';
 
 /**
  *
  */
-export class YafSignatureReflection extends YafElement {
+export class YafSignatureReflection extends HTMLElement {
 	props!: JSONOutput.ReflectionType;
 
-	constructor() {
-		super(componentName);
-	}
-
 	connectedCallback() {
-		if (this.debounce()) return;
-		this.needsParenthesis() && this.appendChild(this.makeSymbolSpan('('));
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
+		yafElement.needsParenthesis(this) &&
+			this.appendChild(yafElement.makeSymbolSpan('('));
 		const members: Element[][] = [];
 
 		let i = 0;
 		for (const child of this.props.declaration?.children || []) {
 			if (child.getSignature && child.setSignature) {
 				members.push([
-					this.makeNameSpan(child.name),
-					this.makeSymbolSpan(': '),
-					this.renderSignatureType(child.getSignature.type, 'none'),
+					yafElement.makeNameSpan(child.name),
+					yafElement.makeSymbolSpan(': '),
+					yafElement.renderSignatureType(
+						child.getSignature.type,
+						'none'
+					),
 				]);
 				continue;
 			}
 			if (child.getSignature) {
 				members.push([
-					this.makeSymbolSpan('get '),
-					this.makeNameSpan(child.name),
-					this.makeSymbolSpan('(): '),
-					this.renderSignatureType(child.getSignature.type, 'none'),
+					yafElement.makeSymbolSpan('get '),
+					yafElement.makeNameSpan(child.name),
+					yafElement.makeSymbolSpan('(): '),
+					yafElement.renderSignatureType(
+						child.getSignature.type,
+						'none'
+					),
 				]);
 				continue;
 			}
 			if (child.setSignature) {
 				const spans = [];
-				spans.push(this.makeSymbolSpan('set '));
-				spans.push(this.makeNameSpan(child.name));
-				spans.push(this.makeSymbolSpan('('));
+				spans.push(yafElement.makeSymbolSpan('set '));
+				spans.push(yafElement.makeNameSpan(child.name));
+				spans.push(yafElement.makeSymbolSpan('('));
 				child.setSignature.parameters?.forEach((parameter) => {
-					spans.push(this.makeNameSpan(parameter.name));
+					spans.push(yafElement.makeNameSpan(parameter.name));
 					spans.push(
-						this.renderSignatureType(parameter.type, 'none')
+						yafElement.renderSignatureType(parameter.type, 'none')
 					);
 				});
 				continue;
 			}
 
 			members.push([
-				this.makeElement(
+				yafElement.makeElement(
 					'span',
 					'name',
 					!i ? child.name : `\n${child.name}`
 				),
-				this.makeSymbolSpan(child.flags.isOptional ? '?: ' : ': '),
-				this.renderSignatureType(child.type, 'none'),
+				yafElement.makeSymbolSpan(
+					child.flags.isOptional ? '?: ' : ': '
+				),
+				yafElement.renderSignatureType(child.type, 'none'),
 			]);
 			i++;
 		}
@@ -67,13 +72,16 @@ export class YafSignatureReflection extends YafElement {
 			const index = this.props.declaration.indexSignature;
 
 			members.push([
-				this.makeSymbolSpan('['),
-				this.makeNameSpan(index.parameters![0].name),
-				this.makeSymbolSpan(':'),
-				this.renderSignatureType(index.parameters![0].type, 'none'),
-				this.makeSymbolSpan(']'),
-				this.makeSymbolSpan(':'),
-				this.renderSignatureType(index.type, 'none'),
+				yafElement.makeSymbolSpan('['),
+				yafElement.makeNameSpan(index.parameters![0].name),
+				yafElement.makeSymbolSpan(':'),
+				yafElement.renderSignatureType(
+					index.parameters![0].type,
+					'none'
+				),
+				yafElement.makeSymbolSpan(']'),
+				yafElement.makeSymbolSpan(':'),
+				yafElement.renderSignatureType(index.type, 'none'),
 			]);
 		}
 
@@ -81,7 +89,7 @@ export class YafSignatureReflection extends YafElement {
 			!members.length &&
 			this.props.declaration?.signatures?.length === 1
 		) {
-			const title = this.makeElement<YafSignatureTitle>(
+			const title = yafElement.makeElement<YafSignatureTitle>(
 				'yaf-signature-title'
 			);
 
@@ -96,7 +104,7 @@ export class YafSignatureReflection extends YafElement {
 		}
 
 		for (const signature of this.props.declaration?.signatures || []) {
-			const title = this.makeElement<YafSignatureTitle>(
+			const title = yafElement.makeElement<YafSignatureTitle>(
 				'yaf-signature-title'
 			);
 			title.props = {
@@ -108,7 +116,7 @@ export class YafSignatureReflection extends YafElement {
 
 		if (members.length) {
 			this.classList.add('block');
-			const openBrace = this.makeSymbolSpan('{ ');
+			const openBrace = yafElement.makeSymbolSpan('{ ');
 			this.parentElement?.insertBefore(openBrace, this);
 			members.forEach((memberArray) => {
 				memberArray.forEach((member, i) => {
@@ -117,14 +125,15 @@ export class YafSignatureReflection extends YafElement {
 						i === memberArray.length - 1 &&
 						member.tagName !== this.tagName
 					) {
-						this.appendChild(this.makeSymbolSpan('; '));
+						this.appendChild(yafElement.makeSymbolSpan('; '));
 					}
 				});
 			});
-			const closeBrace = this.makeSymbolSpan('}');
+			const closeBrace = yafElement.makeSymbolSpan('}');
 			this.parentElement?.insertBefore(closeBrace, this.nextSibling);
 		}
-		this.needsParenthesis() && this.appendChild(this.makeSymbolSpan(')'));
+		yafElement.needsParenthesis(this) &&
+			this.appendChild(yafElement.makeSymbolSpan(')'));
 	}
 }
 const componentName: componentName = 'yaf-signature-reflection';

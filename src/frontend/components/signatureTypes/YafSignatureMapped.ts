@@ -1,13 +1,11 @@
 import { JSONOutput } from 'typedoc';
-import { YafElement } from '../../YafElement.js';
+import yafElement from '../../YafElement.js';
 
-export class YafSignatureMapped extends YafElement {
+export class YafSignatureMapped extends HTMLElement {
 	props!: JSONOutput.MappedType;
-	constructor() {
-		super(yafSignatureMapped);
-	}
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		console.log(this.props);
 	}
 }

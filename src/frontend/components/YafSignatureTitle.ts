@@ -1,20 +1,17 @@
 import { JSONOutput } from 'typedoc';
-import { componentName } from '../../types/types.js';
+import { componentName } from '../../types/frontendTypes.js';
 import appState from '../lib/AppState.js';
-import { YafElement } from '../YafElement.js';
+import yafElement from '../YafElement.js';
 import { YafTypeParameters } from './YafTypeParameters.js';
 
-export class YafSignatureTitle extends YafElement {
+export class YafSignatureTitle extends HTMLElement {
 	props!: {
 		hideName?: boolean;
 		arrowStyle?: boolean;
 	} & JSONOutput.SignatureReflection;
 
-	constructor() {
-		super(yafSignatureTitle);
-	}
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		const spans: HTMLElement[] = [];
 		const {
@@ -34,15 +31,15 @@ export class YafSignatureTitle extends YafElement {
 			nameParts = nameParts.join(' ');
 
 			if (nameParts.length)
-				spans.push(this.makeSymbolSpan(`${nameParts} `));
+				spans.push(yafElement.makeSymbolSpan(`${nameParts} `));
 
 			//spans.push(this.makeSpan(`${nameParts} `, 'symbol'));
 
-			spans.push(this.makeTitleSpan(namePart!));
+			spans.push(yafElement.makeTitleSpan(namePart!));
 			//spans.push(this.makeSpan(namePart!, 'title'));
 		} else if (kind === appState.reflectionKind.ConstructorSignature) {
 			spans.push(
-				this.makeSymbolSpan(
+				yafElement.makeSymbolSpan(
 					`${flags.isAbstract ? 'abstract new ' : 'new '}`
 				)
 
@@ -56,7 +53,7 @@ export class YafSignatureTitle extends YafElement {
 		}
 
 		if (typeParameter) {
-			const typeParams: YafTypeParameters = this.makeElement(
+			const typeParams: YafTypeParameters = yafElement.makeElement(
 				'yaf-type-parameters'
 			);
 			typeParams.props = this.props.typeParameter
@@ -64,33 +61,35 @@ export class YafSignatureTitle extends YafElement {
 				: undefined;
 			spans.push(typeParams);
 		}
-		spans.push(this.makeSymbolSpan('('));
+		spans.push(yafElement.makeSymbolSpan('('));
 		//spans.push(this.makeSpan('(', 'symbol'));
 		parameters?.forEach((parameter, i) => {
-			const wrapper = this.makeElement('span', 'wrapper');
+			const wrapper = yafElement.makeElement('span', 'wrapper');
 
 			parameter.flags.isRest &&
-				wrapper.appendChild(this.makeSymbolSpan('...'));
-			wrapper.appendChild(this.makeNameSpan(parameter.name));
+				wrapper.appendChild(yafElement.makeSymbolSpan('...'));
+			wrapper.appendChild(yafElement.makeNameSpan(parameter.name));
 
 			parameter.flags.isOptional &&
-				wrapper.appendChild(this.makeSymbolSpan('?'));
+				wrapper.appendChild(yafElement.makeSymbolSpan('?'));
 			parameter.defaultValue &&
-				wrapper.appendChild(this.makeSymbolSpan('?'));
-			wrapper.appendChild(this.makeSymbolSpan(':'));
+				wrapper.appendChild(yafElement.makeSymbolSpan('?'));
+			wrapper.appendChild(yafElement.makeSymbolSpan(':'));
 			wrapper.appendChild(
-				this.renderSignatureType(parameter.type, 'none')
+				yafElement.renderSignatureType(parameter.type, 'none')
 			);
 			i < parameters!.length - 1 &&
-				wrapper.appendChild(this.makeSymbolSpan(', '));
+				wrapper.appendChild(yafElement.makeSymbolSpan(', '));
 
 			spans.push(wrapper);
 		});
-		spans.push(this.makeSymbolSpan(')'));
+		spans.push(yafElement.makeSymbolSpan(')'));
 
 		if (type) {
-			spans.push(this.makeSymbolSpan(`${arrowStyle ? ' => ' : ': '}`));
-			spans.push(this.renderSignatureType(type, 'none'));
+			spans.push(
+				yafElement.makeSymbolSpan(`${arrowStyle ? ' => ' : ': '}`)
+			);
+			spans.push(yafElement.renderSignatureType(type, 'none'));
 		}
 		spans.forEach((span) => this.appendChild(span));
 	}

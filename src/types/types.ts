@@ -5,12 +5,15 @@
 declare global {
 	interface Window {
 		searchData: object;
+		yaf: {
+			flushStateCache: () => void;
+		};
 	}
 }
 import { JSONOutput } from 'typedoc';
 
-export * from './backendTypes';
-export * from './frontendTypes';
+//export * from './backendTypes';
+//export * from './frontendTypes';
 
 export type htmlString = `<${string}>${string}</${string}>` | `<${string} />`;
 
@@ -93,4 +96,22 @@ export type treeMenuBranch = {
 	kind: number;
 	id: number;
 	children: treeMenuRoot;
+	parentDrawerElement?: HTMLElement;
+	inheritedFrom?: string | undefined;
 };
+
+export type YAFReflectionLink = {
+	name: string;
+	fileName: string;
+};
+export type reflectionMap = {
+	[key: number]: YAFReflectionLink;
+};
+
+export interface kindSymbol {
+	className: string;
+	symbol: string;
+}
+export type kindSymbols = { [key: number]: kindSymbol };
+
+export type needsParenthesis = Record<string, Record<string, boolean>>;

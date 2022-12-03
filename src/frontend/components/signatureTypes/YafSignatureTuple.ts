@@ -1,27 +1,26 @@
 import { JSONOutput } from 'typedoc';
-import { YafElement } from '../../YafElement.js';
+import yafElement from '../../YafElement.js';
 import { YafSignature } from '../YafSignature.js';
 
-export class YafSignatureTuple extends YafElement {
+export class YafSignatureTuple extends HTMLElement {
 	props!: JSONOutput.TupleType;
-	constructor() {
-		super(yafSignatureTuple);
-	}
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		const { elements } = this.props;
-		this.appendChild(this.makeSymbolSpan('['));
+		this.appendChild(yafElement.makeSymbolSpan('['));
 		elements?.forEach((type, i) => {
-			const signature = this.makeElement<YafSignature>('yaf-signature');
+			const signature =
+				yafElement.makeElement<YafSignature>('yaf-signature');
 			signature.props = { type, context: 'tupleElement' };
 
 			this.appendChild(signature);
 
 			if (i < elements.length - 1)
-				this.appendChild(this.makeSymbolSpan(', '));
+				this.appendChild(yafElement.makeSymbolSpan(', '));
 		});
-		this.appendChild(this.makeSymbolSpan(']'));
+		this.appendChild(yafElement.makeSymbolSpan(']'));
 	}
 }
 

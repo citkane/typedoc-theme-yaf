@@ -1,18 +1,18 @@
-import { componentName } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
+import { componentName } from '../../../types/frontendTypes.js';
+import yafElement from '../../YafElement.js';
 import { JSONOutput } from 'typedoc';
 
-export class YafSignatureUnion extends YafElement {
-	constructor() {
-		super(componentName);
-	}
+export class YafSignatureUnion extends HTMLElement {
 	props!: JSONOutput.UnionType;
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		this.props.types.forEach((type, i) => {
-			this.appendChild(this.renderSignatureType(type, 'unionElement'));
+			this.appendChild(
+				yafElement.renderSignatureType(type, 'unionElement')
+			);
 			if (i < this.props.types.length - 1)
-				this.appendChild(this.makeSymbolSpan(' | '));
+				this.appendChild(yafElement.makeSymbolSpan(' | '));
 		});
 	}
 }

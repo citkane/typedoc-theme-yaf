@@ -18,7 +18,7 @@ export class TypedocThemeYaf extends YAFElement {
 		const html = await this.fetchTemplate('html');
 		const css = await this.fetchTemplate('css');
 		const innerHtml = this.makeContent(html);
-		const innerCss = this.makeElement(css);
+		const innerCss = YafElement.makeElement(css);
 		this.appendChild(innerCss);
 		this.appendChild(innerHtml);
 	}

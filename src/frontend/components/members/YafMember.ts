@@ -2,63 +2,86 @@ import {
 	YAFDataObject,
 	YafDeclarationReflection,
 } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
+import yafElement from '../../YafElement.js';
 import { YafMemberDeclaration } from './YafMemberDeclaration.js';
 import { YafFlags } from '../YafFlags.js';
 import { YafMemberGetterSetter } from './YafMemberGetterSetter.js';
 import { YafMemberSignatures } from './YafMemberSignatures.js';
+import events from '../../lib/events/eventApi.js';
 
-export class YafMember extends YafElement {
+const { action } = events;
+
+export class YafMember extends HTMLElement {
 	props!: YAFDataObject;
-	constructor() {
-		super(yafMember);
-	}
-	connectedCallback() {
-		if (this.debounce()) return;
+	headerElement!: HTMLElement;
 
-		const { name, signatures, flags, comment, has, is, groups } =
+	connectedCallback() {
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
+
+		const { name, signatures, flags, comment, has, is, groups, id } =
 			this.props;
 
-		const flagsElement: YafFlags = this.makeElement('yaf-flags');
-		flagsElement.props = { flags, comment };
+		const flagsElement = yafElement.makeElement<
+			YafFlags,
+			YafFlags['props']
+		>('yaf-flags', null, null, { flags, comment });
+		this.headerElement = yafElement.makeElement('h3', 'header');
+		const nameElement = yafElement.makeNameSpan('');
+		const inner = yafElement.makeElement('div', 'inner');
 
-		const header = this.makeElement('h3', 'header');
+		nameElement.appendChild(yafElement.makeNameSpan(name));
+		nameElement.appendChild(yafElement.makeIconSpan('link'));
+		this.headerElement.appendChild(nameElement);
+		this.headerElement.appendChild(flagsElement);
 
-		const nameElement = this.makeNameSpan('');
-		nameElement.appendChild(this.makeNameSpan(name));
-		nameElement.appendChild(this.makeIconSpan('link'));
-
-		header.appendChild(nameElement);
-		header.appendChild(flagsElement);
-
-		this.appendChild(header);
-
-		const inner = this.makeElement('div');
-		inner.classList.add('inner');
+		events.on(
+			'click',
+			() => events.dispatch(action.menu.scrollTo(String(id))),
+			this.headerElement
+		);
 
 		if (signatures) {
-			const signaturesElement: YafMemberSignatures = this.makeElement(
-				'yaf-member-signatures'
+			inner.appendChild(
+				yafElement.makeElement<
+					YafMemberSignatures,
+					YafMemberSignatures['props']
+				>('yaf-member-signatures', null, null, signatures)
 			);
-			signaturesElement.props = signatures;
-			inner.appendChild(signaturesElement);
 		} else if (has.getterOrSetter) {
-			const getterSetter: YafMemberGetterSetter = this.makeElement(
-				'yaf-member-getter-setter'
+			inner.appendChild(
+				yafElement.makeElement<
+					YafMemberGetterSetter,
+					YafMemberGetterSetter['props']
+				>('yaf-member-getter-setter', null, null, this.props)
 			);
-			getterSetter.props = this.props;
-			inner.appendChild(getterSetter);
 		} else if (is.referenceReflection) {
-			console.error(this.props);
+			console.error('TODO', this.props);
 		} else {
-			const declaration: YafMemberDeclaration = this.makeElement(
-				'yaf-member-declaration'
+			inner.appendChild(
+				yafElement.makeElement<
+					YafMemberDeclaration,
+					YafMemberDeclaration['props']
+				>(
+					'yaf-member-declaration',
+					null,
+					null,
+					<YafDeclarationReflection>this.props
+				)
 			);
-			declaration.props = this.props as YafDeclarationReflection;
-			inner.appendChild(declaration);
 		}
+		this.appendChild(this.headerElement);
 		this.appendChild(inner);
+
 		if (groups) console.warn('TODO', groups);
+	}
+
+	disconnectedCallback() {
+		const { id } = this.props;
+		events.off(
+			'click',
+			() => events.dispatch(action.menu.scrollTo(String(id))),
+			this.headerElement
+		);
 	}
 }
 

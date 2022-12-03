@@ -1,5 +1,5 @@
 import { assert, fixture, html } from '@open-wc/testing';
-import { YafElement } from '../../../dist/src/frontend/YafElement.js';
+import YafElement from '../../../dist/src/frontend/YafElement.js';
 import {
 	baseElementFunctions,
 	baseElementVars,

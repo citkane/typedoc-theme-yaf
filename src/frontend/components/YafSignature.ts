@@ -1,33 +1,28 @@
-import { needsParenthesis } from '../lib/utils.js';
-import {
-	abnormalSigTypes,
-	TypeContext,
-	YAFDataObject,
-} from '../../types/types.js';
-import { YafElement } from '../YafElement.js';
+import { YAFDataObject } from '../../types/types.js';
+import yafElement from '../YafElement.js';
+import { abnormalSigTypes, TypeContext } from '../../types/frontendTypes.js';
+import appState from '../lib/AppState.js';
 
 export * from './signatureTypes/index.js';
 
-export class YafSignature extends YafElement {
+export class YafSignature extends HTMLElement {
 	props!: {
 		type: YAFDataObject['type'] | abnormalSigTypes;
 		context: TypeContext;
 	};
 	count = 0;
-	constructor() {
-		super(yafSignature);
-	}
+
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		let { type } = this.props;
 		const { context } = this.props;
 		if (!type) type = { type: 'unknown', name: 'unknown' };
-		const parenthesis = needsParenthesis[type.type](context);
+		const parenthesis = appState.needsParenthesis[type.type][context];
 
-		const typeSignature: YafElement & {
+		const typeSignature: HTMLElement & {
 			props: YAFDataObject['type'] | abnormalSigTypes;
-		} = this.makeElement(`yaf-signature-${type.type}`);
+		} = yafElement.makeElement(`yaf-signature-${type.type}`);
 		if (parenthesis) typeSignature.setAttribute('needsParenthesis', '');
 		typeSignature.props = type;
 

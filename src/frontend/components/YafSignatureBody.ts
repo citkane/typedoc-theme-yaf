@@ -1,5 +1,6 @@
-import { componentName, YafSignatureReflection } from '../../types/types.js';
-import { YafElement } from '../YafElement.js';
+import { componentName } from '../../types/frontendTypes.js';
+import { YafSignatureReflection } from '../../types/types.js';
+import yafElement from '../YafElement.js';
 import { YafContentMarked } from './YafContentMarked.js';
 import {
 	YafMemberParameters,
@@ -7,46 +8,51 @@ import {
 } from './YafContentMembers.js';
 import { YafSignature } from './YafSignature.js';
 
-export class YafSignatureBody extends YafElement {
+export class YafSignatureBody extends HTMLElement {
 	props!: YafSignatureReflection;
 
-	constructor() {
-		super(yafSignatureBody);
-	}
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		const { text, typeParameter, parameters, type } = this.props;
 
 		if (text.comment) {
-			const comment: YafContentMarked =
-				this.makeElement('yaf-content-marked');
-			comment.props = text.comment;
-			this.appendChild(comment);
+			this.appendChild(
+				yafElement.makeElement<
+					YafContentMarked,
+					YafContentMarked['props']
+				>('yaf-content-marked', null, null, text.comment)
+			);
 		}
 
 		if (typeParameter && typeParameter.length) {
-			const typeParameterElement: YafMemberParametersType =
-				this.makeElement('yaf-member-parameters-type');
-			typeParameterElement.props = typeParameter;
-			this.appendChild(typeParameterElement);
+			this.appendChild(
+				yafElement.makeElement<
+					YafMemberParametersType,
+					YafMemberParametersType['props']
+				>('yaf-member-parameters-type', null, null, typeParameter)
+			);
 		}
 
 		if (parameters && parameters.length) {
-			const parametersElement: YafMemberParameters = this.makeElement(
-				'yaf-member-parameters'
+			this.appendChild(
+				yafElement.makeElement<
+					YafMemberParameters,
+					YafMemberParameters['props']
+				>('yaf-member-parameters', null, null, parameters)
 			);
-			parametersElement.props = parameters;
-			this.appendChild(parametersElement);
 		}
 
 		if (type) {
-			const title = this.makeElement('h5', null, 'Returns:');
-			//title.innerText = 'Returns:';
-			this.appendChild(title);
-			const signature: YafSignature = this.makeElement('yaf-signature');
-			signature.props = { type, context: 'none' };
-			this.appendChild(signature);
+			this.appendChild(yafElement.makeElement('h5', null, 'Returns:'));
+			this.appendChild(
+				yafElement.makeElement<YafSignature, YafSignature['props']>(
+					'yaf-signature',
+					null,
+					null,
+					{ type, context: 'none' }
+				)
+			);
 
 			if (type.type === 'reflection') console.warn(type);
 		}

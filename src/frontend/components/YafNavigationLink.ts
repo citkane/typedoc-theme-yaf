@@ -1,6 +1,6 @@
-import { clickEvent, componentName } from '../../types/types';
+import { clickEvent, componentName } from '../../types/frontendTypes.js';
 import events from '../lib/events/eventApi.js';
-import router from '../lib/router.js';
+import router from '../lib/Router.js';
 
 export class YafNavigationLink extends HTMLAnchorElement {
 	linkElement = document.createElement('a');

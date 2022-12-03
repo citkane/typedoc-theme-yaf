@@ -7,6 +7,7 @@
 		transition: all var(--transition-rotates);
 	}
 }
+menu,
 ul {
 	ul {
 		padding-left: 1rem;
@@ -25,6 +26,10 @@ yaf-navigation-menu-branch {
 		text-decoration: none;
 		transition: color var(--transition-fades);
 	}
+	.yaf-drawer.show .hide a {
+		color: var(--color-fg-muted);
+	}
+	.yaf-drawer.show .hide a:hover,
 	a:hover {
 		color: var(--color-accent-fg);
 	}
@@ -68,6 +73,21 @@ yaf-navigation-menu-branch {
 			}
 		}
 	}
+	.inherited {
+		cursor: pointer;
+		font-size: 0.9rem;
+		padding: 0.5rem;
+		color: var(--color-fg-muted);
+		border: 1px solid var(--color-border-muted);
+		margin-bottom: 0.5rem;
+		text-align: center;
+	}
+	.yaf-drawer.hide > .hide {
+		overflow: hidden;
+		height: 0px;
+		opacity: 0;
+	}
+
 	yaf-navigation-menu-branch {
 		margin-right: var(--size);
 	}
@@ -86,7 +106,9 @@ yaf-navigation-menu-branch.open {
 			font-weight: 600;
 		}
 		.icon {
-			color: var(--color-accent-fg);
+			border-color: var(--color-accent-fg);
+			background: var(--color-accent-fg);
+			color: var(--color-canvas-subtle);
 		}
 		.icon > span {
 			transform: rotate(180deg);

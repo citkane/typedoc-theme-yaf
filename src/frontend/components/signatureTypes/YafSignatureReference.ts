@@ -1,5 +1,5 @@
-import { componentName } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
+import { componentName } from '../../../types/frontendTypes.js';
+import yafElement from '../../YafElement.js';
 import { JSONOutput } from 'typedoc';
 import { YafTypeArguments } from '../YafTypeArguments.js';
 
@@ -12,28 +12,30 @@ import { YafTypeArguments } from '../YafTypeArguments.js';
  * - implement `renderUniquePath
  * -
  */
-export class YafSignatureReference extends YafElement {
-	constructor() {
-		super(componentName);
-	}
+export class YafSignatureReference extends HTMLElement {
 	props!: JSONOutput.ReferenceType;
+
 	async connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		//const { ReflectionKind } = window.yaf;
 		const { externalUrl, id, name } = this.props;
 		this.classList.add('type');
 		let nameElement: Element;
 		if (externalUrl && name) {
-			nameElement = this.makeLinkElement(externalUrl, undefined, name);
+			nameElement = yafElement.makeLinkElement(
+				externalUrl,
+				undefined,
+				name
+			);
 			nameElement.setAttribute('target', '_blank');
 		} else if (name) {
-			nameElement = this.makeTypeSpan(this.props.name);
+			nameElement = yafElement.makeTypeSpan(this.props.name);
 		} else if (id) {
 			return alert('YafSignatureReference');
 			/*
 			const reflection = await this.fetchReflectionById(id);
 			if (reflection.kind === ReflectionKind.TypeParameter) {
-				nameElement = this.makeElement(
+				nameElement = YafElement.makeElement(
 					`<span class="type">${reflection.name}</span>`
 				);
 			} else {
@@ -43,7 +45,7 @@ export class YafSignatureReference extends YafElement {
 				nameElement = this.makeSpan('', 'type');
 				const { query, hash } = reflection.location;
 				const href = hash ? `?page=${query}#${hash}` : `?page=${query}`;
-				const link = this.makeElement(
+				const link = YafElement.makeElement(
 					`<yaf-navigation-link href="${href}">${reflection.name}</yaf-navigation-link>`
 				);
 				nameElement.appendChild(link);
@@ -53,14 +55,17 @@ export class YafSignatureReference extends YafElement {
 
 		this.appendChild(nameElement);
 
-		const typeArgs =
-			this.makeElement<YafTypeArguments>('yaf-type-arguments');
-		typeArgs.props = {
-			args: this.props.typeArguments,
-			context: 'referenceTypeArgument',
-		};
-
-		this.appendChild(typeArgs);
+		this.appendChild(
+			yafElement.makeElement<YafTypeArguments, YafTypeArguments['props']>(
+				'yaf-type-arguments',
+				null,
+				null,
+				{
+					args: this.props.typeArguments,
+					context: 'referenceTypeArgument',
+				}
+			)
+		);
 	}
 }
 

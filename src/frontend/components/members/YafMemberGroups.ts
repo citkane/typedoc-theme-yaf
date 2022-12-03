@@ -1,32 +1,29 @@
+import { DrawerElement } from '../../../types/frontendTypes.js';
 import { YAFDataObject, YAFReflectionLink } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
-import { YafElementDrawers } from '../../YafElementDrawers.js';
+import yafElement from '../../YafElement.js';
+import YafElementDrawers from '../../YafElementDrawers.js';
 import { YafWidgetCounter } from '../YafWidgets.js';
 import { YafMember } from './YafMember.js';
 
 /**
  *
  */
-export class YafMemberGroupLink extends YafElement {
+export class YafMemberGroupLink extends HTMLElement {
 	props!: {
 		title: string;
 		children: YAFReflectionLink[];
 	};
-
-	constructor() {
-		super(yafMemberGroupLink);
-	}
-	ul = this.makeElement(`ul`);
+	ul = yafElement.makeElement(`ul`);
 
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		const { children, title } = this.props;
-		const groupHeader = this.makeElement('h2');
-		const groupTitle = this.makeTitleSpan(`${title}`);
+		const groupHeader = yafElement.makeElement('h2');
+		const groupTitle = yafElement.makeTitleSpan(`${title}`);
 		groupHeader.appendChild(groupTitle);
 
 		const groupCount =
-			this.makeElement<YafWidgetCounter>('yaf-widget-counter');
+			yafElement.makeElement<YafWidgetCounter>('yaf-widget-counter');
 		groupCount.props = {
 			count: children.length,
 		};
@@ -35,8 +32,8 @@ export class YafMemberGroupLink extends YafElement {
 		this.appendChild(groupHeader);
 		this.ul.classList.add('links');
 		children.forEach((child) => {
-			const item = this.makeElement(`li`);
-			const link = this.makeLinkElement(
+			const item = yafElement.makeElement(`li`);
+			const link = yafElement.makeLinkElement(
 				`?page=${child.fileName}`,
 				undefined,
 				child.name
@@ -54,63 +51,61 @@ customElements.define(yafMemberGroupLink, YafMemberGroupLink);
 /**
  *
  */
-export class YafMemberGroupReflection extends YafElementDrawers {
+export class YafMemberGroupReflection extends HTMLElement {
 	props!: {
 		title: string;
 		children: YAFDataObject[];
+		pageId: string;
 	};
-
-	constructor() {
-		super(yafMemberGroupReflection);
-	}
+	drawers!: YafElementDrawers;
 
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
+		const { title, children, pageId } = this.props;
 
-		const drawer = this.makeElement(`ul`);
-		const drawerTrigger = this.makeElement('span', 'trigger');
-		this.initDrawer(
-			this,
-			drawer,
-			drawerTrigger,
-			this.props.title,
-			'content'
-		);
-
-		const { children, title } = this.props;
-		const groupHeader = this.makeElement('h2');
-		const groupTitle = this.makeTitleSpan(`${title}`);
-		const handleIcon = this.makeIconSpan('expand_less');
-		const icon = this.makeElement('span', 'icon');
-		icon.appendChild(handleIcon);
-
-		this.drawerTrigger.appendChild(icon);
-		this.drawerTrigger.appendChild(groupTitle);
-
-		groupHeader.appendChild(this.drawerTrigger);
-
-		const groupCount =
-			this.makeElement<YafWidgetCounter>('yaf-widget-counter');
-		groupCount.props = {
+		const drawer = yafElement.makeElement(`ul`);
+		const drawerTrigger = yafElement.makeElement('span', 'trigger');
+		const groupHeader = yafElement.makeElement('h2');
+		const groupTitle = yafElement.makeTitleSpan(`${title}`);
+		const handleIcon = yafElement.makeIconSpan('expand_less');
+		const icon = yafElement.makeElement('span', 'icon');
+		const groupCount = yafElement.makeElement<
+			YafWidgetCounter,
+			YafWidgetCounter['props']
+		>('yaf-widget-counter', null, null, {
 			count: children.length,
-		};
-
-		groupHeader.appendChild(groupCount);
-
-		this.appendChild(groupHeader);
-		children.forEach((child) => {
-			const item = this.makeElement('li');
-			item.id = child.name;
-			const member = this.makeElement<YafMember>('yaf-member');
-			member.props = child;
-			item.appendChild(member);
-			this.drawer.appendChild(item);
 		});
 
-		this.renderDrawer();
+		icon.appendChild(handleIcon);
+		drawerTrigger.appendChild(icon);
+		drawerTrigger.appendChild(groupTitle);
+		groupHeader.appendChild(drawerTrigger);
+		groupHeader.appendChild(groupCount);
+		this.appendChild(groupHeader);
+
+		children.forEach((child) => {
+			const item = yafElement.makeElement('li');
+			item.id = child.name;
+			const member = yafElement.makeElement<
+				YafMember,
+				YafMember['props']
+			>('yaf-member', null, null, child);
+			item.appendChild(member);
+			drawer.appendChild(item);
+		});
+
+		this.id = `member_${pageId}_${title}`;
+
+		this.drawers = new YafElementDrawers(
+			this as unknown as DrawerElement,
+			drawer,
+			drawerTrigger,
+			this.id
+		);
+		this.drawers.renderDrawer();
 	}
 	disconnectedCallback() {
-		this.drawerHasDisconnected();
+		this.drawers.drawerHasDisconnected();
 	}
 }
 const yafMemberGroupReflection = 'yaf-member-group-reflection';

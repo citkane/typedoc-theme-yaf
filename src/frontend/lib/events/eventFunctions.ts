@@ -1,6 +1,18 @@
+import { yafOptions } from '../../../types/frontendTypes.js';
 import { YAFDataObject } from '../../../types/types.js';
 import { trigger } from './eventApi.js';
 
+export const options = (context: yafOptions, value: unknown) =>
+	new CustomEvent(trigger.options[context], { detail: value });
+
+/**
+ * Notifies the content or menu DOM that it needs to scroll to the given location
+ * @param target
+ * @param context
+ * @returns
+ */
+export const scrollTo = (context: 'menu' | 'content', target: 0 | string) =>
+	new CustomEvent(trigger[context].scrollTo, { detail: { target } });
 /**
  * Notifies that the URL location for content has changed
  *
@@ -8,14 +20,6 @@ import { trigger } from './eventApi.js';
  * @returns
  */
 export const contentSetLocation = () => new Event(trigger.content.setLocation);
-
-/**
- * Notifies that the content needs to scroll to the given location
- * @param target 0 for the top, or an #anchor tag
- * @returns
- */
-export const contentScrollTo = (target: 0 | string) =>
-	new CustomEvent(trigger.content.scrollTo, { detail: { target } });
 
 /**
  * Notifies that data for the given reflection id is required and should be passed back into
@@ -45,5 +49,12 @@ export const getPageContentId = (callBack: (pageId: string) => void) =>
 		detail: { callBack },
 	});
 
-export const rollMenuDown = () => new Event(trigger.content.rollMenuDown);
-export const rollMenuUp = () => new Event(trigger.content.rollMenuUp);
+export const rollMenuDown = () => new Event(trigger.menu.rollMenuDown);
+export const rollMenuUp = () => new Event(trigger.menu.rollMenuUp);
+
+export const sendDrawerHeight = (
+	action: 'refreshHeight' | 'initHeight',
+	height: number
+) => new CustomEvent(trigger.drawers[action], { detail: height });
+
+export const resetDrawerHeight = () => new Event(trigger.drawers.resetHeight);

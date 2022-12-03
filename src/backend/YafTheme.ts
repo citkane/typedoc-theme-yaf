@@ -11,17 +11,25 @@ import {
 	RendererEvent,
 	ReflectionKind,
 } from 'typedoc';
-import { YAFDataObject, reflectionMap, treeMenuRoot } from '../types/types';
+import {
+	YAFDataObject,
+	reflectionMap,
+	treeMenuRoot,
+	needsParenthesis,
+} from '../types/types';
 import {
 	buildNavTree,
 	copyThemeFiles,
 	getHighlighted,
-	KindSymbols,
 	loadHighlighter,
-	makeReflectionMapData,
 	parseProject,
 	saveDataFile,
-} from './lib';
+} from './lib/lib';
+import {
+	makeNeedsParenthesis,
+	makeYafKindSymbols,
+	makeYafReflectionMap,
+} from './lib/makeFrontendData';
 
 /**
  * The YAF extension to the default typedoc theme.
@@ -35,6 +43,7 @@ export class YafTheme extends DefaultTheme {
 	menuData: treeMenuRoot;
 	reflectionDataObjects: YAFDataObject[];
 	reflectionMapData: reflectionMap;
+	needsParenthesis: needsParenthesis;
 
 	constructor(renderer: Renderer) {
 		super(renderer);
@@ -98,9 +107,6 @@ export class YafTheme extends DefaultTheme {
 			this.context
 		);
 
-		this.reflectionMapData = makeReflectionMapData(
-			this.reflectionDataObjects
-		);
 		this.saveYafThemeAssets();
 	};
 
@@ -110,9 +116,22 @@ export class YafTheme extends DefaultTheme {
 	saveYafThemeAssets = () => {
 		copyThemeFiles(this.rootDir, this.docDir);
 		saveDataFile('yafNavigationMenu', this.docDir, this.menuData);
-		saveDataFile('yafReflectionMap', this.docDir, this.reflectionMapData);
-		saveDataFile('yafKindSymbols', this.docDir, KindSymbols);
+		saveDataFile(
+			'yafReflectionMap',
+			this.docDir,
+			makeYafReflectionMap(this.reflectionDataObjects)
+		);
+		saveDataFile(
+			'yafKindSymbols',
+			this.docDir,
+			makeYafKindSymbols(this.context.icons)
+		);
 		saveDataFile('yafReflectionKind', this.docDir, ReflectionKind);
+		saveDataFile(
+			'yafNeedsParenthesis',
+			this.docDir,
+			makeNeedsParenthesis()
+		);
 
 		this.reflectionDataObjects.forEach((object) => {
 			const fileName = object.is.project

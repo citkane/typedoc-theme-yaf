@@ -1,9 +1,6 @@
-import {
-	componentName,
-	YAFDataObject,
-	YafDeclarationReflection,
-} from '../../../types/types';
-import { YafElement } from '../../YafElement.js';
+import { componentName } from '../../../types/frontendTypes';
+import { YAFDataObject, YafDeclarationReflection } from '../../../types/types';
+import yafElement from '../../YafElement.js';
 import { YafContentMarked } from '../YafContentMarked';
 import { YafSignature } from '../YafSignature';
 import {
@@ -14,33 +11,34 @@ import {
 /**
  *
  */
-export class YafMemberDeclaration extends YafElement {
-	constructor() {
-		super(yafMemberDeclaration);
-	}
+export class YafMemberDeclaration extends HTMLElement {
 	props!: YafDeclarationReflection;
+
 	async connectedCallback() {
 		const { name, typeParameters, type, flags, defaultValue, text } =
 			this.props;
-		const pre = this.makeElement('pre');
-		const title = this.makeElement('element', 'title', name);
+		const pre = yafElement.makeElement('pre');
+		const title = yafElement.makeElement('element', 'title', name);
 		pre.classList.add('highlight');
 		pre.appendChild(title);
 
 		if (typeParameters && typeParameters.length) {
-			const typeParamsElement =
-				this.makeElement<YafTypeParams>('yaf-type-params');
-			typeParamsElement.props = {
+			const typeParamsElement = yafElement.makeElement<
+				YafTypeParams,
+				YafTypeParams['props']
+			>('yaf-type-params', null, null, {
 				typeParameters,
-			};
+			});
 			pre.appendChild(typeParamsElement);
 		}
 		if (type) {
-			const optional = this.makeSymbolSpan(flags.isOptional ? '?' : '');
+			const optional = yafElement.makeSymbolSpan(
+				flags.isOptional ? '?' : ''
+			);
 			pre.appendChild(optional);
 
 			const signatureType =
-				this.makeElement<YafSignature>('yaf-signature');
+				yafElement.makeElement<YafSignature>('yaf-signature');
 			signatureType.props = {
 				type,
 				context: 'none',
@@ -49,29 +47,28 @@ export class YafMemberDeclaration extends YafElement {
 		}
 
 		if (defaultValue) {
-			pre.appendChild(this.makeSymbolSpan(' = '));
-			pre.appendChild(this.makeValueSpan(defaultValue));
+			pre.appendChild(yafElement.makeSymbolSpan(' = '));
+			pre.appendChild(yafElement.makeValueSpan(defaultValue));
 		}
 		this.appendChild(pre);
 
 		if (text?.comment) {
 			const commentElement: YafContentMarked =
-				this.makeElement('yaf-content-marked');
+				yafElement.makeElement('yaf-content-marked');
 			commentElement.props = text.comment;
 			this.appendChild(commentElement);
 		}
 
 		if (typeParameters) {
 			const typeParameterElement: YafMemberParametersType =
-				this.makeElement('yaf-member-parameters-type');
+				yafElement.makeElement('yaf-member-parameters-type');
 			typeParameterElement.props = typeParameters;
 			this.appendChild(typeParameterElement);
 		}
 
 		if (type?.type === 'reflection') {
-			const parametersElement: YafMemberParameters = this.makeElement(
-				'yaf-member-parameters'
-			);
+			const parametersElement: YafMemberParameters =
+				yafElement.makeElement('yaf-member-parameters');
 			parametersElement.props = type.declaration
 				?.children as YafDeclarationReflection[];
 			this.appendChild(parametersElement);
@@ -84,22 +81,19 @@ customElements.define(yafMemberDeclaration, YafMemberDeclaration);
 /**
  *
  */
-export class YafTypeParams extends YafElement {
-	constructor() {
-		super(yafTypeParams);
-	}
+export class YafTypeParams extends HTMLElement {
 	props!: { typeParameters: YAFDataObject['typeParameters'] };
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 		const params = (this.props.typeParameters || []).flatMap((param) => {
-			const span = this.makeElement(
+			const span = yafElement.makeElement(
 				'span',
 				`type ${param.kindString ? ` ${param.kindString}` : ''}`,
 				param.name
 			);
 			return param.varianceModifier
 				? [
-						this.makeElement(
+						yafElement.makeElement(
 							'span',
 							'modifier',
 							`${param.varianceModifier}`
@@ -108,9 +102,9 @@ export class YafTypeParams extends YafElement {
 				  ]
 				: span;
 		});
-		this.appendChild(this.makeSymbolSpan('<'));
+		this.appendChild(yafElement.makeSymbolSpan('<'));
 		params.forEach((param) => this.appendChild(param));
-		this.appendChild(this.makeSymbolSpan('>'));
+		this.appendChild(yafElement.makeSymbolSpan('>'));
 	}
 }
 const yafTypeParams: componentName = 'yaf-type-params';

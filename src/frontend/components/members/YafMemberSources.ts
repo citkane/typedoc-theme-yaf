@@ -1,33 +1,27 @@
-import { JSONOutput, SignatureReflection } from 'typedoc';
 import {
 	YafDeclarationReflection,
 	YafSignatureReflection,
 } from '../../../types/types.js';
-import { YafElement } from '../../YafElement.js';
-import { YafNavigationLink } from '../YafNavigationLink.js';
+import yafElement from '../../YafElement.js';
 
-export class YafMemberSources extends YafElement {
+export class YafMemberSources extends HTMLElement {
 	props!: YafSignatureReflection | YafDeclarationReflection;
 
-	constructor() {
-		super(yafMemberSources);
-	}
-
 	connectedCallback() {
-		if (this.debounce()) return;
+		if (yafElement.debounce(this as Record<string, unknown>)) return;
 
 		const { sources } = this.props;
 
 		if (sources) {
-			const header = this.makeElement('h5', null, 'Defined in:');
+			const header = yafElement.makeElement('h5', null, 'Defined in:');
 			this.appendChild(header);
 
-			const ul = this.makeElement('ul');
+			const ul = yafElement.makeElement('ul');
 			sources?.forEach((source) => {
 				const { fileName, line, url } = source;
-				const li = this.makeElement('li');
+				const li = yafElement.makeElement('li');
 				if (url) {
-					const link = this.makeLinkElement(
+					const link = yafElement.makeLinkElement(
 						url,
 						undefined,
 						`${fileName}:${line}`
