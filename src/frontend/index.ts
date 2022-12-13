@@ -1,8 +1,10 @@
 /**
+ * Some stuff to say here hooray!!
+ *
  * @module frontend
  */
 
-export * as router from './lib/Router.js';
-export * as components from './components/index.js';
-export * as state from './lib/AppState.js';
-export * as errorHandlers from './lib/ErrorHandlers.js';
+export * as webComponents from './webComponents/index.js';
+export * as lib from './lib/index.js';
+export { default as YafElementDrawers } from './YafElementDrawers.js';
+export { default as YafElement } from './YafElement.js';

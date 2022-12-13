@@ -1,6 +1,7 @@
 import {
 	localStorageKey,
 	ReflectionKind,
+	yafDisplayOptions,
 	yafState,
 } from '../../types/frontendTypes.js';
 import {
@@ -11,9 +12,6 @@ import {
 	needsParenthesis,
 } from '../../types/types.js';
 import ErrorHandlers from './ErrorHandlers.js';
-import events from './events/eventApi.js';
-
-const { action } = events;
 
 /**
  *
@@ -53,9 +51,11 @@ export class AppState {
 				navigationMenu: navigationMenu as treeMenuRoot,
 				drawers: AppState.getLocalStorageItem('drawers') || {},
 				scrollTop: AppState.getLocalStorageItem('scrollTop') || {},
-				options:
-					AppState.getLocalStorageItem('options') ||
-					AppState.defaultOptions,
+				options: {
+					display:
+						AppState.getLocalStorageItem('displayOptions') ||
+						AppState.defaultOptions.display,
+				},
 			};
 
 			Object.freeze(this.state);
@@ -94,11 +94,14 @@ export class AppState {
 	set closeDrawer(id: string) {
 		delete this.state.drawers[id];
 	}
-	set showInheritedMembers(state: 'show' | 'hide') {
-		this.state.options.showInheritedMembers = state;
-		events.dispatch(action.options.showInheritedMembers(state));
-	}
 
+	toggleDisplayOption = (flag: yafDisplayOptions) => {
+		const displayState = this.options.display[flag];
+		const newDisplayState = displayState === 'show' ? 'hide' : 'show';
+		this.state.options.display[flag] = newDisplayState;
+
+		return newDisplayState;
+	};
 	setScrollTop = (id: string, position: number) =>
 		(this.state.scrollTop[id] = position);
 
@@ -113,15 +116,16 @@ export class AppState {
 			  );
 
 	private flushStateCache = () => {
-		(<(keyof yafState)[]>Object.keys(localStorage)).forEach((key) => {
-			if (this.state[key]) localStorage.removeItem(key);
-		});
+		localStorage.clear();
 		this.initCache().then(() => AppState.saveToLocalStorage(this.state));
 	};
 
 	private static defaultDataDir = './frontend/data/';
 	private static defaultOptions: yafState['options'] = {
-		showInheritedMembers: 'hide',
+		display: {
+			inherited: 'hide',
+			private: 'hide',
+		},
 	};
 
 	private static fetchDataFromFile = async <returnType>(fileName: string) => {
@@ -159,7 +163,10 @@ export class AppState {
 	private static saveToLocalStorage = (state: yafState) => {
 		localStorage.setItem('drawers', JSON.stringify(state.drawers));
 		localStorage.setItem('scrollTop', JSON.stringify(state.scrollTop));
-		localStorage.setItem('options', JSON.stringify(state.options));
+		localStorage.setItem(
+			'displayOptions',
+			JSON.stringify(state.options.display)
+		);
 	};
 }
 

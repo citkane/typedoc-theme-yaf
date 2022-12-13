@@ -1,9 +1,16 @@
-import { DrawerElement, drawerState } from '../types/frontendTypes.js';
+import {
+	DrawerElement,
+	drawerState,
+	yafDisplayOptions,
+	yafState,
+} from '../types/frontendTypes.js';
 import appState from './lib/AppState.js';
 import events from './lib/events/eventApi.js';
 
-const { trigger, action } = events;
-
+const { trigger } = events;
+/**
+ * Utility class for folding, hierarchical drawers
+ */
 export default class YafElementDrawers {
 	drawer!: HTMLElement;
 	drawerParent!: DrawerElement;
@@ -28,7 +35,7 @@ export default class YafElementDrawers {
 		this.drawerTrigger = drawerTrigger;
 		this.drawerId = id;
 		this.parentDrawerElement = parentDrawerElement;
-		this.hasContent = !!this.drawer.innerHTML;
+
 		this.drawerParent.isDrawer = true;
 
 		this.drawerParent.classList.add('yaf-parent-drawer');
@@ -36,61 +43,54 @@ export default class YafElementDrawers {
 		this.drawerParent.setAttribute('data-height', '0');
 		this.drawerParent.setAttribute('data-height-extra', '0');
 
+		this.drawerParent.appendChild(this.drawer);
+
+		(<yafDisplayOptions[]>Object.keys(appState.options.display)).forEach(
+			(key) => {
+				this.drawerParent.setAttribute(
+					key,
+					appState.options.display[key]
+				);
+			}
+		);
+
 		events.on('click', () => this.toggleDrawerState(), this.drawerTrigger);
 		events.on('resize', () => this.heightControl.debounceReset(), window);
-		events.on(
-			trigger.drawers.initHeight,
-			({ detail }: CustomEvent) =>
-				this.heightControl.initDataHeight(detail),
-			this.drawerParent
+		events.on(trigger.drawers.resetHeight, () =>
+			this.heightControl.resetHeights(true)
 		);
-		events.on(
-			trigger.drawers.refreshHeight,
-			({ detail }: CustomEvent) =>
-				this.heightControl.updateHeightAbove(detail),
-			this.drawerParent
-		);
-		events.on(
-			trigger.drawers.resetHeight,
-			this.heightControl.resetHeights,
-			this.drawerParent
-		);
+		events.on(trigger.options.display, ({ detail }: CustomEvent) => {
+			const { key, value } = detail;
+			this.drawerParent.setAttribute(key, value);
+		});
 	}
+	drawerHasDisconnected = () => {
+		events.off('click', () => this.toggleDrawerState(), this.drawerTrigger);
+		events.off('resize', () => this.heightControl.debounceReset(), window);
 
-	renderDrawer = (refresh = false) => {
-		if (!refresh) this.drawerParent.appendChild(this.drawer);
+		events.on(trigger.drawers.resetHeight, () =>
+			this.heightControl.resetHeights(true)
+		);
+		events.off(trigger.options.display, ({ detail }: CustomEvent) => {
+			const { key, value } = detail;
+			this.drawerParent.setAttribute(key, value);
+		});
+	};
+
+	renderDrawers = (init = false) => {
+		if (init && !this.isRoot) return;
+		this.hasContent = !!this.drawer.innerHTML;
 
 		this.heightControl.initDataHeight(this.drawer.clientHeight);
-
 		this.drawerParent.classList.add('closed');
-
 		appState.openDrawers[this.drawerId]
 			? this.openDrawer()
 			: this.closeDrawer();
 
+		this.childDrawerElements.forEach((child) =>
+			child.drawers.renderDrawers()
+		);
 		setTimeout(() => this.drawerParent.classList.add('rendered'));
-	};
-
-	drawerHasDisconnected = () => {
-		events.off('click', () => this.toggleDrawerState(), this.drawerTrigger);
-		events.off('resize', () => this.heightControl.debounceReset(), window);
-		events.off(
-			trigger.drawers.initHeight,
-			({ detail }: CustomEvent) =>
-				this.heightControl.initDataHeight(detail),
-			this.drawerParent
-		);
-		events.off(
-			trigger.drawers.refreshHeight,
-			({ detail }: CustomEvent) =>
-				this.heightControl.updateHeightAbove(detail),
-			this.drawerParent
-		);
-		events.off(
-			trigger.drawers.resetHeight,
-			this.heightControl.resetHeights,
-			this.drawerParent
-		);
 	};
 
 	openDrawer = () => {
@@ -118,11 +118,6 @@ export default class YafElementDrawers {
 	heightControl = {
 		initDataHeight: (clientHeight: number) => {
 			this.dataHeight = this.dataHeight + clientHeight;
-			if (this.isBranch)
-				events.dispatch(
-					action.drawers.initHeight(this.drawerParent.clientHeight),
-					this.parentDrawerElement
-				);
 			this.heightControl.setMaxHeightStyle();
 		},
 		setMaxHeightStyle: () => {
@@ -134,31 +129,37 @@ export default class YafElementDrawers {
 		updateHeightAbove: (height: number) => {
 			this.dataExtraHeight = height;
 			this.heightControl.setMaxHeightStyle();
-			if (this.isBranch)
-				events.dispatch(
-					action.drawers.refreshHeight(height),
-					this.parentDrawerElement
+			if (this.parentDrawerElement)
+				this.parentDrawerElement.drawers.heightControl.updateHeightAbove(
+					height
 				);
 		},
-		resetHeights: () => {
+		reRenderDrawers: (init = false) => {
+			if (init && !this.isLeaf) return;
+			if (init) this.renderDrawers(true);
+			if (this.parentDrawerElement)
+				this.parentDrawerElement.drawers.heightControl.reRenderDrawers();
+		},
+		resetHeights: (init = false) => {
+			if (init && !this.isRoot) return;
+
 			this.dataHeight = 0;
 			this.dataExtraReset = 0;
 			this.drawer.removeAttribute('style');
-			['rendered', 'open', 'closed'].forEach((className) =>
-				this.drawerParent.classList.remove(className)
-			);
-			this.childDrawerElements.forEach((child) =>
-				events.dispatch(action.drawers.resetHeight(), child)
-			);
+			['rendered', 'open', 'closed'].forEach((className) => {
+				if (this.drawerParent.classList.contains(className))
+					this.drawerParent.classList.remove(className);
+			});
 
-			this.renderDrawer(true);
+			this.childDrawerElements.forEach((child) => {
+				child.drawers.heightControl.resetHeights();
+			});
+			this.renderDrawers(true);
 		},
 		debounceReset: () => {
 			this.debounceResize && clearTimeout(this.debounceResize);
-
-			if (this.isBranch) return;
 			this.debounceResize = setTimeout(() => {
-				this.heightControl.resetHeights();
+				this.heightControl.resetHeights(true);
 			}, 100);
 		},
 	};
@@ -202,11 +203,18 @@ export default class YafElementDrawers {
 	get isRoot() {
 		return !this.parentDrawerElement;
 	}
+	get isBranch() {
+		return !!this.parentDrawerElement;
+	}
 	get isLeaf() {
 		return !this.childDrawerElements.length;
 	}
-	get isBranch() {
-		return !!this.parentDrawerElement;
+	get flagCounts(): Record<keyof yafState['options']['display'], number> {
+		return {
+			private: this.drawer.querySelectorAll(':scope > .private').length,
+			inherited: this.drawer.querySelectorAll(':scope > .inherited')
+				.length,
+		};
 	}
 
 	static findParentDrawers = (

@@ -1,4 +1,6 @@
 import path from 'path';
+import fs from 'fs-extra';
+
 import {
 	DeclarationReflection,
 	DefaultTheme,
@@ -17,19 +19,15 @@ import {
 	treeMenuRoot,
 	needsParenthesis,
 } from '../types/types';
+import { getHighlighted } from './lib/highlighter';
 import {
-	buildNavTree,
-	copyThemeFiles,
-	getHighlighted,
-	loadHighlighter,
-	parseProject,
-	saveDataFile,
-} from './lib/lib';
-import {
+	makeNavTree,
 	makeNeedsParenthesis,
 	makeYafKindSymbols,
 	makeYafReflectionMap,
 } from './lib/makeFrontendData';
+import { YafSerializer } from './Serialiser';
+import { highlighter } from '../types/backendTypes';
 
 /**
  * The YAF extension to the default typedoc theme.
@@ -38,25 +36,31 @@ import {
  * @version 0.1.0
  */
 export class YafTheme extends DefaultTheme {
+	static highlighter: highlighter;
+
 	project: ProjectReflection;
 	projectObject: JSONOutput.ProjectReflection;
 	menuData: treeMenuRoot;
-	reflectionDataObjects: YAFDataObject[];
+	yafSerialiser: YafSerializer;
 	reflectionMapData: reflectionMap;
 	needsParenthesis: needsParenthesis;
 
+	docDir = this.application.options.getValue('out') || 'docs';
+	rootDir = path.join(__dirname, '..', '..', '../');
+	context = this.getRenderContext();
+
 	constructor(renderer: Renderer) {
 		super(renderer);
-		this.application.renderer.on(RendererEvent.BEGIN, this.prepareYafTheme);
 
-		/**
-		 * Callbacks to typedoc events appear to be synchronous, thus asynchrounous
-		 * code in `BEGIN` fires after `END`.
-		 *
-		 * The below line of code would be semantically better, but not feasible ATM.
-		 *
-		 */
-		//this.application.renderer.on(RendererEvent.END, this.commitYafTheme);
+		this.markedPlugin.getHighlighted = (text: string, lang?: string) =>
+			getHighlighted(YafTheme.highlighter, text, lang);
+
+		this.markedPlugin.getRelativeUrl = (absolute: string) => {
+			console.log(absolute);
+			return 'foo';
+		};
+
+		this.application.renderer.on(RendererEvent.BEGIN, this.prepareYafTheme);
 	}
 
 	/**
@@ -67,7 +71,6 @@ export class YafTheme extends DefaultTheme {
 	override getRenderContext(): DefaultThemeRenderContext {
 		return new DefaultThemeRenderContext(this, this.application.options);
 	}
-	context = this.getRenderContext();
 
 	/**
 	 * Prevents the default typedoc `render` call from saving pages to html.
@@ -80,28 +83,16 @@ export class YafTheme extends DefaultTheme {
 	}
 
 	/**
-	 * The documentation output directory.
-	 */
-	docDir = this.application.options.getValue('out');
-	rootDir = path.join(__dirname, '..', '..', '../');
-
-	/**
 	 * Triggered at the typedoc `RendererEvent.BEGIN` event.
 	 *
 	 * It prepares various items of data that are to be consumed by the theme front-end;
 	 *
 	 * @param output
 	 */
-	prepareYafTheme = async (output: RendererEvent) => {
+	prepareYafTheme = (output: RendererEvent) => {
 		this.project = output.project;
 		this.projectObject = this.application.serializer.toObject(this.project);
-		this.menuData = buildNavTree({}, this.project);
-
-		const highlighter = await loadHighlighter(); //uses "Starry Night" to emulate GitHub.
-		this.markedPlugin.getHighlighted = (text: string, lang?: string) =>
-			getHighlighted(highlighter, text, lang);
-
-		this.reflectionDataObjects = parseProject(
+		this.yafSerialiser = new YafSerializer(
 			this.projectObject as YAFDataObject,
 			this.project as ProjectReflection & DeclarationReflection,
 			this.context
@@ -114,30 +105,79 @@ export class YafTheme extends DefaultTheme {
 	 * Copies / saves various theme assets and data files for consumption by the front-end.
 	 */
 	saveYafThemeAssets = () => {
-		copyThemeFiles(this.rootDir, this.docDir);
-		saveDataFile('yafNavigationMenu', this.docDir, this.menuData);
-		saveDataFile(
+		YafTheme.copyThemeFiles(this.rootDir, this.docDir);
+		console.log(this.rootDir, this.docDir);
+		YafTheme.saveDataFile(
+			'yafNavigationMenu',
+			this.docDir,
+			makeNavTree(this.project)
+		);
+		YafTheme.saveDataFile(
 			'yafReflectionMap',
 			this.docDir,
-			makeYafReflectionMap(this.reflectionDataObjects)
+			makeYafReflectionMap(this.yafSerialiser.dataObjectArray)
 		);
-		saveDataFile(
+		YafTheme.saveDataFile(
 			'yafKindSymbols',
 			this.docDir,
 			makeYafKindSymbols(this.context.icons)
 		);
-		saveDataFile('yafReflectionKind', this.docDir, ReflectionKind);
-		saveDataFile(
+		YafTheme.saveDataFile('yafReflectionKind', this.docDir, ReflectionKind);
+		YafTheme.saveDataFile(
 			'yafNeedsParenthesis',
 			this.docDir,
 			makeNeedsParenthesis()
 		);
-
-		this.reflectionDataObjects.forEach((object) => {
+		this.yafSerialiser.dataObjectArray.forEach((object) => {
 			const fileName = object.is.project
 				? 'index'
 				: object.location.query;
-			saveDataFile(fileName, this.docDir, object);
+			YafTheme.saveDataFile(fileName, this.docDir, object);
 		});
+	};
+
+	/**
+	 * Copies various theme resource files into the documentation target directory.
+	 * @param rootDir The absolute path to the project root
+	 * @param outDir The absolute path to the root documentation out directory
+	 */
+	private static copyThemeFiles = (rootDir: string, outDir: string) => {
+		const assetsSrc = path.join(
+			rootDir,
+			'dist',
+			'src',
+			'frontend',
+			'assets'
+		);
+		const indexSrc = path.join(assetsSrc, 'index.html');
+		const frontendSrc = path.join(rootDir, 'dist', 'src', 'frontend');
+
+		const frontendDest = path.join(outDir, 'frontend');
+		const indexDest = path.join(outDir, 'index.html');
+
+		fs.copySync(frontendSrc, frontendDest);
+		fs.copySync(indexSrc, indexDest);
+	};
+
+	/**
+	 * saves a data object to a data .json file for consumption by the front-end.
+	 * @param fileName the file name with or without .json extension
+	 * @param docDir the absolute path to the document directory
+	 * @param data
+	 * @param dataDir the data subdirectory path under the document directory
+	 */
+	private static saveDataFile = (
+		fileName: string,
+		docDir: string,
+		data: { [key: symbol]: unknown } | YAFDataObject,
+		dataDir: string | false = 'frontend/data'
+	) => {
+		fileName = fileName.replace(/.JSON$/i, '.json');
+		if (!fileName.endsWith('.json')) fileName = `${fileName}.json`;
+		const dirPath = dataDir ? path.join(docDir, dataDir) : docDir;
+		const filePath = path.join(dirPath, fileName);
+
+		fs.ensureDirSync(path.dirname(filePath));
+		fs.writeJsonSync(filePath, data);
 	};
 }

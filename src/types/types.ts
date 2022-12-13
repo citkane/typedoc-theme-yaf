@@ -12,9 +12,6 @@ declare global {
 }
 import { JSONOutput } from 'typedoc';
 
-//export * from './backendTypes';
-//export * from './frontendTypes';
-
 export type htmlString = `<${string}>${string}</${string}>` | `<${string} />`;
 
 export interface YAFDataObject
@@ -50,6 +47,7 @@ export interface YAFDataObject
 	setSignature: YafSignatureReflection;
 	typeParameter: YafTypeParameterReflection[];
 	parameters: YafParameterReflection[];
+	hierarchy?: hierarchy[];
 }
 
 export interface YafDeclarationReflection
@@ -86,6 +84,12 @@ export interface YafTypeParameterReflection
 	};
 }
 
+export type hierarchy = {
+	name: string;
+	linkId?: string;
+	isTarget?: boolean;
+	children?: hierarchy[];
+};
 export type treeMenuRoot = {
 	[key: number]: treeMenuBranch;
 };
@@ -95,6 +99,7 @@ export type treeMenuBranch = {
 	hash: string | '';
 	kind: number;
 	id: number;
+	flags: JSONOutput.ReflectionFlags;
 	children: treeMenuRoot;
 	parentDrawerElement?: HTMLElement;
 	inheritedFrom?: string | undefined;
@@ -103,9 +108,10 @@ export type treeMenuBranch = {
 export type YAFReflectionLink = {
 	name: string;
 	fileName: string;
+	id?: string;
 };
 export type reflectionMap = {
-	[key: number]: YAFReflectionLink;
+	[key: string]: YAFReflectionLink;
 };
 
 export interface kindSymbol {

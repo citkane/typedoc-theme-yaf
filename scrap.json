@@ -1,0 +1,19 @@
+{
+	"options": "/home/michaeladmin/code/typedoc-theme-yaf",
+	"tsconfig": "/home/michaeladmin/code/typedoc-theme-yaf",
+	"entryPoints": [
+		"/home/michaeladmin/code/typedoc-theme-yaf/src/index.ts",
+		"/home/michaeladmin/code/typedoc-theme-yaf/src/shared/types.ts",
+		"/home/michaeladmin/code/typedoc-theme-yaf/src/frontend/index.ts",
+		"/home/michaeladmin/code/typedoc-theme-yaf/src/examples/index.ts"
+	],
+	"entryPointStrategy": "resolve",
+	"exclude": [],
+	"externalPattern": ["**/node_modules/**"],
+	"excludeExternals": true,
+	"excludeNotDocumented": false,
+	"excludeInternal": false,
+	"excludePrivate": false,
+	"excludeProtected": false,
+	"externalSymbolLinkMappings": {}
+}

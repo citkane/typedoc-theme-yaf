@@ -47,6 +47,9 @@ yaf-member-group-link {
 	}
 }
 yaf-member-group-reflection {
+	yaf-member {
+		padding-left: 0.5rem;
+	}
 	&.open {
 		.icon > span {
 			transform: rotate(180deg);

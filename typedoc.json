@@ -14,7 +14,7 @@
 	"excludeNotDocumented": false,
 	"media": "./dist/src/frontend/assets",
 	"logLevel": "Verbose",
-	"plugin": ["./dist", "typedoc-plugin-versions", "typedoc-plugin-hot-dev"],
+	"plugin": ["typedoc-theme-yaf", "typedoc-plugin-hot-dev"],
 	"theme": "yaf",
 	"hot-dev": {
 		"npmScripts": ["build:frontend:watch", "build:css:watch"]

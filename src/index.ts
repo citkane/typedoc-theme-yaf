@@ -8,6 +8,7 @@
  */
 
 import { Application } from 'typedoc';
+import { loadHighlighter } from './backend/lib/highlighter';
 
 import { YafTheme } from './backend/YafTheme';
 
@@ -16,9 +17,12 @@ import { YafTheme } from './backend/YafTheme';
  * @param app
  */
 export function load(app: Application) {
-	app.renderer.defineTheme('yaf', YafTheme);
+	loadHighlighter().then((higlighter) => {
+		YafTheme.highlighter = higlighter;
+		app.renderer.defineTheme('yaf', YafTheme);
+	});
 }
 
 export { YafTheme } from './backend/YafTheme';
-export * as lib from './backend/lib/lib';
-export { serialize } from './backend/serializer';
+export * as lib from './backend/lib/highlighter';
+export { YafSerializer as Serialiser } from './backend/Serialiser';

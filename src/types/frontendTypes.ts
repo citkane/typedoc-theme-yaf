@@ -11,7 +11,7 @@ import {
 } from './types';
 
 export type ReflectionKind = typeof TdocReflectionKind;
-export type yafState = {
+export interface yafState {
 	reflectionMap: reflectionMap;
 	reflectionKind: ReflectionKind;
 	kindSymbols: kindSymbols;
@@ -21,11 +21,15 @@ export type yafState = {
 	drawers: { [key: string]: drawerState };
 	scrollTop: { [key: string]: number };
 	options: {
-		showInheritedMembers: 'show' | 'hide';
+		display: {
+			inherited: displayStates;
+			private: displayStates;
+		};
 	};
-};
+}
 
-export type yafOptions = keyof yafState['options'];
+export type displayStates = 'show' | 'hide';
+export type yafDisplayOptions = keyof yafState['options']['display'];
 
 export type drawerState = 'open' | 'closed';
 
@@ -45,6 +49,10 @@ export type abnormalSigTypes =
 
 export type clickEvent = Event & { ctrlKey: boolean };
 
-export type localStorageKey = 'drawers' | 'scrollTop' | 'options';
+export type localStorageKey =
+	| 'drawers'
+	| 'scrollTop'
+	| 'options'
+	| 'displayOptions';
 
 export type DrawerElement = HTMLElement & YafElementDrawers;

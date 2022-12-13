@@ -1,17 +1,18 @@
-import { YAFDataObject } from '../types/types.js';
 import {
 	abnormalSigTypes,
 	componentName,
 	materialIcon,
 	TypeContext,
 } from '../types/frontendTypes.js';
-import { YafSignature } from './components/YafSignature.js';
-import errorHandlers from './lib/ErrorHandlers.js';
-import { YafNavigationLink } from './components/YafNavigationLink.js';
+
 import { JSONOutput } from 'typedoc';
-import { YafFlags } from './components/YafFlags.js';
+import { YAFDataObject } from '../types/types';
+import { YafNavigationLink } from './webComponents/Navigation/index.js';
+import { YafSignature } from './webComponents/Signature/index.js';
+
+import errorHandlers from './lib/ErrorHandlers.js';
 import YafElementDrawers from './YafElementDrawers.js';
-import ErrorHandlers from './lib/ErrorHandlers.js';
+import { YafWidgetFlags } from './webComponents/Widget/index.js';
 
 const iconClass = 'material-icons-sharp';
 
@@ -33,11 +34,12 @@ const yafElement = {
 		props?: P,
 		is?: componentName
 	) => {
-		const element = is
-			? document.createElement(tagName, { is })
-			: document.createElement(tagName);
+		const element = document.createElement(tagName, { is });
+		if (is) element.setAttribute('is', is);
 		if (className)
-			className.split(' ').forEach((c) => element.classList.add(c));
+			className.split(' ').forEach((c) => {
+				if (c.length) element.classList.add(c);
+			});
 		if (innerText) element.innerText = innerText;
 		if (props) (<any>element).props = props;
 
@@ -87,16 +89,29 @@ const yafElement = {
 		flags: JSONOutput.ReflectionFlags,
 		comment: JSONOutput.Comment | undefined
 	) {
-		const flagElement = yafElement.makeElement<YafFlags, YafFlags['props']>(
-			'yaf-flags',
-			null,
-			null,
-			{
-				flags,
-				comment,
-			}
-		);
+		const normalisedFlags = yafElement.normaliseFlags(flags);
+		const flagElement = yafElement.makeElement<
+			YafWidgetFlags,
+			YafWidgetFlags['props']
+		>('yaf-widget-flags', null, null, {
+			flags: normalisedFlags,
+			comment,
+		});
 		return flagElement;
+	},
+	/**
+	 * Converts a ReflectionFlags Record object into an array of flags
+	 * @param flags
+	 * @returns
+	 */
+	normaliseFlags: (flags: JSONOutput.ReflectionFlags) => {
+		const flagsArray = Object.keys(flags)
+			.map((flag) =>
+				flag.replace('is', '').replace('has', '').toLowerCase().trim()
+			)
+			.filter((flag) => !!flag);
+
+		return flagsArray;
 	},
 
 	getHtmlTemplate: (id: componentName) => {
@@ -156,22 +171,25 @@ const yafElement = {
 
 			if (!YafElementDrawers.hasClosedDrawers(drawerParents)) {
 				targetElement.scrollIntoView({ behavior: 'smooth' });
+				yafElement.flashElementBackground(targetElement);
 			} else if (drawerParents.length) {
 				drawerParents.forEach((element) =>
 					element.drawers.openDrawer()
 				);
-				setTimeout(
-					() => targetElement.scrollIntoView({ behavior: 'smooth' }),
-					yafElement.getTransitionDuration(
-						drawerParents[0].drawers.drawer
-					) / 2
-				);
+				setTimeout(() => {
+					targetElement.scrollIntoView({ behavior: 'smooth' });
+					yafElement.flashElementBackground(targetElement);
+				}, yafElement.getTransitionDuration(drawerParents[0].drawers.drawer) / 2);
 			}
 		} else {
-			return ErrorHandlers.notFound(
+			return errorHandlers.notFound(
 				`Could not find element for "#${anchor}"`
 			);
 		}
+	},
+	flashElementBackground: (element: HTMLElement) => {
+		element.classList.add('flash');
+		setTimeout(() => element.classList.remove('flash'), 1000);
 	},
 };
 

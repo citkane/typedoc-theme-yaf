@@ -1,9 +1,4 @@
-import { yafOptions } from '../../../types/frontendTypes.js';
 import * as actions from './eventFunctions.js';
-
-const options: Record<yafOptions, string> = {
-	showInheritedMembers: 'yaf.options.showInheritedMembers',
-};
 
 export const trigger = {
 	content: {
@@ -16,8 +11,6 @@ export const trigger = {
 		scrollTo: 'yaf.menu.scrollTo',
 	},
 	drawers: {
-		refreshHeight: 'yaf.drawer.refreshHeight',
-		initHeight: 'yaf.drawer.refreshHeight',
 		resetHeight: 'yaf.drawer.resetHeight',
 	},
 	fetch: {
@@ -27,10 +20,12 @@ export const trigger = {
 		reflectionLinkById: 'yaf.get.reflectionLinkById',
 		pageContentId: 'yaf.get.pageContentId',
 	},
-	options,
+	options: {
+		display: 'yaf.options.display',
+	},
 };
 
-class Events {
+export class Events {
 	trigger = trigger;
 	action = {
 		content: {
@@ -43,8 +38,6 @@ class Events {
 			scrollTo: actions.scrollTo.bind(null, 'menu'),
 		},
 		drawers: {
-			refreshHeight: actions.sendDrawerHeight.bind(null, 'refreshHeight'),
-			initHeight: actions.sendDrawerHeight.bind(null, 'initHeight'),
 			resetHeight: actions.resetDrawerHeight,
 		},
 		fetch: {
@@ -55,10 +48,7 @@ class Events {
 			pageContentId: actions.getPageContentId,
 		},
 		options: {
-			showInheritedMembers: actions.options.bind(
-				null,
-				'showInheritedMembers'
-			),
+			display: actions.displayOptions,
 		},
 	};
 	dispatch = (

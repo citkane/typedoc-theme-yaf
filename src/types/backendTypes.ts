@@ -9,5 +9,4 @@ export interface highlighter {
 export type dataLocation = {
 	hash: string;
 	query: string;
-	isLeaf: boolean;
 };

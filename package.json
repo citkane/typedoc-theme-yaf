@@ -57,7 +57,7 @@
 		"hast-util-to-html": "^8.0.3",
 		"typedoc": "^0.23",
 		"typedoc-plugin-hot-dev": "file:../typedoc-plugin-hot-dev/dist",
-		"typedoc-plugin-versions": "^0.2.1"
+		"typedoc-theme-yaf": "file:dist"
 	},
 	"peerDependencies": {
 		"typedoc": "^0.23"

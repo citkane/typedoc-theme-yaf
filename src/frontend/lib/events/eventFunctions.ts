@@ -1,9 +1,11 @@
-import { yafOptions } from '../../../types/frontendTypes.js';
+import { yafDisplayOptions } from '../../../types/frontendTypes.js';
 import { YAFDataObject } from '../../../types/types.js';
 import { trigger } from './eventApi.js';
 
-export const options = (context: yafOptions, value: unknown) =>
-	new CustomEvent(trigger.options[context], { detail: value });
+export const displayOptions = (
+	key: yafDisplayOptions,
+	value: 'show' | 'hide'
+) => new CustomEvent(trigger.options.display, { detail: { key, value } });
 
 /**
  * Notifies the content or menu DOM that it needs to scroll to the given location
@@ -51,10 +53,5 @@ export const getPageContentId = (callBack: (pageId: string) => void) =>
 
 export const rollMenuDown = () => new Event(trigger.menu.rollMenuDown);
 export const rollMenuUp = () => new Event(trigger.menu.rollMenuUp);
-
-export const sendDrawerHeight = (
-	action: 'refreshHeight' | 'initHeight',
-	height: number
-) => new CustomEvent(trigger.drawers[action], { detail: height });
 
 export const resetDrawerHeight = () => new Event(trigger.drawers.resetHeight);

@@ -1,7 +1,18 @@
-import { ReflectionKind, Type, TypeContext } from 'typedoc';
+import {
+	DeclarationReflection,
+	ProjectReflection,
+	ReflectionKind,
+	Type,
+	TypeContext,
+} from 'typedoc';
 import * as typeClasses from 'typedoc';
 
-import { YAFDataObject, YAFReflectionLink } from '../../types/types';
+import {
+	treeMenuRoot,
+	YAFDataObject,
+	YAFReflectionLink,
+} from '../../types/types';
+import { YafSerializer } from '../Serialiser';
 
 export const makeYafKindSymbols = (icons: Record<string, () => unknown>) => {
 	const symbols = {};
@@ -57,4 +68,38 @@ export const makeNeedsParenthesis = () => {
 		});
 
 	return map;
+};
+
+/**
+ * Builds a data tree for the main navigation menu
+ * @param menuNode
+ * @param reflection
+ * @returns a hierarchical tree representation of the main navigation menu.
+ */
+export const makeNavTree = (
+	reflection: DeclarationReflection | ProjectReflection,
+	menuNode: treeMenuRoot = {}
+): treeMenuRoot => {
+	if (reflection.isProject()) {
+		reflection.children?.forEach((child) => makeNavTree(child, menuNode));
+	} else {
+		const { hash, query } =
+			YafSerializer.formatReflectionLocation(reflection);
+		menuNode[reflection.id] = {
+			name: reflection.name,
+			query,
+			hash,
+			kind: reflection.kind,
+			id: reflection.id,
+			children: {},
+			flags: YafSerializer.extendDefaultFlags(reflection),
+			inheritedFrom: reflection.inheritedFrom
+				? reflection.inheritedFrom.qualifiedName
+				: undefined,
+		};
+		reflection.children?.forEach((child) => {
+			makeNavTree(child, menuNode[reflection.id].children);
+		});
+	}
+	return menuNode;
 };

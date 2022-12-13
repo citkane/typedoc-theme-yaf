@@ -1,6 +1,6 @@
-import events from './events/eventApi.js';
-import { YafNavigationLink } from '../components/YafNavigationLink.js';
 import { clickEvent } from '../../types/frontendTypes.js';
+import { YafNavigationLink } from '../webComponents/Navigation/index.js';
+import events from './events/eventApi.js';
 
 const { action } = events;
 
@@ -12,20 +12,19 @@ export default class Router {
 		const hrefOrigin = href ? href.split('?')[0] : href;
 		const target = link.getAttribute('target') || undefined;
 
-		if (
+		const isExternalLink =
 			!href ||
 			target === '_blank' ||
 			(hrefOrigin && !window.location.href.startsWith(hrefOrigin)) ||
-			e.ctrlKey
-		)
-			return;
+			e.ctrlKey;
 
-		e.preventDefault(); //use internal routing for document partials
+		if (isExternalLink) return;
+		e.preventDefault();
 
-		if (
+		const linkIsOnCurrentPage =
 			Router.getHrefWithoutHash(window.location.href) ===
-			Router.getHrefWithoutHash(href)
-		) {
+			Router.getHrefWithoutHash(href);
+		if (linkIsOnCurrentPage) {
 			const hash = this.getHash(href);
 			events.dispatch(action.content.scrollTo(hash));
 			if (hash) {

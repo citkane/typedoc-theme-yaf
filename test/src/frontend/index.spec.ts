@@ -21,7 +21,7 @@ describe('Frontend unit tests', function () {
 	unitTestYafElement();
 });
 
-import typedocThemeYaf from './components/TypedocThemeYaf.spec';
+import typedocThemeYaf from './webComponents/TypedocThemeYaf.spec';
 import { fetchStub, makeFetchStub } from './stubs/stubs';
 describe('Frontend component unit tests', function () {
 	this.beforeAll(function () {

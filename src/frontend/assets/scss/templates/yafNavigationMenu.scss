@@ -11,13 +11,13 @@ menu,
 ul {
 	ul {
 		padding-left: 1rem;
-		yaf-navigation-menu-branch:last-child {
+		li[is='yaf-navigation-menu-branch']:last-child {
 			padding-bottom: 1rem;
 		}
 	}
 }
 
-yaf-navigation-menu-branch {
+li[is='yaf-navigation-menu-branch'] {
 	display: list-item;
 	padding: 0;
 
@@ -73,7 +73,8 @@ yaf-navigation-menu-branch {
 			}
 		}
 	}
-	.inherited {
+
+	.inherited_toggle {
 		cursor: pointer;
 		font-size: 0.9rem;
 		padding: 0.5rem;
@@ -88,18 +89,18 @@ yaf-navigation-menu-branch {
 		opacity: 0;
 	}
 
-	yaf-navigation-menu-branch {
+	li[is='yaf-navigation-menu-branch'] {
 		margin-right: var(--size);
 	}
 }
-yaf-navigation-menu-branch.closed {
+li[is='yaf-navigation-menu-branch'].closed {
 	> .header {
 		.icon > span {
 			transform: rotate(270deg);
 		}
 	}
 }
-yaf-navigation-menu-branch.open {
+li[is='yaf-navigation-menu-branch'].open {
 	> .header {
 		border-bottom-color: var(--color-accent-fg);
 		.name {
