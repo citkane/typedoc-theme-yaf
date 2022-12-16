@@ -1,12 +1,30 @@
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../YafElement.js';
+import { debouncer } from '../../../../types/frontendTypes.js';
+import yafElement from '../../../yafElement.js';
+const { debounce, makeSymbolSpan, makeNameSpan, renderSignatureType } =
+	yafElement;
 
 export class YafSignaturePredicate extends HTMLElement {
 	props!: JSONOutput.PredicateType;
 
 	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-		console.log(this.props);
+		if (debounce(this as debouncer)) return;
+
+		const { name, asserts, targetType } = this.props;
+		const HTMLElements = [
+			asserts ? makeSymbolSpan('asserts ') : undefined,
+			makeNameSpan(name),
+			targetType
+				? [
+						makeSymbolSpan(' is '),
+						renderSignatureType(targetType, 'predicateTarget'),
+				  ]
+				: undefined,
+		]
+			.filter((element) => !!element)
+			.flat();
+
+		HTMLElements.forEach((element) => this.appendChild(element!));
 	}
 }
 

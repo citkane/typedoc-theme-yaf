@@ -3,7 +3,7 @@ import { YafWidgetKind } from '../Widget/YafWidgets.js';
 
 import appState from '../../lib/AppState.js';
 import events from '../../lib/events/eventApi.js';
-import yafElement from '../../YafElement.js';
+import yafElement from '../../yafElement.js';
 import YafElementDrawers from '../../YafElementDrawers.js';
 
 const { action } = events;

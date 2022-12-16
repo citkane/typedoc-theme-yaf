@@ -1,17 +1,21 @@
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../YafElement.js';
+import { debouncer } from '../../../../types/frontendTypes.js';
+import yafElement from '../../../yafElement.js';
+const { debounce, makeSymbolSpan, renderSignatureType } = yafElement;
 
 export class YafSignatureTypeOperator extends HTMLElement {
 	props!: JSONOutput.TypeOperatorType;
 
 	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+		if (debounce(this as debouncer)) return;
 
 		const { operator, target } = this.props;
-		this.appendChild(yafElement.makeSymbolSpan(`${operator} `));
-		this.appendChild(
-			yafElement.renderSignatureType(target, 'typeOperatorTarget')
-		);
+		const HTMLElements = [
+			makeSymbolSpan(`${operator} `),
+			renderSignatureType(target, 'typeOperatorTarget'),
+		];
+
+		HTMLElements.forEach((element) => this.appendChild(element));
 	}
 }
 

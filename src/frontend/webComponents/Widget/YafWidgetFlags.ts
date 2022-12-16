@@ -1,5 +1,5 @@
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../YafElement.js';
+import yafElement from '../../yafElement.js';
 
 export class YafWidgetFlags extends HTMLElement {
 	props!: {

@@ -1,14 +1,17 @@
 /**
  *
  */
-import { componentName } from '../../../types/frontendTypes.js';
+import { componentName, debouncer } from '../../../types/frontendTypes.js';
 import { htmlString } from '../../../types/types.js';
+import yafElement from '../../yafElement.js';
+const { debounce } = yafElement;
 
 export class YafContentMarked extends HTMLElement {
 	props!: htmlString | undefined;
 
-	async connectedCallback() {
-		if (!this.props) return;
+	connectedCallback() {
+		if (!this.props || debounce(this as debouncer)) return;
+
 		this.classList.add('markdown-body');
 		this.innerHTML = this.props;
 	}

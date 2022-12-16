@@ -109,6 +109,8 @@ export type YAFReflectionLink = {
 	name: string;
 	fileName: string;
 	id?: string;
+	kind?: number;
+	target?: number;
 };
 export type reflectionMap = {
 	[key: string]: YAFReflectionLink;

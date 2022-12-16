@@ -1,20 +1,23 @@
+import { debouncer } from '../../../types/frontendTypes.js';
 import { YAFDataObject } from '../../../types/types.js';
-import yafElement from '../../YafElement.js';
+import yafElement from '../../yafElement.js';
+const { debounce, makeElement, makeSymbolSpan } = yafElement;
 
 export class YafTypeParameters extends HTMLElement {
 	props!: YAFDataObject['typeParameters'];
+
 	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+		if (debounce(this as debouncer)) return;
 
 		const params = (this.props || []).flatMap((param) => {
-			const span = yafElement.makeElement(
+			const span = makeElement(
 				'span',
 				`type ${param.kindString ? ` ${param.kindString}` : ''}`,
 				param.name
 			);
 			return param.varianceModifier
 				? [
-						yafElement.makeElement(
+						makeElement(
 							'span',
 							'modifier',
 							`${param.varianceModifier}`
@@ -23,37 +26,14 @@ export class YafTypeParameters extends HTMLElement {
 				  ]
 				: span;
 		});
-		this.appendChild(yafElement.makeSymbolSpan('<'));
-		params.forEach((param) => this.appendChild(param));
-		this.appendChild(yafElement.makeSymbolSpan('>'));
-	}
-	/*
-	props!: JSONOutput.TypeParameterReflection[] | undefined;
-
-	
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-
-		if (!this.props || !this.props.length) return;
-		this.appendChild(yafElement.makeSymbolSpan('<'));
-		this.props.forEach((parameter, i) => {
-			if (parameter.varianceModifier)
-				this.appendChild(
-					yafElement.makeElement(
-						'span',
-						null,
-						`${parameter.varianceModifier} `
-					)
-				);
-			this.appendChild(yafElement.makeTypeSpan(parameter.name));
-			if (i < this.props!.length - 1)
-				this.appendChild(yafElement.makeSymbolSpan(', '));
+		this.appendChild(makeSymbolSpan('<'));
+		params.forEach((param, i) => {
+			this.appendChild(param);
+			if (i >= params.length - 1) return;
+			this.appendChild(makeSymbolSpan(','));
 		});
-		this.appendChild(yafElement.makeSymbolSpan('>'));
-		
+		this.appendChild(makeSymbolSpan('>'));
 	}
-	*/
 }
 const yafTypeParameters = 'yaf-type-parameters';
 customElements.define(yafTypeParameters, YafTypeParameters);

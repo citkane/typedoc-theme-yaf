@@ -1,15 +1,15 @@
 yaf-member,
 yaf-member-signatures,
 yaf-signature-body,
-yaf-member-parameters,
-yaf-member-parameters-type {
+yaf-signature-parameters,
+yaf-signature-parameters-type {
 	display: block;
 }
 yaf-member-group-reflection yaf-member {
 	border-left: 3px solid var(--color-fg-subtle);
 }
-yaf-member-parameters,
-yaf-member-parameters-type {
+yaf-signature-parameters,
+yaf-signature-parameters-type {
 	table {
 		display: table;
 		width: 100%;

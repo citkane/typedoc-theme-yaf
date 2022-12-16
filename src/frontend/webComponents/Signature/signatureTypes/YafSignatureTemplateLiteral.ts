@@ -1,46 +1,34 @@
-import { componentName } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../YafElement.js';
+import { componentName, debouncer } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
+import yafElement from '../../../yafElement.js';
+const { debounce, makeSymbolSpan, makeLiteralSpan, renderSignatureType } =
+	yafElement;
 
 export class YafSignatureTemplateLiteral extends HTMLElement {
 	props!: JSONOutput.TemplateLiteralType;
 
 	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+		if (debounce(this as debouncer)) return;
+
 		const { head, tail } = this.props;
-
-		let items = [yafElement.makeSymbolSpan('`')];
-		head && items.push(yafElement.makeLiteralSpan(head));
-		tail.forEach((item) => {
-			items.push(yafElement.makeSymbolSpan('${'));
-
-			const type = yafElement.renderSignatureType(
-				item[0],
-				'templateLiteralElement'
-			);
-			type.classList.add('type');
-			items.push(type);
-			items.push(yafElement.makeSymbolSpan('}'));
+		const HTMLElements = [makeSymbolSpan('`')];
+		if (head) HTMLElements.push(makeLiteralSpan(head));
+		tail.map((item) => {
+			const tailElements = [
+				makeSymbolSpan('${'),
+				renderSignatureType(item[0], 'templateLiteralElement'),
+				makeSymbolSpan('}'),
+			];
 			if (item[1]) {
-				const span = yafElement.makeLiteralSpan('');
-				span.innerText = item[1];
-				items.push(span);
+				tailElements.push(makeLiteralSpan(item[1]));
 			}
-		});
+			return tailElements;
+		})
+			.flat()
+			.forEach((element) => HTMLElements.push(element));
+		HTMLElements.push(makeSymbolSpan('`'));
 
-		items = [...items, yafElement.makeSymbolSpan('`')];
-
-		items.forEach((item) => this.appendChild(item));
-		/*
-		const inner = YafElement.needsParenthesis()
-			? `<span class="symbol>(</span>"${this.props.value}"<span class="symbol>)</span>`
-			: `"${this.props.value}"`;
-
-		const newElement = YafElement.makeElement(
-			`<span class="type">${inner}</span>`
-		);
-		this.parentElement?.replaceChild(newElement, this);
-		*/
+		HTMLElements.forEach((item) => this.appendChild(item));
 	}
 }
 

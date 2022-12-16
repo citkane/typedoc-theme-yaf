@@ -1,25 +1,27 @@
-import { componentName } from '../../../../types/frontendTypes.js';
+import { componentName, debouncer } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../YafElement.js';
-import { YafSignature } from '../YafSignature.js';
+import yafElement from '../../../yafElement.js';
+const { debounce, makeSymbolSpan, needsParenthesis, renderSignatureType } =
+	yafElement;
 
 export class YafSignatureArray extends HTMLElement {
 	props!: JSONOutput.ArrayType;
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-		this.classList.add('type');
-		yafElement.needsParenthesis(this) &&
-			this.appendChild(yafElement.makeSymbolSpan('('));
 
-		const signature = yafElement.makeElement<YafSignature>('yaf-signature');
-		signature.props = {
-			type: this.props.elementType,
-			context: 'arrayElement',
-		};
-		this.appendChild(signature);
-		this.appendChild(yafElement.makeSymbolSpan('[]'));
-		yafElement.needsParenthesis(this) &&
-			this.appendChild(yafElement.makeSymbolSpan(')'));
+	connectedCallback() {
+		if (debounce(this as debouncer)) return;
+
+		const { elementType } = this.props;
+
+		const HTMLElements = [
+			renderSignatureType(elementType, 'arrayElement'),
+			makeSymbolSpan('[]'),
+		];
+		if (needsParenthesis(this)) {
+			HTMLElements.unshift(makeSymbolSpan('('));
+			HTMLElements.push(makeSymbolSpan(')'));
+		}
+
+		HTMLElements.forEach((element) => this.appendChild(element));
 	}
 }
 const yafSignatureArray: componentName = 'yaf-signature-array';

@@ -1,12 +1,26 @@
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../YafElement.js';
+import { debouncer } from '../../../../types/frontendTypes.js';
+import yafElement from '../../../yafElement.js';
+const { debounce, makeSymbolSpan, makeTypeSpan, renderSignatureType } =
+	yafElement;
 
 export class YafSignatureInferred extends HTMLElement {
 	props!: JSONOutput.InferredType;
 
 	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-		console.log(this.props);
+		if (debounce(this as debouncer)) return;
+
+		const { name, constraint } = this.props;
+		const HTMLElements = [makeSymbolSpan('infer '), makeTypeSpan(name)];
+
+		if (constraint) {
+			HTMLElements.push(makeSymbolSpan(' extends '));
+			HTMLElements.push(
+				renderSignatureType(constraint, 'inferredConstraint')
+			);
+		}
+
+		HTMLElements.forEach((element) => this.appendChild(element));
 	}
 }
 

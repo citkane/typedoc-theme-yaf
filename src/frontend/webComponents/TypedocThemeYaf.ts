@@ -1,5 +1,5 @@
 import { componentName } from '../../types/frontendTypes.js';
-import yafElement from '../YafElement.js';
+import yafElement from '../yafElement.js';
 import appState from '../lib/AppState.js';
 
 /**

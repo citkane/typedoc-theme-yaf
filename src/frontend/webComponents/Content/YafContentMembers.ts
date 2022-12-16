@@ -1,129 +1,142 @@
 import { JSONOutput } from 'typedoc';
 import { YAFDataObject, YAFReflectionLink } from '../../../types/types.js';
-import appState from '../../lib/AppState.js';
-import yafElement from '../../YafElement.js';
+import { debouncer } from '../../../types/frontendTypes.js';
 import { YafMember } from '../Member/YafMember.js';
 import errorHandlers from '../../lib/ErrorHandlers.js';
 import {
 	YafMemberGroupLink,
 	YafMemberGroupReflection,
 } from '../Member/index.js';
+import appState from '../../lib/AppState.js';
+import yafElement from '../../yafElement.js';
+const { debounce, makeElement } = yafElement;
 
 /**
  *
  */
 export class YafContentMembers extends HTMLElement {
-	props!: {
-		groups: YAFDataObject['groups'];
-		children: YAFDataObject['children'];
-		pageId: string;
-	};
+	props!: YAFDataObject;
+	pageId!: string;
 
 	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+		if (debounce(this as debouncer)) return;
 
-		const { groups, children } = this.props;
+		const { groups, children, id, kind } = this.props;
+		this.pageId = String(id);
 
-		const isLinkList = children && children.length ? false : true;
-		const constructor = groups?.find(
+		const isLinkList = this.linkReferencPageTypes.includes(kind);
+		const constructorGroup = groups?.find(
 			(group) => group.title === 'Constructors'
 		);
+		const hasConstructor =
+			constructorGroup && constructorGroup.children?.length;
 
-		/* There should only ever be one constructor, so it does not need a group header
-		 */
-		if (constructor && constructor.children?.length) {
-			this.makeConstructor(
-				constructor.children[0],
-				constructor,
-				children || []
-			);
-		}
+		const HTMLElements = [
+			hasConstructor
+				? this.factory.constructorElement(
+						constructorGroup,
+						children || []
+				  )
+				: undefined,
+			groups
+				?.sort((a, b) => a.title.localeCompare(b.title))
+				.map((group) => {
+					const isConstructorGroup =
+						group.title === 'Constructors' &&
+						group.children &&
+						group.children.length === 1;
 
-		groups
-			?.sort((a, b) => a.title.localeCompare(b.title))
-			.forEach((group) => {
-				if (
-					group.title === 'Constructors' &&
-					group.children &&
-					group.children.length === 1
-				) {
-					return;
-				} else if (isLinkList) {
-					/* This is a group of links to reflection pages, ie. a summary page
-					 */
-					this.makeLinkGroup(group);
-				} else {
-					/* This is a reflection page with reflections rolled up into groups
-					 */
-					this.makeReflectionGroup(group, children || []);
-				}
-			});
+					if (isConstructorGroup) return undefined;
+					if (isLinkList)
+						return this.factory.linkGroup(group, children || []);
+					return this.factory.reflectionGroup(group, children || []);
+				}),
+		];
+
+		HTMLElements.flat()
+			.filter((element) => !!element)
+			.forEach((element) => this.appendChild(element!));
 	}
-	makeConstructor = (
-		childId: number,
-		group: JSONOutput.ReflectionGroup,
-		children: YAFDataObject[]
-	) => {
-		const constructor = children.find((child) => child.id === childId);
-		if (constructor) {
-			const member = yafElement.makeElement<
-				YafMember,
-				YafMember['props']
-			>('yaf-member', null, null, constructor);
-			member.id = 'constructor';
-			this.appendChild(member);
-		} else {
-			errorHandlers.notFound(
-				`Could not find reflection id: ${childId} in group ${group.title}`
+
+	private factory = {
+		/**
+		 * Returns a HTMLElement for the consructor member
+		 * @param constructorGroup
+		 * @param children
+		 * @returns
+		 */
+		constructorElement: (
+			constructorGroup: JSONOutput.ReflectionGroup,
+			children: YAFDataObject[]
+		) => {
+			const childId = constructorGroup.children![0];
+			const constructor = children.find((child) => child.id === childId);
+			if (constructor) {
+				const HTMLElement = makeElement<YafMember, YafMember['props']>(
+					'yaf-member',
+					null,
+					null,
+					constructor
+				);
+				HTMLElement.id = 'constructor';
+				return HTMLElement;
+			} else {
+				errorHandlers.notFound(
+					`Could not find reflection id: ${childId} in group ${constructorGroup.title}`
+				);
+			}
+		},
+		linkGroup: (
+			group: JSONOutput.ReflectionGroup,
+			children: YAFDataObject[]
+		) => {
+			const linkChildren = group.children
+				?.map((id) => {
+					const child =
+						children.find((child) => child.id === id) ||
+						appState.reflectionMap[id];
+					child.id = String(id);
+					!child &&
+						errorHandlers.notFound(
+							`Did not find reflectionMap id: ${id}`
+						);
+					return appState.reflectionMap[id] ? child : undefined;
+				})
+				.filter((child) => !!child);
+
+			return makeElement<YafMemberGroupLink, YafMemberGroupLink['props']>(
+				'yaf-member-group-link',
+				null,
+				null,
+				{
+					title: group.title,
+					children: <YAFReflectionLink[]>linkChildren || [],
+				}
 			);
-		}
-	};
-	makeLinkGroup = (group: JSONOutput.ReflectionGroup) => {
-		const children = group.children
-			?.map((id) => {
-				const child = appState.reflectionMap[id];
-				child.id = String(id);
-				!child &&
-					errorHandlers.notFound(
-						`Did not find reflectionMap id: ${id}`
-					);
-				return appState.reflectionMap[id] ? child : undefined;
-			})
-			.filter((child) => !!child);
+		},
+		reflectionGroup: (
+			group: JSONOutput.ReflectionGroup,
+			children: YAFDataObject[]
+		) => {
+			const groupChildren = YafMemberGroupReflection.mapReflectionGroup(
+				group,
+				children
+			);
 
-		this.appendChild(
-			yafElement.makeElement<
-				YafMemberGroupLink,
-				YafMemberGroupLink['props']
-			>('yaf-member-group-link', null, null, {
+			return makeElement<
+				YafMemberGroupReflection,
+				YafMemberGroupReflection['props']
+			>('yaf-member-group-reflection', null, null, {
 				title: group.title,
-				children: <YAFReflectionLink[]>children || [],
-			})
-		);
+				children: <YAFDataObject[]>groupChildren || [],
+				pageId: this.pageId,
+			});
+		},
 	};
-	makeReflectionGroup = (
-		group: JSONOutput.ReflectionGroup,
-		children: YAFDataObject[]
-	) => {
-		const groupChildren = group.children
-			?.map((id) => {
-				const child = children?.find((child) => child.id === id);
-				!child &&
-					errorHandlers.notFound(`Did not find reflection id: ${id}`);
-				return child;
-			})
-			.filter((child) => !!child);
-
-		const reflectionGroup = yafElement.makeElement<
-			YafMemberGroupReflection,
-			YafMemberGroupReflection['props']
-		>('yaf-member-group-reflection', null, null, {
-			title: group.title,
-			children: <YAFDataObject[]>groupChildren || [],
-			pageId: this.props.pageId,
-		});
-		this.appendChild(reflectionGroup);
-	};
+	private linkReferencPageTypes = (<(keyof typeof appState.reflectionKind)[]>[
+		'Namespace',
+		'Project',
+	]).map((kindString) => appState.reflectionKind[kindString]);
 }
 
 const yafContentMembers = 'yaf-content-members';

@@ -2,7 +2,7 @@ import {
 	YafDeclarationReflection,
 	YafSignatureReflection,
 } from '../../../types/types.js';
-import yafElement from '../../YafElement.js';
+import yafElement from '../../yafElement.js';
 
 export class YafMemberSources extends HTMLElement {
 	props!: YafSignatureReflection | YafDeclarationReflection;

@@ -1,0 +1,104 @@
+import { debouncer, DrawerElement } from '../../../types/frontendTypes';
+import { hierarchy } from '../../../types/types';
+import appState from '../../lib/AppState.js';
+import yafElement from '../../yafElement.js';
+import YafElementDrawers from '../../YafElementDrawers.js';
+const { debounce, makeElement, makeIconSpan, makeLinkElement } = yafElement;
+
+export class YafContentHierarchy extends HTMLElement {
+	props!: {
+		hierarchy: hierarchy[] | undefined;
+		pageId?: string;
+		init?: boolean;
+	};
+	drawers?: YafElementDrawers;
+	drawerTrigger!: HTMLElement;
+	drawer = makeElement('ul');
+
+	connectedCallback() {
+		if (debounce(this as debouncer) || this.isOrphan) return;
+
+		const { hierarchy, pageId, init } = this.props;
+
+		const HTMLElements = hierarchy?.map((item) => {
+			const isLink = !(item.isTarget || !item.linkId);
+			const hasChildren = !(!item.children || !item.children.length);
+			const parentLi = isLink
+				? this.factory.linkLi(item)
+				: this.factory.li(item);
+
+			if (!hasChildren) return parentLi;
+
+			const childrenLi = makeElement('li');
+			childrenLi.appendChild(this.factory.hierarchy(item));
+
+			return [parentLi, childrenLi];
+		});
+
+		if (init) this.initDrawers(pageId!);
+		HTMLElements?.flat().forEach((element) =>
+			this.drawer.appendChild(element)
+		);
+
+		init
+			? this.appendChild(this.drawer)
+			: this.parentElement?.replaceChild(this.drawer, this);
+	}
+
+	private initDrawers = (pageId: string) => {
+		this.drawerTrigger = makeElement('h5');
+
+		this.drawerTrigger.appendChild(makeElement('span', null, 'Hierarchy'));
+		this.drawerTrigger.appendChild(makeIconSpan('expand_less'));
+		this.appendChild(this.drawerTrigger);
+
+		this.drawers = new YafElementDrawers(
+			this as unknown as DrawerElement,
+			this.drawer,
+			this.drawerTrigger,
+			`hierarchy_${pageId}`
+		);
+	};
+
+	private get isOrphan() {
+		const { hierarchy, init } = this.props;
+		if (!hierarchy || !hierarchy.length) return true;
+		return (
+			init &&
+			hierarchy &&
+			hierarchy.length === 1 &&
+			(!hierarchy[0].children || !hierarchy[0].children.length)
+		);
+	}
+
+	private factory = {
+		li: (item: hierarchy) =>
+			makeElement('li', item.isTarget ? 'target' : null, item.name),
+
+		linkLi: (item: hierarchy) => {
+			const linkData = appState.reflectionMap[item.linkId!];
+			const parentLi = makeElement('li');
+			parentLi.appendChild(
+				makeLinkElement(
+					`?page=${linkData.fileName}`,
+					undefined,
+					item.name
+				)
+			);
+			return parentLi;
+		},
+
+		hierarchy: (item: hierarchy) =>
+			makeElement<YafContentHierarchy, YafContentHierarchy['props']>(
+				'yaf-content-hierarchy',
+				null,
+				null,
+				{
+					hierarchy: item.children,
+				}
+			),
+	};
+}
+
+const yafContentHierarchy = 'yaf-content-hierarchy';
+customElements.define(yafContentHierarchy, YafContentHierarchy);

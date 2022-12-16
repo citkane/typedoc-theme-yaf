@@ -1,12 +1,23 @@
 yaf-member-group-reflection,
 yaf-member-group-link {
-	h2 {
+	h2,
+	h3,
+	h3 .trigger {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+	}
+	h2 {
 		font-weight: 300;
 		border-color: var(--color-fg-subtle);
 		color: var(--color-fg-default);
+	}
+	h3 .icon {
+		display: inline-block;
+		height: 24px;
+	}
+	h3 .trigger {
+		cursor: pointer;
 	}
 	ul {
 		border: 0;

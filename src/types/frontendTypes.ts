@@ -43,10 +43,6 @@ export type materialIcon =
 	| 'highlight_off'
 	| 'link';
 
-export type abnormalSigTypes =
-	| { type: 'named-tuple-member' }
-	| { type: 'template-literal' };
-
 export type clickEvent = Event & { ctrlKey: boolean };
 
 export type localStorageKey =
@@ -56,3 +52,7 @@ export type localStorageKey =
 	| 'displayOptions';
 
 export type DrawerElement = HTMLElement & YafElementDrawers;
+
+export type debouncer = Record<string, unknown>;
+
+export type yafEventList = Array<[string, unknown, (HTMLElement | Window)?]>;

@@ -1,5 +1,5 @@
 import { YafSignatureReflection } from '../../../types/types.js';
-import yafElement from '../../YafElement.js';
+import yafElement from '../../yafElement.js';
 import { YafSignatureBody, YafSignatureTitle } from '../Signature/index.js';
 
 export class YafMemberSignatures extends HTMLElement {

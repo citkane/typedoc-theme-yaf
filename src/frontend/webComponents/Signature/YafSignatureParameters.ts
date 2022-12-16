@@ -1,69 +1,8 @@
-import {
-	YafParameterReflection,
-	YafTypeParameterReflection,
-} from '../../../types/types.js';
-import yafElement from '../../YafElement.js';
-import { YafSignature } from '../Signature/YafSignature.js';
+import { YafParameterReflection } from '../../../types/types.js';
+import yafElement from '../../yafElement.js';
+import { YafSignature } from './YafSignature.js';
 
-export class YafMemberParametersType extends HTMLElement {
-	props!: YafTypeParameterReflection[] | undefined;
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-		if (!this.props) return;
-		this.appendChild(
-			yafElement.makeElement('h5', null, 'Type Parameters:')
-		);
-		const table = yafElement.makeElement('table');
-		const thead = yafElement.makeElement('thead');
-		const headers = yafElement.makeElement('tr');
-		['name', 'modifier', 'extends', 'default', 'comment'].forEach(
-			(heading) =>
-				headers.appendChild(yafElement.makeElement('th', null, heading))
-		);
-		thead.appendChild(headers);
-		table.appendChild(thead);
-
-		const tbody = yafElement.makeElement('tbody');
-		this.props.forEach((parameter) => {
-			const { varianceModifier, name, type, text } = parameter;
-			const defaultValue = parameter.default;
-
-			const row = yafElement.makeElement('tr');
-
-			let td = yafElement.makeElement('td', null, name);
-			row.appendChild(td);
-
-			td = yafElement.makeElement('td', null, varianceModifier);
-			row.appendChild(td);
-
-			td = yafElement.makeElement('td');
-			if (type)
-				td.appendChild(yafElement.renderSignatureType(type, 'none'));
-			row.appendChild(td);
-
-			td = yafElement.makeElement('td');
-			if (defaultValue)
-				td.appendChild(
-					yafElement.renderSignatureType(defaultValue, 'none')
-				);
-			row.appendChild(td);
-
-			td = yafElement.makeElement('td');
-			if (text?.comment) td.innerHTML = text.comment;
-			row.appendChild(td);
-
-			tbody.appendChild(row);
-		});
-		table.appendChild(tbody);
-		this.appendChild(table);
-	}
-}
-
-const yafMemberParametersType = 'yaf-member-parameters-type';
-customElements.define(yafMemberParametersType, YafMemberParametersType);
-
-export class YafMemberParameters extends HTMLElement {
+export class YafSignatureParameters extends HTMLElement {
 	props!: YafParameterReflection[] | undefined;
 
 	connectedCallback() {
@@ -144,5 +83,5 @@ export class YafMemberParameters extends HTMLElement {
 	};
 }
 
-const yafMemberParameters = 'yaf-member-parameters';
-customElements.define(yafMemberParameters, YafMemberParameters);
+const yafSignatureParameters = 'yaf-signature-parameters';
+customElements.define(yafSignatureParameters, YafSignatureParameters);

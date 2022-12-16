@@ -1,5 +1,4 @@
 import {
-	abnormalSigTypes,
 	componentName,
 	materialIcon,
 	TypeContext,
@@ -17,7 +16,7 @@ import { YafWidgetFlags } from './webComponents/Widget/index.js';
 const iconClass = 'material-icons-sharp';
 
 /**
- * The base library upon which all typedoc-theme-yaf web components are built.
+ * The base helper library for building typedoc-theme-yaf HTMLCustomElements.
  *
  * It provides:
  * - A number of utility methods to construct HTML Elements
@@ -128,16 +127,19 @@ const yafElement = {
 	},
 
 	renderSignatureType: (
-		type: YAFDataObject['type'] | abnormalSigTypes,
+		type: YAFDataObject['type'],
 		context: TypeContext
 	) => {
-		if (!type) return yafElement.makeElement('span', null, 'value');
-		const signature = yafElement.makeElement<YafSignature>('yaf-signature');
-		signature.props = {
-			type,
-			context,
-		};
-		return signature;
+		if (!type) return yafElement.makeElement('span', null, 'null');
+		return yafElement.makeElement<YafSignature, YafSignature['props']>(
+			'yaf-signature',
+			null,
+			null,
+			{
+				type,
+				context,
+			}
+		);
 	},
 
 	initCap: (text: string) =>
@@ -190,6 +192,12 @@ const yafElement = {
 	flashElementBackground: (element: HTMLElement) => {
 		element.classList.add('flash');
 		setTimeout(() => element.classList.remove('flash'), 1000);
+	},
+	stringify(value: unknown) {
+		if (typeof value === 'bigint') {
+			return String(value) + 'n';
+		}
+		return JSON.stringify(value);
 	},
 };
 

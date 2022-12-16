@@ -1,28 +1,24 @@
-import { componentName } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../YafElement.js';
+import { componentName, debouncer } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
+import yafElement from '../../../yafElement.js';
+const { debounce, needsParenthesis, makeElement, makeSymbolSpan, stringify } =
+	yafElement;
 
 export class YafContentSignatureLiteral extends HTMLElement {
 	props!: JSONOutput.LiteralType;
 
 	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-		this.classList.add('type');
-		if (yafElement.needsParenthesis(this)) {
-			this.innerHTML = `<span class="symbol>(</span>"${this.props.value}"<span class="symbol>)</span>`;
-		} else {
-			this.innerText = `"${this.props.value}"`;
-		}
-		/*
-		const inner = YafElement.needsParenthesis()
-			? `<span class="symbol>(</span>"${this.props.value}"<span class="symbol>)</span>`
-			: `"${this.props.value}"`;
+		if (debounce(this as debouncer)) return;
 
-		const newElement = YafElement.makeElement(
-			`<span class="type">${inner}</span>`
-		);
-		this.parentElement?.replaceChild(newElement, this);
-		*/
+		const { value } = this.props;
+		const HTMLElements = [makeElement('span', null, stringify(value))];
+
+		if (needsParenthesis(this)) {
+			HTMLElements.unshift(makeSymbolSpan('('));
+			HTMLElements.push(makeSymbolSpan(')'));
+		}
+
+		HTMLElements.forEach((element) => this.appendChild(element));
 	}
 }
 

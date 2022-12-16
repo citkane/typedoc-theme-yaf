@@ -1,29 +1,28 @@
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../YafElement.js';
+import { debouncer } from '../../../../types/frontendTypes.js';
+import yafElement from '../../../yafElement.js';
+const { debounce, renderSignatureType, makeSymbolSpan } = yafElement;
 
 export class YafSignatureConditional extends HTMLElement {
 	props!: JSONOutput.ConditionalType;
 
 	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-		console.log(this.props);
+		if (debounce(this as debouncer)) return;
 
 		const { checkType, extendsType, falseType, trueType } = this.props;
 
-		this.appendChild(
-			yafElement.renderSignatureType(checkType, 'conditionalCheck')
-		);
-		this.appendChild(yafElement.makeSymbolSpan(' extends '));
-		this.appendChild(
-			yafElement.renderSignatureType(extendsType, 'conditionalExtends')
-		);
-		this.appendChild(yafElement.makeSymbolSpan(' ? '));
-		this.appendChild(
-			yafElement.renderSignatureType(trueType, 'conditionalTrue')
-		);
-		this.appendChild(yafElement.makeSymbolSpan(' : '));
-		this.appendChild(
-			yafElement.renderSignatureType(falseType, 'conditionalFalse')
+		const HTMLElements = [
+			renderSignatureType(checkType, 'conditionalCheck'),
+			makeSymbolSpan(' extends '),
+			renderSignatureType(extendsType, 'conditionalExtends'),
+			makeSymbolSpan(' ? '),
+			renderSignatureType(trueType, 'conditionalTrue'),
+			makeSymbolSpan(' : '),
+			renderSignatureType(falseType, 'conditionalFalse'),
+		];
+
+		HTMLElements.forEach((element: HTMLElement) =>
+			this.appendChild(element)
 		);
 	}
 }

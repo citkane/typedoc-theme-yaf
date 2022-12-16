@@ -1,5 +1,5 @@
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../YafElement.js';
+import yafElement from '../../yafElement.js';
 import { YafSignature } from '../Signature/YafSignature.js';
 
 export class YafTypeArguments extends HTMLElement {
