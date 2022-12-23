@@ -1,27 +1,34 @@
-import { debouncer } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../yafElement.js';
-const { debounce, makeSymbolSpan, renderSignatureType } = yafElement;
+import { makeSymbolSpan, renderSignatureType } from '../../../yafElement.js';
+import { YafHTMLElement } from '../../../index.js';
+import { componentName } from '../../../../types/frontendTypes.js';
 
-export class YafSignatureTuple extends HTMLElement {
-	props!: JSONOutput.TupleType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureTuple extends YafHTMLElement<JSONOutput.TupleType> {
+	onConnect() {
 		const { elements: tupleTypes } = this.props;
-		const HTMLElements = [makeSymbolSpan('[')];
+		const { factory } = YafSignatureTuple;
 
-		tupleTypes?.forEach((type, i) => {
-			HTMLElements.push(renderSignatureType(type, 'tupleElement'));
-			if (i >= tupleTypes.length - 1) return;
-			HTMLElements.push(makeSymbolSpan(', '));
-		});
-		HTMLElements.push(makeSymbolSpan(']'));
+		const HTMLElements = [
+			makeSymbolSpan('['),
+			factory.tupleTypes(tupleTypes),
+			makeSymbolSpan(']'),
+		];
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
+
+	private static factory = {
+		tupleTypes: (tupleTypes: JSONOutput.TupleType['elements']) =>
+			tupleTypes
+				?.map((type, i) => [
+					renderSignatureType(type, 'tupleElement'),
+					i < tupleTypes.length - 1
+						? makeSymbolSpan(', ')
+						: undefined,
+				])
+				.flat(),
+	};
 }
 
-const yafSignatureTuple = 'yaf-signature-tuple';
+const yafSignatureTuple: componentName = 'yaf-signature-tuple';
 customElements.define(yafSignatureTuple, YafSignatureTuple);

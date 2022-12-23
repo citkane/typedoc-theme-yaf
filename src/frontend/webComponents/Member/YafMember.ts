@@ -1,26 +1,31 @@
 import {
 	YAFDataObject,
 	YafDeclarationReflection,
+	YAFReflectionLink,
 	YafSignatureReflection,
 } from '../../../types/types.js';
 import { YafMemberDeclaration } from './YafMemberDeclaration.js';
 import { YafMemberGetterSetter } from './YafMemberGetterSetter.js';
 import { YafMemberSignatures } from './YafMemberSignatures.js';
 import events from '../../lib/events/eventApi.js';
-import yafElement from '../../yafElement.js';
-import { debouncer } from '../../../types/frontendTypes.js';
+import {
+	makeFlags,
+	makeElement,
+	makeNameSpan,
+	makeIconSpan,
+} from '../../yafElement.js';
+import { yafReflectionGroup } from '../../../types/frontendTypes.js';
 import appState from '../../lib/AppState.js';
-const { debounce, makeFlags, makeElement, makeNameSpan, makeIconSpan } =
-	yafElement;
+import errorHandlers from '../../lib/ErrorHandlers.js';
+import { JSONOutput } from 'typedoc';
+import { YafHTMLElement } from '../../index.js';
 
 const { action } = events;
 
-export class YafMember extends HTMLElement {
-	props!: YAFDataObject;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafMember extends YafHTMLElement<
+	YAFDataObject | YAFReflectionLink
+> {
+	onConnect() {
 		const {
 			name,
 			kind,
@@ -32,19 +37,20 @@ export class YafMember extends HTMLElement {
 			setSignature,
 		} = this.props;
 
-		const flagsElement = makeFlags(flags, comment);
+		const flagsElement = flags ? makeFlags(flags, comment) : undefined;
 		const headerElement = makeElement('h3', 'header');
 		headerElement.onclick = this.scrollMenuToTarget;
 		const nameElement = makeNameSpan('');
 		const inner = makeElement('div', 'inner');
 		const hasGetterOrSetter = !!getSignature || !!setSignature;
 		const isReferenceReflection =
-			appState.reflectionKind[kind] === 'Reference';
+			kind && appState.reflectionKind[kind] === 'Reference';
 
-		nameElement.appendChild(makeNameSpan(name));
-		nameElement.appendChild(makeIconSpan('link'));
-		headerElement.appendChild(nameElement);
-		headerElement.appendChild(flagsElement);
+		nameElement.appendChildren([makeNameSpan(name), makeIconSpan('link')]);
+		headerElement.appendChildren([
+			nameElement,
+			flagsElement ? flagsElement : undefined,
+		]);
 
 		const memberType = signatures
 			? 'signatures'
@@ -56,7 +62,7 @@ export class YafMember extends HTMLElement {
 
 		switch (memberType) {
 			case 'signatures':
-				inner.appendChild(this.factory.signatures(signatures));
+				inner.appendChild(this.factory.signatures(signatures!));
 				break;
 			case 'getterOrSetter':
 				inner.appendChild(this.factory.getterOrSetter());
@@ -68,8 +74,7 @@ export class YafMember extends HTMLElement {
 				inner.appendChild(this.factory.memberDeclaration());
 		}
 
-		const HTMLElements = [headerElement, inner];
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren([headerElement, inner]);
 
 		if (groups) console.warn('TODO', groups);
 	}
@@ -90,7 +95,7 @@ export class YafMember extends HTMLElement {
 				'yaf-member-getter-setter',
 				null,
 				null,
-				this.props
+				this.props as YAFDataObject
 			),
 		memberDeclaration: () =>
 			makeElement<YafMemberDeclaration, YafMemberDeclaration['props']>(
@@ -100,6 +105,50 @@ export class YafMember extends HTMLElement {
 				<YafDeclarationReflection>this.props
 			),
 	};
+
+	public static serialiseReflectionGroup = (
+		group: JSONOutput.ReflectionGroup,
+		children: YAFDataObject[]
+	): yafReflectionGroup => {
+		if (!group.children) return { title: group.title, children: [] };
+
+		const mappedChildren = group.children
+			?.map(
+				(id) =>
+					children?.find((child) => child.id === id) ||
+					appState.reflectionMap[id] ||
+					id
+			)
+			.filter((child) => {
+				if (typeof child === 'number')
+					errorHandlers.notFound(
+						`Did not find reflection id: ${child}`
+					);
+				return !!child;
+			});
+
+		return { title: group.title, children: mappedChildren || [] };
+	};
+
+	public static serialiseLinkGroup = (
+		group: JSONOutput.ReflectionGroup,
+		children: YAFDataObject[]
+	) =>
+		(group.children
+			?.map((id) => {
+				const child =
+					children.find((child) => child.id === id) ||
+					appState.reflectionMap[id];
+				child.id = String(id);
+				!child &&
+					errorHandlers.notFound(
+						`Did not find reflectionMap id: ${id}`
+					);
+				return appState.reflectionMap[id]
+					? (child as YAFReflectionLink)
+					: undefined;
+			})
+			.filter((child) => !!child) as YAFReflectionLink[]) || [];
 }
 
 const yafMember = 'yaf-member';

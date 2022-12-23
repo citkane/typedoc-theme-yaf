@@ -1,8 +1,11 @@
-import { debouncer, TypeContext } from '../../../types/frontendTypes.js';
+import {
+	componentName,
+	yafSignatureProps,
+} from '../../../types/frontendTypes.js';
 import { YAFDataObject } from '../../../types/types.js';
+import { YafHTMLElement } from '../../index.js';
 import appState from '../../lib/AppState.js';
-import yafElement from '../../yafElement.js';
-const { debounce, makeElement, makeNameSpan } = yafElement;
+import { makeElement, makeNameSpan } from '../../yafElement.js';
 
 /**
  * A factory class that produces Yaf theme HTMLCustomElements for the given props.type and props.context. \
@@ -11,16 +14,8 @@ const { debounce, makeElement, makeNameSpan } = yafElement;
  * This class is best used with the helper {@link frontend.yafElement}.renderSignatureType
  *
  */
-export class YafSignature extends HTMLElement {
-	props!: {
-		type: YAFDataObject['type'];
-		context: TypeContext;
-	};
-	count = 0;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignature extends YafHTMLElement<yafSignatureProps> {
+	onConnect() {
 		const { context, type } = this.props;
 		if (!type || type.type === 'unknown')
 			return this.appendChild(makeNameSpan(type ? type.name : 'unknown'));
@@ -46,7 +41,11 @@ export class YafSignature extends HTMLElement {
 	 */
 	private static parseTypeName = (name: string) =>
 		name.replace(/[A-Z]/g, (s) => `-${s.toLowerCase()}`);
+
+	static isCallSignature = (kind: number) => {
+		return appState.callTypes.includes(kind);
+	};
 }
 
-const yafSignature = 'yaf-signature';
+const yafSignature: componentName = 'yaf-signature';
 customElements.define(yafSignature, YafSignature);

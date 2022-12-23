@@ -11,6 +11,8 @@
 //export * from "./reactComponents";
 //export * from './internals';
 
+export * from './reflection.js';
+
 export namespace NamespaceA {
 	export interface InterfaceA {}
 	//export type renamedInterfaceA =  InterfaceA; // WA to typedoc v0.15

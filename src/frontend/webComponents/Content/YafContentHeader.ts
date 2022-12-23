@@ -1,15 +1,16 @@
-import { componentName, debouncer } from '../../../types/frontendTypes.js';
+import { componentName } from '../../../types/frontendTypes.js';
 import { YAFDataObject } from '../../../types/types.js';
 import { YafTypeParameters } from '../Type/YafTypeParameters.js';
-import yafElement from '../../yafElement.js';
-const { debounce, makeElement, makeKindSpan, makeNameSpan, makeFlags } =
-	yafElement;
+import {
+	makeElement,
+	makeKindSpan,
+	makeNameSpan,
+	makeFlags,
+} from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
 
-export class YafContentHeader extends HTMLElement {
-	props!: YAFDataObject;
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafContentHeader extends YafHTMLElement<YAFDataObject> {
+	onConnect() {
 		const {
 			typeParameters,
 			kindString,

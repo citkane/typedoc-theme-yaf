@@ -1,51 +1,46 @@
+import { componentName } from '../../../types/frontendTypes.js';
 import { YafTypeParameterReflection } from '../../../types/types.js';
-import yafElement from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
+import { makeElement, renderSignatureType } from '../../yafElement.js';
 
-export class YafSignatureParametersType extends HTMLElement {
-	props!: YafTypeParameterReflection[] | undefined;
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+export class YafSignatureParametersType extends YafHTMLElement<
+	YafTypeParameterReflection[] | undefined
+> {
+	onConnect() {
 		if (!this.props) return;
-		this.appendChild(
-			yafElement.makeElement('h5', null, 'Type Parameters:')
-		);
-		const table = yafElement.makeElement('table');
-		const thead = yafElement.makeElement('thead');
-		const headers = yafElement.makeElement('tr');
+		this.appendChild(makeElement('h5', null, 'Type Parameters:'));
+		const table = makeElement('table');
+		const thead = makeElement('thead');
+		const headers = makeElement('tr');
 		['name', 'modifier', 'extends', 'default', 'comment'].forEach(
-			(heading) =>
-				headers.appendChild(yafElement.makeElement('th', null, heading))
+			(heading) => headers.appendChild(makeElement('th', null, heading))
 		);
 		thead.appendChild(headers);
 		table.appendChild(thead);
 
-		const tbody = yafElement.makeElement('tbody');
+		const tbody = makeElement('tbody');
 		this.props.forEach((parameter) => {
 			const { varianceModifier, name, type, text } = parameter;
 			const defaultValue = parameter.default;
 
-			const row = yafElement.makeElement('tr');
+			const row = makeElement('tr');
 
-			let td = yafElement.makeElement('td', null, name);
+			let td = makeElement('td', null, name);
 			row.appendChild(td);
 
-			td = yafElement.makeElement('td', null, varianceModifier);
+			td = makeElement('td', null, varianceModifier);
 			row.appendChild(td);
 
-			td = yafElement.makeElement('td');
-			if (type)
-				td.appendChild(yafElement.renderSignatureType(type, 'none'));
+			td = makeElement('td');
+			if (type) td.appendChild(renderSignatureType(type, 'none'));
 			row.appendChild(td);
 
-			td = yafElement.makeElement('td');
+			td = makeElement('td');
 			if (defaultValue)
-				td.appendChild(
-					yafElement.renderSignatureType(defaultValue, 'none')
-				);
+				td.appendChild(renderSignatureType(defaultValue, 'none'));
 			row.appendChild(td);
 
-			td = yafElement.makeElement('td');
+			td = makeElement('td');
 			if (text?.comment) td.innerHTML = text.comment;
 			row.appendChild(td);
 
@@ -56,5 +51,6 @@ export class YafSignatureParametersType extends HTMLElement {
 	}
 }
 
-const yafSignatureParametersType = 'yaf-signature-parameters-type';
+const yafSignatureParametersType: componentName =
+	'yaf-signature-parameters-type';
 customElements.define(yafSignatureParametersType, YafSignatureParametersType);

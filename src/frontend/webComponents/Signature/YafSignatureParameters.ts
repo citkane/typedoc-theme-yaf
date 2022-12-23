@@ -1,35 +1,36 @@
+import { componentName } from '../../../types/frontendTypes.js';
 import { YafParameterReflection } from '../../../types/types.js';
-import yafElement from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
+import { makeElement, makeFlags } from '../../yafElement.js';
 import { YafSignature } from './YafSignature.js';
 
-export class YafSignatureParameters extends HTMLElement {
-	props!: YafParameterReflection[] | undefined;
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+export class YafSignatureParameters extends YafHTMLElement<
+	YafParameterReflection[] | undefined
+> {
+	onConnect() {
 		if (!this.props) return;
 
-		this.appendChild(yafElement.makeElement('h5', null, 'Parameters:'));
-		const table = yafElement.makeElement('table');
-		const thead = yafElement.makeElement('thead');
+		this.appendChild(makeElement('h5', null, 'Parameters:'));
+		const table = makeElement('table');
+		const thead = makeElement('thead');
 
-		const headers = yafElement.makeElement('tr');
+		const headers = makeElement('tr');
 		['flags', 'name', 'type', 'default', 'comment'].forEach((heading) =>
-			headers.appendChild(yafElement.makeElement('th', null, heading))
+			headers.appendChild(makeElement('th', null, heading))
 		);
 		thead.appendChild(headers);
 		table.appendChild(thead);
 
-		const tbody = yafElement.makeElement('tbody');
+		const tbody = makeElement('tbody');
 		this.props.forEach((parameter) => {
-			const row = yafElement.makeElement('tr');
-
-			row.appendChild(this.makeFlags(parameter));
-			row.appendChild(this.makeName(parameter));
-			row.appendChild(this.makeType(parameter));
-			row.appendChild(this.makeDefault(parameter));
-			row.appendChild(this.makeComment(parameter));
-
+			const row = makeElement('tr');
+			row.appendChildren([
+				this.makeFlags(parameter),
+				this.makeName(parameter),
+				this.makeType(parameter),
+				this.makeDefault(parameter),
+				this.makeComment(parameter),
+			]);
 			tbody.appendChild(row);
 		});
 		table.appendChild(tbody);
@@ -39,28 +40,23 @@ export class YafSignatureParameters extends HTMLElement {
 	}
 	makeFlags = (parameter: YafParameterReflection) => {
 		const { flags, comment } = parameter;
-		const td = yafElement.makeElement('td');
-		const flagsElement = yafElement.makeFlags(flags, comment);
+		const td = makeElement('td');
+		const flagsElement = makeFlags(flags, comment);
 		td.appendChild(flagsElement);
 		return td;
 	};
 	makeName = (parameter: YafParameterReflection) => {
 		const { flags, name } = parameter;
-		const td = yafElement.makeElement(
-			'td',
-			null,
-			flags.isRest ? `...${name}` : name
-		);
+		const td = makeElement('td', null, flags.isRest ? `...${name}` : name);
 		return td;
 	};
 	makeType = (parameter: YafParameterReflection) => {
 		const { type } = parameter;
 
-		const td = yafElement.makeElement('td', 'type');
-		const pre = yafElement.makeElement('pre', 'highlight');
+		const td = makeElement('td', 'type');
+		const pre = makeElement('pre', 'highlight');
 
-		const typeSignature =
-			yafElement.makeElement<YafSignature>('yaf-signature');
+		const typeSignature = makeElement<YafSignature>('yaf-signature');
 		typeSignature.props = { type, context: 'none' };
 
 		pre.appendChild(typeSignature);
@@ -70,18 +66,18 @@ export class YafSignatureParameters extends HTMLElement {
 	};
 	makeDefault = (parameter: YafParameterReflection) => {
 		const { defaultValue } = parameter;
-		const td = yafElement.makeElement('td', null, defaultValue);
+		const td = makeElement('td', null, defaultValue);
 
 		return td;
 	};
 	makeComment = (parameter: YafParameterReflection) => {
 		const { text } = parameter;
-		const td = yafElement.makeElement('td');
-		if (text.comment) td.innerHTML = text.comment;
+		const td = makeElement('td');
+		if (text?.comment) td.innerHTML = text.comment;
 
 		return td;
 	};
 }
 
-const yafSignatureParameters = 'yaf-signature-parameters';
+const yafSignatureParameters: componentName = 'yaf-signature-parameters';
 customElements.define(yafSignatureParameters, YafSignatureParameters);

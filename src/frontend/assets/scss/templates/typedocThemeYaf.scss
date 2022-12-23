@@ -87,12 +87,12 @@ yaf-member-group-reflection {
 
 @keyframes flash {
 	0% {
-		background-color: none;
+		background: none;
 	}
 	50% {
-		background-color: var(--color-attention-subtle);
+		background: var(--color-attention-subtle);
 	}
 	100% {
-		background-color: none;
+		background: none;
 	}
 }

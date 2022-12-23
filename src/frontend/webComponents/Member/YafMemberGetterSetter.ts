@@ -1,52 +1,60 @@
 import { YAFDataObject, YafSignatureReflection } from '../../../types/types.js';
-import yafElement from '../../yafElement.js';
 import { YafSignatureBody, YafSignatureTitle } from '../Signature';
+import { makeElement, makeSymbolSpan, makeNameSpan } from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
+import { componentName } from '../../../types/frontendTypes.js';
 
-export class YafMemberGetterSetter extends HTMLElement {
-	props!: YAFDataObject;
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-
+export class YafMemberGetterSetter extends YafHTMLElement<YAFDataObject> {
+	onConnect() {
 		const { getSignature, setSignature } = this.props;
+		const { factory } = YafMemberGetterSetter;
+
 		if (getSignature) {
-			const wrapper = yafElement.makeElement('div');
-			wrapper.classList.add('wrapper');
-			wrapper.appendChild(this.makeSignature('get', getSignature));
-			wrapper.appendChild(this.makeBody(getSignature));
-			this.appendChild(wrapper);
+			const wrapperHTMLElement = makeElement('div', 'wrapper');
+			wrapperHTMLElement.appendChildren([
+				factory.makeSignature('get', getSignature),
+				factory.makeBody(getSignature),
+			]);
+
+			this.appendChild(wrapperHTMLElement);
 		}
 
 		if (setSignature) {
-			const wrapper = yafElement.makeElement('div');
-			wrapper.classList.add('wrapper');
-			this.appendChild(this.makeSignature('set', setSignature));
-			this.appendChild(this.makeBody(setSignature));
-			this.appendChild(wrapper);
+			const wrapperHTMLElement = makeElement('div', 'wrapper');
+			wrapperHTMLElement.appendChildren([
+				factory.makeSignature('set', setSignature),
+				factory.makeBody(setSignature),
+			]);
+
+			this.appendChild(wrapperHTMLElement);
 		}
 	}
-	makeSignature = (prefix: string, data: YafSignatureReflection) => {
-		const pre = yafElement.makeElement('pre');
-		pre.classList.add('highlight');
-		pre.appendChild(yafElement.makeSymbolSpan(`${prefix} `));
-		pre.appendChild(yafElement.makeNameSpan(data.name));
 
-		const title: YafSignatureTitle = yafElement.makeElement(
-			'yaf-signature-title'
-		);
-		title.props = { ...data, hideName: true };
-		pre.appendChild(title);
+	private static factory = {
+		makeSignature: (prefix: string, data: YafSignatureReflection) => {
+			const title = makeElement<
+				YafSignatureTitle,
+				YafSignatureTitle['props']
+			>('yaf-signature-title', null, null, { ...data, hideName: true });
 
-		return pre;
-	};
-	makeBody = (data: YafSignatureReflection) => {
-		const body: YafSignatureBody =
-			yafElement.makeElement('yaf-signature-body');
-		body.props = data;
+			const preHTMLElement = makeElement('pre', 'highlight');
+			preHTMLElement.appendChildren([
+				makeSymbolSpan(`${prefix} `),
+				makeNameSpan(data.name),
+				title,
+			]);
 
-		return body;
+			return preHTMLElement;
+		},
+		makeBody: (data: YafSignatureReflection) =>
+			makeElement<YafSignatureBody, YafSignatureBody['props']>(
+				'yaf-signature-body',
+				null,
+				null,
+				data
+			),
 	};
 }
 
-const yafMemberGetterSetter = 'yaf-member-getter-setter';
+const yafMemberGetterSetter: componentName = 'yaf-member-getter-setter';
 customElements.define(yafMemberGetterSetter, YafMemberGetterSetter);

@@ -94,6 +94,17 @@ export class AppState {
 	set closeDrawer(id: string) {
 		delete this.state.drawers[id];
 	}
+	get callTypes() {
+		return [
+			this.reflectionKind.CallSignature,
+			this.reflectionKind.ConstructorSignature,
+			this.reflectionKind.Function,
+			this.reflectionKind.FunctionOrMethod,
+			this.reflectionKind.GetSignature,
+			this.reflectionKind.Method,
+			this.reflectionKind.SetSignature,
+		];
+	}
 
 	toggleDisplayOption = (flag: yafDisplayOptions) => {
 		const displayState = this.options.display[flag];

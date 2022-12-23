@@ -1,49 +1,53 @@
 import { JSONOutput } from 'typedoc';
-import { debouncer } from '../../../../types/frontendTypes.js';
+import { YafHTMLElement } from '../../../index.js';
 import appState from '../../../lib/AppState.js';
-import yafElement from '../../../yafElement.js';
-const { debounce, renderSignatureType, makeLinkElement, makeSymbolSpan } =
-	yafElement;
+import {
+	renderSignatureType,
+	makeLinkElement,
+	makeSymbolSpan,
+} from '../../../yafElement.js';
 
-export class YafSignatureIndexedAccess extends HTMLElement {
-	props!: JSONOutput.IndexedAccessType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureIndexedAccess extends YafHTMLElement<JSONOutput.IndexedAccessType> {
+	onConnect() {
 		const { indexType, objectType } = this.props;
+		const { factory } = YafSignatureIndexedAccess;
 
 		const referenceId = (<objectWithId>objectType).id;
 		const linkTheSignature =
 			!!referenceId && objectType.type !== 'reference';
-		const indexTypeElement = renderSignatureType(indexType, 'indexedIndex');
-		const indexSignatureElement = linkTheSignature
-			? YafSignatureIndexedAccess.wrapSignatureInLink(
+		const indexTypeHTMLElement = renderSignatureType(
+			indexType,
+			'indexedIndex'
+		);
+		const indexSignatureHTMLElement = linkTheSignature
+			? factory.wrapSignatureInLink(
 					String(referenceId!),
-					indexTypeElement
+					indexTypeHTMLElement
 			  )
-			: indexTypeElement;
+			: indexTypeHTMLElement;
 
 		const HTMLElements = [
 			renderSignatureType(objectType, 'indexedObject'),
 			makeSymbolSpan('['),
-			indexSignatureElement,
+			indexSignatureHTMLElement,
 			makeSymbolSpan(']'),
 		];
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements);
 	}
 
-	private static wrapSignatureInLink(
-		referenceId: string,
-		indexTypeElement: HTMLElement
-	) {
-		const linkElement = makeLinkElement(
-			`?page=${appState.reflectionMap[referenceId].fileName}`
-		);
-		linkElement.appendChild(indexTypeElement);
-		return linkElement;
-	}
+	private static factory = {
+		wrapSignatureInLink: (
+			referenceId: string,
+			indexTypeElement: HTMLElement
+		) => {
+			const linkElement = makeLinkElement(
+				`?page=${appState.reflectionMap[referenceId].fileName}`
+			);
+			linkElement.appendChild(indexTypeElement);
+			return linkElement;
+		},
+	};
 }
 
 const yafSignatureIndexedAccess = 'yaf-signature-indexed-access';
@@ -58,6 +62,6 @@ customElements.define(yafSignatureIndexedAccess, YafSignatureIndexedAccess);
  *
  * @see https://typedoc.org/api/interfaces/JSONOutput.IndexedAccessType.html
  */
-type objectWithId = JSONOutput.IndexedAccessType['objectType'] & {
+export type objectWithId = JSONOutput.IndexedAccessType['objectType'] & {
 	id?: number;
 };

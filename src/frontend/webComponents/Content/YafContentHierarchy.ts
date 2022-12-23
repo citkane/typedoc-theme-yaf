@@ -1,23 +1,20 @@
-import { debouncer, DrawerElement } from '../../../types/frontendTypes';
+import { YafHTMLElement } from '../../index.js';
 import { hierarchy } from '../../../types/types';
 import appState from '../../lib/AppState.js';
-import yafElement from '../../yafElement.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
-const { debounce, makeElement, makeIconSpan, makeLinkElement } = yafElement;
+import {
+	makeElement,
+	makeIconSpan,
+	makeLinkElement,
+} from '../../yafElement.js';
+import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
+import { yafContentHierarchyProps } from '../../../types/frontendTypes.js';
 
-export class YafContentHierarchy extends HTMLElement {
-	props!: {
-		hierarchy: hierarchy[] | undefined;
-		pageId?: string;
-		init?: boolean;
-	};
+export class YafContentHierarchy extends YafHTMLElement<yafContentHierarchyProps> {
 	drawers?: YafElementDrawers;
 	drawerTrigger!: HTMLElement;
 	drawer = makeElement('ul');
 
-	connectedCallback() {
-		if (debounce(this as debouncer) || this.isOrphan) return;
-
+	onConnect() {
 		const { hierarchy, pageId, init } = this.props;
 
 		const HTMLElements = hierarchy?.map((item) => {
@@ -36,9 +33,7 @@ export class YafContentHierarchy extends HTMLElement {
 		});
 
 		if (init) this.initDrawers(pageId!);
-		HTMLElements?.flat().forEach((element) =>
-			this.drawer.appendChild(element)
-		);
+		this.drawer.appendChildren(HTMLElements?.flat());
 
 		init
 			? this.appendChild(this.drawer)

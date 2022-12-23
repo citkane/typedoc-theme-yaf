@@ -95,7 +95,8 @@ export class YafTheme extends DefaultTheme {
 		this.yafSerialiser = new YafSerializer(
 			this.projectObject as YAFDataObject,
 			this.project as ProjectReflection & DeclarationReflection,
-			this.context
+			this.context,
+			this.application.serializer
 		);
 
 		this.saveYafThemeAssets();

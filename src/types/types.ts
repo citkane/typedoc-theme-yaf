@@ -13,13 +13,17 @@ declare global {
 import { JSONOutput } from 'typedoc';
 
 export type htmlString = `<${string}>${string}</${string}>` | `<${string} />`;
+export type yafReflectionText = {
+	readme?: htmlString;
+	comment?: htmlString;
+};
 
 export interface YAFDataObject
 	extends JSONOutput.SignatureReflection,
 		JSONOutput.DeclarationReflection,
 		JSONOutput.ProjectReflection,
 		JSONOutput.ContainerReflection {
-	version: string;
+	version?: string;
 	children?: YAFDataObject[];
 	is: {
 		leaf: boolean;
@@ -33,10 +37,7 @@ export interface YAFDataObject
 		query: string;
 		hash: string;
 	};
-	text: {
-		readme?: htmlString;
-		comment?: htmlString;
-	};
+	text?: yafReflectionText;
 	has: {
 		typeParameters: boolean;
 		getterOrSetter: boolean;
@@ -54,34 +55,23 @@ export interface YafDeclarationReflection
 	extends JSONOutput.DeclarationReflection {
 	parameters?: YafParameterReflection[];
 	typeParameters?: YafTypeParameterReflection[] | undefined;
-	text: {
-		readme?: htmlString;
-		comment?: htmlString;
-	};
+	text?: yafReflectionText;
 	type: JSONOutput.ReflectionType;
 }
 export interface YafSignatureReflection extends JSONOutput.SignatureReflection {
 	parameters?: YafParameterReflection[];
 	typeParameter?: YafTypeParameterReflection[];
-	text: {
-		readme?: htmlString;
-		comment?: htmlString;
-	};
+	text?: yafReflectionText;
 	sources?: YafDeclarationReflection['sources'];
 	implementedBy?: YafDeclarationReflection['implementedBy'];
+	defaultValue?: unknown;
 }
 export interface YafParameterReflection extends JSONOutput.ParameterReflection {
-	text: {
-		readme?: htmlString;
-		comment?: htmlString;
-	};
+	text?: yafReflectionText;
 }
 export interface YafTypeParameterReflection
 	extends JSONOutput.TypeParameterReflection {
-	text: {
-		readme?: htmlString;
-		comment?: htmlString;
-	};
+	text?: yafReflectionText;
 }
 
 export type hierarchy = {
@@ -111,6 +101,12 @@ export type YAFReflectionLink = {
 	id?: string;
 	kind?: number;
 	target?: number;
+	flags?: undefined;
+	signatures?: undefined;
+	comment?: undefined;
+	groups?: undefined;
+	getSignature?: undefined;
+	setSignature?: undefined;
 };
 export type reflectionMap = {
 	[key: string]: YAFReflectionLink;

@@ -1,105 +1,136 @@
-import { DrawerElement } from '../../../types/frontendTypes.js';
-import { YafWidgetKind } from '../Widget/YafWidgets.js';
-
 import appState from '../../lib/AppState.js';
 import events from '../../lib/events/eventApi.js';
-import yafElement from '../../yafElement.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
-
+import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
+import {
+	makeIconSpan,
+	makeElement,
+	makeLinkElement,
+	makeNameSpan,
+} from '../../yafElement.js';
+import { kindSymbols } from '../../../types/types.js';
+import { YafHTMLElement } from '../../index.js';
+import { YafWidgetKind } from '../Widget/index.js';
 const { action } = events;
 
 /**
  *
  */
-export class YafNavigationHeader extends HTMLElement {
+export class YafNavigationHeader extends YafHTMLElement {
 	drawers!: YafElementDrawers;
-	drawer!: HTMLElement;
-	drawerTrigger!: HTMLElement;
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+	id = 'yafNavigationHeader';
 
-		this.drawerTrigger = yafElement.makeElement('span', 'info');
-		this.drawerTrigger.appendChild(
-			yafElement.makeIconSpan('question_mark', 18)
+	onConnect() {
+		const { factory } = YafNavigationHeader;
+		const drawerTriggerHTMLElement = makeElement('span', 'info');
+		const navigationControlsHTMLElement = makeElement(
+			'div',
+			'controls-navigation'
 		);
-		this.drawerTrigger.appendChild(
-			yafElement.makeIconSpan('highlight_off')
+		const homeLinkHTMLElement = makeLinkElement('/', 'button');
+		const drawerHTMLElement = factory.infoDrawer(
+			this.keyKinds,
+			appState.kindSymbols
 		);
 
-		this.id = 'yafNavigationHeader';
-		this.drawer = this.makeInfoDrawer();
+		homeLinkHTMLElement.appendChild(makeIconSpan('home'));
+		drawerTriggerHTMLElement.appendChildren([
+			makeIconSpan('question_mark', 18),
+			makeIconSpan('highlight_off'),
+		]);
+		navigationControlsHTMLElement.appendChildren([
+			homeLinkHTMLElement,
+			factory.menuRollControls(drawerTriggerHTMLElement),
+		]);
+
+		this.appendChildren([navigationControlsHTMLElement, drawerHTMLElement]);
 
 		this.drawers = new YafElementDrawers(
 			this as unknown as DrawerElement,
-			this.drawer,
-			this.drawerTrigger,
+			drawerHTMLElement,
+			drawerTriggerHTMLElement,
 			this.id
 		);
-
-		const navigationControls = yafElement.makeElement('div');
-		const homeLink = yafElement.makeLinkElement('/', 'button');
-
-		navigationControls.classList.add('controls-navigation');
-
-		homeLink.appendChild(yafElement.makeIconSpan('home'));
-		navigationControls.appendChild(homeLink);
-		navigationControls.appendChild(this.makeMenuRollControls());
-		this.appendChild(navigationControls);
-		this.appendChild(this.drawer);
-
 		this.drawers.renderDrawers(true);
 	}
 	disconnectedCallback() {
 		this.drawers.drawerHasDisconnected();
 	}
-	makeMenuRollControls = () => {
-		const openAll = yafElement.makeElement('span', 'open button');
-		const closeAll = yafElement.makeElement('span', 'close button');
-		const drawerControls = yafElement.makeElement(
-			'span',
-			'controls-drawers'
-		);
 
-		openAll.appendChild(yafElement.makeIconSpan('expand_more'));
-		closeAll.appendChild(yafElement.makeIconSpan('expand_less'));
-		drawerControls.appendChild(this.drawerTrigger);
-		drawerControls.appendChild(openAll);
-		drawerControls.appendChild(closeAll);
+	private static factory = {
+		menuRollControls: (drawerTriggerHTMLElement: HTMLElement) => {
+			const openAllHTMLElement = makeElement('span', 'open button');
+			const closeAllHTMLElement = makeElement('span', 'close button');
+			const drawerControlsHTMLElement = makeElement(
+				'span',
+				'controls-drawers'
+			);
 
-		openAll.onclick = () => events.dispatch(action.menu.rollMenuDown());
-		closeAll.onclick = () => events.dispatch(action.menu.rollMenuUp());
+			openAllHTMLElement.appendChild(makeIconSpan('expand_more'));
+			closeAllHTMLElement.appendChild(makeIconSpan('expand_less'));
+			drawerControlsHTMLElement.appendChildren([
+				drawerTriggerHTMLElement,
+				openAllHTMLElement,
+				closeAllHTMLElement,
+			]);
 
-		return drawerControls;
+			openAllHTMLElement.onclick = () =>
+				events.dispatch(action.menu.rollMenuDown());
+			closeAllHTMLElement.onclick = () =>
+				events.dispatch(action.menu.rollMenuUp());
+
+			return drawerControlsHTMLElement;
+		},
+		infoDrawer: (keyKinds: number[], kindSymbols: kindSymbols) => {
+			const infoDrawerHTMLElement = makeElement('div', 'drawers-info');
+			const innerHTMLElement = makeElement('span', 'inner');
+
+			const keySymbolHTMLElements = keyKinds.map((keyKind) => {
+				let nameString = kindSymbols[keyKind].className;
+				nameString =
+					nameString.charAt(0).toUpperCase() + nameString.slice(1);
+
+				const widgetHTMLElement = makeElement('span', 'widget');
+				const nameHTMLElement = makeNameSpan(nameString);
+				const kindIconHTMLElement = this.factory.kindIcon(
+					String(keyKind)
+				);
+
+				widgetHTMLElement.appendChildren([
+					kindIconHTMLElement,
+					nameHTMLElement,
+				]);
+
+				return widgetHTMLElement;
+			});
+
+			innerHTMLElement.appendChildren(keySymbolHTMLElements);
+			infoDrawerHTMLElement.appendChild(innerHTMLElement);
+			return infoDrawerHTMLElement;
+		},
+		kindIcon: (kind: string) =>
+			makeElement<YafWidgetKind, YafWidgetKind['props']>(
+				'yaf-widget-kind',
+				null,
+				null,
+				{ kind }
+			),
 	};
-	makeInfoDrawer = () => {
-		const kinds = [
-			262144, 128, 512, 8, 64, 256, 2048, 4, 1024, 8388608, 32, 4194304,
-			2,
-		].sort();
 
-		const infoDrawer = yafElement.makeElement('div', 'drawers-info');
-		const inner = yafElement.makeElement('span', 'inner');
-
-		kinds.forEach((kind) => {
-			let nameString = appState.kindSymbols[kind].className;
-			nameString =
-				nameString.charAt(0).toUpperCase() + nameString.slice(1);
-
-			const widget = yafElement.makeElement('span', 'widget');
-			const name = yafElement.makeNameSpan(nameString);
-			const kindIcon = yafElement.makeElement<
-				YafWidgetKind,
-				YafWidgetKind['props']
-			>('yaf-widget-kind', null, null, { kind: String(kind) });
-
-			widget.appendChild(kindIcon);
-			widget.appendChild(name);
-			inner.appendChild(widget);
-		});
-		infoDrawer.appendChild(inner);
-
-		return infoDrawer;
-	};
+	private keyKinds = [
+		appState.reflectionKind.Property,
+		appState.reflectionKind.Method,
+		appState.reflectionKind.Accessor,
+		appState.reflectionKind.Variable,
+		appState.reflectionKind.TypeAlias,
+		appState.reflectionKind.Constructor,
+		appState.reflectionKind.Function,
+		appState.reflectionKind.Class,
+		appState.reflectionKind.Namespace,
+		appState.reflectionKind.Interface,
+		appState.reflectionKind.Namespace,
+		appState.reflectionKind.Enum,
+		appState.reflectionKind.Reference,
+	];
 }
 const yafNavigationHeader = 'yaf-navigation-header';
 customElements.define(yafNavigationHeader, YafNavigationHeader);

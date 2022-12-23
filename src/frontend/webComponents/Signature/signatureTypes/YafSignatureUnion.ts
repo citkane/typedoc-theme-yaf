@@ -1,28 +1,18 @@
-import { componentName, debouncer } from '../../../../types/frontendTypes.js';
+import { componentName } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../yafElement.js';
-const { debounce, renderSignatureType, makeSymbolSpan } = yafElement;
+import { renderSignatureType, makeSymbolSpan } from '../../../yafElement.js';
+import { YafHTMLElement } from '../../../index.js';
 
-export class YafSignatureUnion extends HTMLElement {
-	props!: JSONOutput.UnionType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureUnion extends YafHTMLElement<JSONOutput.UnionType> {
+	onConnect() {
 		const { types } = this.props;
 
-		const HTMLElements = types
-			.map((type, i) => {
-				const typeElements = [
-					renderSignatureType(type, 'unionElement'),
-				];
-				if (i >= types.length - 1) return typeElements;
-				typeElements.push(makeSymbolSpan(' | '));
-				return typeElements;
-			})
-			.flat();
+		const HTMLElements = types.map((type, i) => [
+			renderSignatureType(type, 'unionElement'),
+			i < types.length - 1 ? makeSymbolSpan(' | ') : undefined,
+		]);
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
 }
 

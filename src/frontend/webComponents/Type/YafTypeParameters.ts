@@ -1,14 +1,11 @@
-import { debouncer } from '../../../types/frontendTypes.js';
 import { YAFDataObject } from '../../../types/types.js';
-import yafElement from '../../yafElement.js';
-const { debounce, makeElement, makeSymbolSpan } = yafElement;
+import { YafHTMLElement } from '../../index.js';
+import { makeElement, makeSymbolSpan } from '../../yafElement.js';
 
-export class YafTypeParameters extends HTMLElement {
-	props!: YAFDataObject['typeParameters'];
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafTypeParameters extends YafHTMLElement<
+	YAFDataObject['typeParameters']
+> {
+	onConnect() {
 		const params = (this.props || []).flatMap((param) => {
 			const span = makeElement(
 				'span',

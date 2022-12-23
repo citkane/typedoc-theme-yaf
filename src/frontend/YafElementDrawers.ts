@@ -1,5 +1,4 @@
 import {
-	DrawerElement,
 	drawerState,
 	yafDisplayOptions,
 	yafState,
@@ -7,6 +6,7 @@ import {
 import appState from './lib/AppState.js';
 import events from './lib/events/eventApi.js';
 
+export type DrawerElement = HTMLElement & YafElementDrawers;
 const { trigger } = events;
 /**
  * Utility class for folding, hierarchical drawers
@@ -22,7 +22,6 @@ export default class YafElementDrawers {
 	hasContent = false;
 	drawers!: YafElementDrawers;
 	childDrawers!: DrawerElement[];
-
 	constructor(
 		drawerParent: DrawerElement,
 		drawer: HTMLElement,
@@ -42,8 +41,6 @@ export default class YafElementDrawers {
 		this.drawer.classList.add('yaf-drawer');
 		this.drawerParent.setAttribute('data-height', '0');
 		this.drawerParent.setAttribute('data-height-extra', '0');
-
-		this.drawerParent.appendChild(this.drawer);
 
 		(<yafDisplayOptions[]>Object.keys(appState.options.display)).forEach(
 			(key) => {
@@ -87,9 +84,9 @@ export default class YafElementDrawers {
 			? this.openDrawer()
 			: this.closeDrawer();
 
-		this.childDrawerElements.forEach((child) =>
-			child.drawers.renderDrawers()
-		);
+		this.childDrawerElements.forEach((child) => {
+			child.drawers.renderDrawers();
+		});
 		setTimeout(() => this.drawerParent.classList.add('rendered'));
 	};
 
@@ -194,10 +191,16 @@ export default class YafElementDrawers {
 	}
 
 	get childDrawerElements() {
-		if (!this.childDrawers)
-			this.childDrawers = (<DrawerElement[]>[
-				...this.drawer.children,
-			]).filter((child) => child.isDrawer);
+		if (this.childDrawers) return this.childDrawers;
+		this.childDrawers = [...this.drawer.children]
+			.map((element) => {
+				if ('drawers' in element) return element as DrawerElement;
+				const nestedDrawer = [...element.children].find(
+					(childElement) => 'drawers' in childElement
+				);
+				return nestedDrawer || undefined;
+			})
+			.filter((element) => !!element) as DrawerElement[];
 		return this.childDrawers;
 	}
 	get isRoot() {

@@ -1,14 +1,15 @@
-import { componentName, debouncer } from '../../../../types/frontendTypes.js';
+import { componentName } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../yafElement.js';
-const { debounce, needsParenthesis, makeTypeSpan, makeSymbolSpan } = yafElement;
 
-export class YafContentSignatureIntrinsic extends HTMLElement {
-	props!: JSONOutput.IntrinsicType;
+import {
+	needsParenthesis,
+	makeTypeSpan,
+	makeSymbolSpan,
+} from '../../../yafElement.js';
+import { YafHTMLElement } from '../../../index.js';
 
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafContentSignatureIntrinsic extends YafHTMLElement<JSONOutput.IntrinsicType> {
+	onConnect() {
 		const { name } = this.props;
 		const HTMLElements = [makeTypeSpan(name)];
 
@@ -16,7 +17,7 @@ export class YafContentSignatureIntrinsic extends HTMLElement {
 			HTMLElements.unshift(makeSymbolSpan('('));
 			HTMLElements.push(makeSymbolSpan(')'));
 		}
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
 }
 

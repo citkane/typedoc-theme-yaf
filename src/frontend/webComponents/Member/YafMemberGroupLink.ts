@@ -1,56 +1,69 @@
 import { YAFReflectionLink } from '../../../types/types';
 import { appState, events } from '../../lib/index.js';
-import yafElement from '../../yafElement.js';
 import { YafWidgetCounter } from '../Widget/index.js';
+import {
+	makeElement,
+	makeTitleSpan,
+	makeLinkElement,
+} from '../../yafElement.js';
+import { yafMemberGroupLinkProps } from '../../../types/frontendTypes';
+import { YafHTMLElement } from '../../index.js';
 
 const { action } = events;
 
-export class YafMemberGroupLink extends HTMLElement {
-	props!: {
-		title: string;
-		children: YAFReflectionLink[];
-	};
-	ul = yafElement.makeElement(`ul`);
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+export class YafMemberGroupLink extends YafHTMLElement<yafMemberGroupLinkProps> {
+	onConnect() {
 		const { children, title } = this.props;
 
-		const groupHeader = yafElement.makeElement('h2');
-		const groupTitle = yafElement.makeTitleSpan(`${title}`);
-		groupHeader.appendChild(groupTitle);
-
-		const groupCount =
-			yafElement.makeElement<YafWidgetCounter>('yaf-widget-counter');
-		groupCount.props = {
+		const ulHTMLElement = makeElement(`ul`, 'links');
+		const groupHeaderHTMLElement = makeElement('h2');
+		const groupTitleHTMLElement = makeTitleSpan(`${title}`);
+		const groupCountHTMLElement = makeElement<
+			YafWidgetCounter,
+			YafWidgetCounter['props']
+		>('yaf-widget-counter', null, null, {
 			count: children.length,
-		};
-		groupHeader.appendChild(groupCount);
+		});
 
-		this.appendChild(groupHeader);
-		this.ul.classList.add('links');
+		groupHeaderHTMLElement.appendChildren([
+			groupTitleHTMLElement,
+			groupCountHTMLElement,
+		]);
+
 		children.forEach((child) => {
-			child = this.transformReferencedChild(child);
+			child = this.serialiseReferencedChild(child);
 
-			const item = yafElement.makeElement(`li`);
-			const link = yafElement.makeLinkElement(
+			const liHTMLElement = makeElement(`li`);
+			const linkHTMLElement = makeLinkElement(
 				`?page=${child.fileName}`,
 				undefined,
 				child.name
 			);
 
-			item.appendChild(link);
-			item.id = child.name;
-			item.onclick = () =>
+			liHTMLElement.appendChild(linkHTMLElement);
+			liHTMLElement.id = child.name;
+			liHTMLElement.onclick = () =>
 				events.dispatch(action.content.scrollTo(`menu_${child.id}`));
-			this.ul.appendChild(item);
+
+			ulHTMLElement.appendChild(liHTMLElement);
 		});
-		this.appendChild(this.ul);
+
+		this.appendChildren([groupHeaderHTMLElement, ulHTMLElement]);
 	}
-	private transformReferencedChild = (child: YAFReflectionLink) => {
-		if (!child.kind || appState.reflectionKind[child.kind] !== 'Reference')
+
+	/**
+	 * If the link is to a `Reference` kind, this modifies the name
+	 * to indicate how the original target has been modified.
+	 * @param child
+	 * @returns
+	 */
+	private serialiseReferencedChild = (child: YAFReflectionLink) => {
+		if (!child.kind || child.kind !== appState.reflectionKind.Reference)
 			return child;
-		const target = appState.reflectionMap[child.target!];
+
+		const target = child.target
+			? appState.reflectionMap[child.target]
+			: undefined;
 
 		const referenceType = !target
 			? 'ReExports'
@@ -69,7 +82,9 @@ export class YafMemberGroupLink extends HTMLElement {
 				break;
 			case 'ReExportsRenameLink':
 				child.fileName = appState.reflectionMap[child.target!].fileName;
-				child.name = `Re-named/exported: "${target.name}" to "${child.name}"`;
+				child.name = `Re-named/exported: "${target!.name}" to "${
+					child.name
+				}"`;
 		}
 		return child;
 	};

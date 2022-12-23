@@ -1,11 +1,6 @@
 {
 	"extends": "@typedoc-theme-yaf/tsconfig/es6.json",
-	"include": [
-		"./frontend",
-		"./types/types.ts",
-		"./types/frontendTypes.ts",
-		"./examples"
-	],
+	"include": ["./frontend", "./types/types.ts", "./types/frontendTypes.ts"],
 	"exclude": ["./frontend/assets"],
 	"compilerOptions": {
 		"outDir": "../dist/src",

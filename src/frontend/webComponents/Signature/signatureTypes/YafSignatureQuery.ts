@@ -1,21 +1,16 @@
 import { JSONOutput } from 'typedoc';
-import { debouncer } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../yafElement.js';
-const { debounce, makeSymbolSpan, renderSignatureType } = yafElement;
+import { YafHTMLElement } from '../../../index.js';
+import { makeSymbolSpan, renderSignatureType } from '../../../yafElement.js';
 
-export class YafSignatureQuery extends HTMLElement {
-	props!: JSONOutput.QueryType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureQuery extends YafHTMLElement<JSONOutput.QueryType> {
+	onConnect() {
 		const { queryType } = this.props;
 		const HTMLElements = [
 			makeSymbolSpan('typeof '),
 			renderSignatureType(queryType, 'queryTypeTarget'),
 		];
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
 }
 

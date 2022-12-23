@@ -1,5 +1,4 @@
-import { DeclarationHierarchy, ReferenceType } from 'typedoc';
-import { Serializer } from 'typedoc';
+import { DeclarationHierarchy, JSONOutput, Serializer } from 'typedoc';
 import {
 	CommentDisplayPart,
 	DeclarationReflection,
@@ -9,6 +8,7 @@ import {
 	ReflectionKind,
 	ReflectionType,
 } from 'typedoc';
+
 import { dataLocation } from '../types/backendTypes';
 import {
 	hierarchy,
@@ -20,71 +20,50 @@ import {
 } from '../types/types';
 
 export class YafSerializer {
-	private dataObject: YAFDataObject;
 	dataObjectArray: YAFDataObject[];
+	private dataObject: YAFDataObject;
 	private context: DefaultThemeRenderContext;
-	/**
-	 * The kinds of reflections which will generate their own document page in the front-end.
-	 */
-	private static hasOwnPage = [
-		ReflectionKind.Class,
-		ReflectionKind.Interface,
-		ReflectionKind.Enum,
-		ReflectionKind.Namespace,
-		ReflectionKind.Module,
-		ReflectionKind.TypeAlias,
-		ReflectionKind.Function,
-		ReflectionKind.Variable,
-	];
+	private reflection: ProjectReflection & DeclarationReflection;
+	private tdocSerializer: Serializer;
 
 	constructor(
 		object: YAFDataObject,
 		reflection: ProjectReflection & DeclarationReflection,
-		context: DefaultThemeRenderContext
+		context: DefaultThemeRenderContext,
+		tdocSerializer: Serializer
 	) {
 		this.context = context;
 		this.dataObject = this.parseProjectToObject(object, reflection);
 		this.dataObjectArray = this.parseDataObjectToArray(this.dataObject);
+		this.reflection = reflection;
+		this.tdocSerializer = tdocSerializer;
 	}
-	/**
-	 * Flattens the extended JSONOutput project into an array of reflections.
-	 * @param objects
-	 * @param object
-	 * @returns an array of extended JSONOutput reflections
-	 */
-	private parseDataObjectToArray = (
-		object: YAFDataObject,
-		objects: YAFDataObject[] = []
-	) => {
-		const thisChildren: YAFDataObject[] = [];
-		const newPages: YAFDataObject[] = [];
-		object.children?.forEach((child: YAFDataObject) => {
-			YafSerializer.isPage(child.kind)
-				? newPages.push(child)
-				: thisChildren.push(child);
-		});
-		object.children = thisChildren;
-		objects.push(object);
-		newPages.forEach((child) => {
-			this.parseDataObjectToArray(child, objects);
-		});
-		return objects;
-	};
+
 	private parseProjectToObject = (
 		object: YAFDataObject,
 		reflection: ProjectReflection & DeclarationReflection
 	) => {
+		object = this.serialize(object, reflection);
+
+		this.fixDeclarationReflections(object, reflection);
+
+		if (reflection.type instanceof ReflectionType) {
+			const children =
+				(<JSONOutput.ReflectionType>object.type)?.declaration
+					?.children || [];
+		}
+
 		if (object.groups) {
 			object.groups.forEach((group) => {
-				group.children = group.children.filter(
-					(id) => !!object.children.find((child) => child.id === id)
+				group.children = group.children?.filter(
+					(id) => !!object.children?.find((child) => child.id === id)
 				);
 			});
 		}
-		object = this.serialize(object, reflection);
+
 		object.children?.forEach((objectChild) => {
-			const reflectionChild = reflection.children.find(
-				(rc) => rc.id === objectChild.id
+			const reflectionChild = reflection.children?.find(
+				(reflectionChild) => reflectionChild.id === objectChild.id
 			);
 			this.parseProjectToObject(
 				objectChild as YAFDataObject,
@@ -134,6 +113,31 @@ export class YafSerializer {
 		return object;
 	};
 
+	/**
+	 * Flattens the extended JSONOutput project into an array of reflections.
+	 * @param objects
+	 * @param object
+	 * @returns an array of extended JSONOutput reflections
+	 */
+	private parseDataObjectToArray = (
+		object: YAFDataObject,
+		objects: YAFDataObject[] = []
+	) => {
+		const thisChildren: YAFDataObject[] = [];
+		const newPages: YAFDataObject[] = [];
+		object.children?.forEach((child: YAFDataObject) => {
+			YafSerializer.isPage(child.kind)
+				? newPages.push(child)
+				: thisChildren.push(child);
+		});
+		object.children = thisChildren;
+		objects.push(object);
+		newPages.forEach((child) => {
+			this.parseDataObjectToArray(child, objects);
+		});
+		return objects;
+	};
+
 	private parseHierarchy = (
 		hierachy: DeclarationHierarchy | undefined
 	): YAFDataObject['hierarchy'] => {
@@ -177,7 +181,7 @@ export class YafSerializer {
 	) => {
 		if (!object.text) object.text = {};
 
-		if (YafSerializer.hasVisibleComponent(object)) {
+		if (YafSerializer.hasVisibleComponent(object) && !!object.comment) {
 			object.text.comment = this.context.markdown(
 				object.comment.summary as CommentDisplayPart[]
 			) as htmlString;
@@ -193,22 +197,30 @@ export class YafSerializer {
 			});
 		}
 
-		if ((<YAFDataObject>object).signatures)
-			(<YAFDataObject>object).signatures.forEach((signature) =>
-				this.parseComment(signature)
-			);
+		const signatures = (<YAFDataObject>object).signatures;
+		const declaration =
+			this.reflection && this.reflection.type instanceof ReflectionType
+				? this.reflection.type.declaration
+				: undefined;
+		const children = declaration ? declaration.children : undefined;
+		const parameters = (<YafSignatureReflection>object).parameters;
 
-		if ((<YafDeclarationReflection>object).type?.declaration)
-			(<YafDeclarationReflection>(
-				object
-			)).type.declaration.children?.forEach((parameter) =>
-				this.parseComment(parameter as YafDeclarationReflection)
-			);
+		if (signatures)
+			signatures.forEach((signature) => this.parseComment(signature));
 
-		if ((<YafSignatureReflection>object).parameters)
-			(<YafSignatureReflection>object).parameters.forEach((parameter) =>
-				this.parseComment(parameter)
+		if (children)
+			children?.forEach((child) => {
+				this.parseComment(child as unknown as YafDeclarationReflection);
+			});
+
+		if (parameters)
+			parameters.forEach((parameter) => this.parseComment(parameter));
+
+		if (declaration) {
+			this.parseComment(
+				declaration as unknown as YafDeclarationReflection
 			);
+		}
 	};
 
 	/**
@@ -217,12 +229,18 @@ export class YafSerializer {
 	 * @returns a data object which will extend the typedoc `JSONOutput` reflection
 	 */
 	static formatReflectionLocation = (
-		reflection: DeclarationReflection
+		reflection: DeclarationReflection,
+		isDeclarationChild = false
 	): dataLocation => {
 		let hash = '';
-		const locationArray = reflection.getFriendlyFullName().split('.');
+		const locationArray = isDeclarationChild
+			? `${reflection.parent!.getFriendlyFullName()}.${
+					reflection.name
+			  }`.split('.')
+			: reflection.getFriendlyFullName().split('.');
+
 		if (!YafSerializer.isPage(reflection.kind) && locationArray.length)
-			hash = locationArray.pop();
+			hash = locationArray.pop() || '';
 
 		if (reflection.parent) {
 			locationArray.splice(
@@ -245,9 +263,10 @@ export class YafSerializer {
 			| YafSignatureReflection
 			| YAFDataObject
 	) => {
-		const flags = (<DeclarationReflection>reflection).flags.toObject
-			? (<DeclarationReflection>reflection).flags.toObject()
-			: reflection.flags;
+		const flags =
+			'toObject' in reflection.flags
+				? (<DeclarationReflection>reflection).flags.toObject()
+				: reflection.flags;
 		if (
 			reflection.inheritedFrom &&
 			ReflectionKind[reflection.kind] !== 'Constructor'
@@ -271,4 +290,128 @@ export class YafSerializer {
 					object.comment.blockTags.length > 0))
 		);
 	};
+
+	private fixDeclarationReflections = (
+		object: YAFDataObject,
+		reflection: DeclarationReflection
+	) => {
+		const declaration =
+			reflection.type instanceof ReflectionType
+				? reflection.type.declaration
+				: undefined;
+		if (!declaration) return;
+
+		const objectDeclaration = (<JSONOutput.ReflectionType>object.type)
+			.declaration;
+		objectDeclaration!.name = reflection.name;
+
+		objectDeclaration!.signatures?.forEach(
+			(signature) => (signature.name = reflection.name)
+		);
+
+		if (objectDeclaration!.children && declaration.children)
+			objectDeclaration!.children?.forEach((objectChild, i) => {
+				const fixedChild = YafSerializer.fixedReflectionChild(
+					declaration.children![i],
+					reflection
+				);
+				objectChild.name = fixedChild.name;
+				objectChild.kind = fixedChild.kind;
+				objectChild.kindString = fixedChild.kindString;
+
+				this.fixDeclarationReflections(
+					objectChild as YAFDataObject,
+					fixedChild
+				);
+			});
+		YafSerializer.fixReflectionGroups(object);
+	};
+	private static fixReflectionGroups = (object: YAFDataObject) => {
+		if (
+			!object.type ||
+			!('declaration' in object.type) ||
+			!object.type.declaration!.groups
+		)
+			return;
+		const groups = object.type.declaration!.groups;
+		const children = object.type.declaration!.children;
+
+		const propertyGroup = groups.find(
+			(group) => group.title === 'Properties'
+		);
+		let methodGroup = groups.find((group) => group.title === 'Methods');
+		const getMethodGroup = () => {
+			if (methodGroup) return methodGroup;
+			methodGroup = {
+				title: 'Methods',
+				children: [],
+			} as JSONOutput.ReflectionGroup;
+			groups.push(methodGroup);
+			return methodGroup;
+		};
+
+		if (propertyGroup)
+			propertyGroup.children = propertyGroup.children?.filter((id) => {
+				const child = children?.find((child) => child.id === id);
+				if (child && child.kind === ReflectionKind.CallSignature) {
+					methodGroup = getMethodGroup();
+					methodGroup.children?.push(id);
+					return false;
+				}
+				return true;
+			});
+		object.type.declaration!.groups = groups.filter(
+			(group) => group.children?.length
+		);
+	};
+	static fixedReflectionChild = (
+		child: DeclarationReflection,
+		parent: DeclarationReflection
+	) => {
+		const childClone = new DeclarationReflection(
+			child.name,
+			this.getCallSignatureKind(child),
+			parent
+		);
+		Object.keys(child).forEach((key) => {
+			if (['name', 'kind', 'parent', 'kindString'].includes(key)) return;
+
+			if (Object.prototype.hasOwnProperty.call(child, key))
+				childClone[key] = child[key];
+		});
+		childClone.kindString = this.getKindString(childClone.kind);
+		return childClone;
+	};
+	private static getCallSignatureKind = (
+		reflection: DeclarationReflection
+	) => {
+		const type = reflection.type as ReflectionType;
+		const signatures = type?.declaration?.signatures;
+
+		if (!signatures || signatures.length !== 1) return reflection.kind;
+		return signatures[0].kind;
+	};
+
+	private static getKindString = (kind: ReflectionKind) => {
+		let str = ReflectionKind[kind];
+		str = str.replace(
+			/(.)([A-Z])/g,
+			(_m, a, b) => a + ' ' + b.toLowerCase()
+		);
+		return str;
+	};
+
+	/**
+	 * The kinds of reflections which will generate their own document page in the front-end.
+	 */
+	private static hasOwnPage = [
+		ReflectionKind.Class,
+		ReflectionKind.Interface,
+		ReflectionKind.Enum,
+		ReflectionKind.Namespace,
+		ReflectionKind.Module,
+		ReflectionKind.TypeAlias,
+		ReflectionKind.Function,
+		ReflectionKind.Variable,
+	];
 }

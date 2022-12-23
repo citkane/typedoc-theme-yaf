@@ -1,14 +1,9 @@
 import { JSONOutput } from 'typedoc';
-import { debouncer } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../yafElement.js';
-const { debounce, renderSignatureType, makeSymbolSpan } = yafElement;
+import { YafHTMLElement } from '../../../index.js';
+import { renderSignatureType, makeSymbolSpan } from '../../../yafElement.js';
 
-export class YafSignatureConditional extends HTMLElement {
-	props!: JSONOutput.ConditionalType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureConditional extends YafHTMLElement<JSONOutput.ConditionalType> {
+	onConnect() {
 		const { checkType, extendsType, falseType, trueType } = this.props;
 
 		const HTMLElements = [
@@ -21,9 +16,7 @@ export class YafSignatureConditional extends HTMLElement {
 			renderSignatureType(falseType, 'conditionalFalse'),
 		];
 
-		HTMLElements.forEach((element: HTMLElement) =>
-			this.appendChild(element)
-		);
+		this.appendChildren(HTMLElements);
 	}
 }
 

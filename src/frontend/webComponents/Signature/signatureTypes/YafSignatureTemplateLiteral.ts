@@ -1,35 +1,43 @@
-import { componentName, debouncer } from '../../../../types/frontendTypes.js';
+import { componentName } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../yafElement.js';
-const { debounce, makeSymbolSpan, makeLiteralSpan, renderSignatureType } =
-	yafElement;
+import {
+	makeSymbolSpan,
+	makeLiteralSpan,
+	renderSignatureType,
+} from '../../../yafElement.js';
+import { YafHTMLElement } from '../../../index.js';
 
-export class YafSignatureTemplateLiteral extends HTMLElement {
-	props!: JSONOutput.TemplateLiteralType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureTemplateLiteral extends YafHTMLElement<JSONOutput.TemplateLiteralType> {
+	onConnect() {
 		const { head, tail } = this.props;
-		const HTMLElements = [makeSymbolSpan('`')];
-		if (head) HTMLElements.push(makeLiteralSpan(head));
-		tail.map((item) => {
-			const tailElements = [
-				makeSymbolSpan('${'),
-				renderSignatureType(item[0], 'templateLiteralElement'),
-				makeSymbolSpan('}'),
-			];
-			if (item[1]) {
-				tailElements.push(makeLiteralSpan(item[1]));
-			}
-			return tailElements;
-		})
-			.flat()
-			.forEach((element) => HTMLElements.push(element));
-		HTMLElements.push(makeSymbolSpan('`'));
+		const { factory } = YafSignatureTemplateLiteral;
 
-		HTMLElements.forEach((item) => this.appendChild(item));
+		const HTMLElements = [
+			makeSymbolSpan('`'),
+			head ? makeLiteralSpan(head) : undefined,
+			factory.tail(tail),
+			makeSymbolSpan('`'),
+		];
+
+		this.appendChildren(HTMLElements.flat());
 	}
+
+	private static factory = {
+		tail: (tail: JSONOutput.TemplateLiteralType['tail']) =>
+			tail
+				.map((item) => {
+					const tailElements = [
+						makeSymbolSpan('${'),
+						renderSignatureType(item[0], 'templateLiteralElement'),
+						makeSymbolSpan('}'),
+					];
+					if (item[1]) {
+						tailElements.push(makeLiteralSpan(item[1]));
+					}
+					return tailElements;
+				})
+				.flat(),
+	};
 }
 
 const componentName: componentName = 'yaf-signature-template-literal';

@@ -1,101 +1,108 @@
-import { JSONOutput } from 'typedoc';
-import { DrawerElement } from '../../../types/frontendTypes.js';
-import { YAFDataObject } from '../../../types/types.js';
-import yafElement from '../../yafElement.js';
-import errorHandlers from '../../lib/ErrorHandlers.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
-import { YafWidgetCounter, YafWidgetTagToggle } from '../Widget/YafWidgets.js';
+import {
+	componentName,
+	yafMemberGroupReflectionProps,
+} from '../../../types/frontendTypes.js';
+import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
 import { YafMember } from './YafMember.js';
+import { YAFDataObject, YAFReflectionLink } from '../../../types/types.js';
+import { JSONOutput } from 'typedoc';
+import {
+	makeElement,
+	makeTitleSpan,
+	makeIconSpan,
+	normaliseFlags,
+} from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
+import { YafWidgetCounter, YafWidgetTagToggle } from '../Widget/index.js';
 
 /**
  *
  */
-export class YafMemberGroupReflection extends HTMLElement {
-	props!: {
-		title: string;
-		children: YAFDataObject[];
-		pageId: string;
-		nested?: boolean;
-	};
+export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupReflectionProps> {
 	drawers!: YafElementDrawers;
 
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
+	onConnect() {
 		const { title, children, pageId, nested } = this.props;
-
-		const drawer = yafElement.makeElement(`ul`);
-		const drawerTrigger = yafElement.makeElement('span', 'trigger');
-		const groupHeader = yafElement.makeElement(nested ? 'h3' : 'h2');
-		const groupTitle = yafElement.makeTitleSpan(`${title}`);
-		const handleIcon = yafElement.makeIconSpan('expand_less');
-		const icon = yafElement.makeElement('span', 'icon');
-		const groupCount = yafElement.makeElement<
-			YafWidgetCounter,
-			YafWidgetCounter['props']
-		>('yaf-widget-counter', null, null, {
-			count: children.length,
-		});
-
-		icon.appendChild(handleIcon);
-		drawerTrigger.appendChild(icon);
-		drawerTrigger.appendChild(groupTitle);
-		groupHeader.appendChild(drawerTrigger);
-		groupHeader.appendChild(groupCount);
-		this.appendChild(groupHeader);
-
-		children.forEach((child) => {
-			const item = yafElement.makeElement('li');
-			item.id = child.name;
-			yafElement
-				.normaliseFlags(child.flags)
-				.forEach((flag) => item.classList.add(flag));
-			const member = yafElement.makeElement<
-				YafMember,
-				YafMember['props']
-			>('yaf-member', null, null, child);
-			item.appendChild(member);
-			drawer.appendChild(item);
-		});
-
+		const { factory } = YafMemberGroupReflection;
 		this.id = `member_${pageId}_${title}`;
+
+		const drawerHTMLElement = makeElement(`ul`);
+		const drawerTriggerHTMLElement = makeElement('span', 'trigger');
+		const groupHeaderHTMLElement = makeElement(nested ? 'h3' : 'h2');
+		const groupTitleHTMLElement = makeTitleSpan(`${title}`);
+		const handleIconHTMLElement = makeIconSpan('expand_less');
+		const iconHTMLElement = makeElement('span', 'icon');
+		const groupCountHTMLElement = factory.counterWidget(children.length);
+		const drawerLiHTMLElements = factory.drawerListChildren(children);
+
+		iconHTMLElement.appendChild(handleIconHTMLElement);
+		drawerTriggerHTMLElement.appendChildren([
+			iconHTMLElement,
+			groupTitleHTMLElement,
+		]);
+		groupHeaderHTMLElement.appendChildren([
+			drawerTriggerHTMLElement,
+			groupCountHTMLElement,
+		]);
+		drawerHTMLElement.appendChildren(drawerLiHTMLElements);
+
+		this.appendChildren([groupHeaderHTMLElement, drawerHTMLElement]);
 
 		this.drawers = new YafElementDrawers(
 			this as unknown as DrawerElement,
-			drawer,
-			drawerTrigger,
+			drawerHTMLElement,
+			drawerTriggerHTMLElement,
 			this.id
 		);
+		/**
+		 * NOTE: `drawers.renderDrawers()` is called from `YafMemberDeclaration`.
+		 * That is the root of the drawer tree and propogates downwards to branches
+		 * from within the `renderDrawers` method itself.
+		 */
 
-		drawer.prepend(
-			yafElement.makeElement<
-				YafWidgetTagToggle,
-				YafWidgetTagToggle['props']
-			>(
-				'li',
-				'tagtoggles',
-				null,
-				{ drawers: this.drawers },
-				'yaf-widget-tag-toggle'
-			)
-		);
-
-		this.drawers.renderDrawers(true);
+		drawerHTMLElement.prepend(factory.tagToggles(this.drawers));
 	}
 	disconnectedCallback() {
 		this.drawers.drawerHasDisconnected();
 	}
-	public static mapReflectionGroup = (
-		group: JSONOutput.ReflectionGroup,
-		children: YAFDataObject[]
-	) =>
-		group.children
-			?.map((id) => {
-				const child = children?.find((child) => child.id === id);
-				!child &&
-					errorHandlers.notFound(`Did not find reflection id: ${id}`);
-				return child;
-			})
-			.filter((child) => !!child);
+
+	private static factory = {
+		drawerListChildren: (children: (YAFDataObject | YAFReflectionLink)[]) =>
+			children.map((child) => {
+				const liHTMLElement = this.factory.listItem(child.flags);
+				liHTMLElement.id = child.name;
+				liHTMLElement.appendChild(this.factory.member(child));
+
+				return liHTMLElement;
+			}),
+		listItem: (flags: JSONOutput.ReflectionFlags | undefined) =>
+			makeElement('li', flags ? normaliseFlags(flags).join(' ') : ''),
+		member: (child: YAFDataObject | YAFReflectionLink) =>
+			makeElement<YafMember, YafMember['props']>(
+				'yaf-member',
+				null,
+				null,
+				child
+			),
+		tagToggles: (drawers: YafElementDrawers) => {
+			const toggleHTMLElement = makeElement<
+				YafWidgetTagToggle,
+				YafWidgetTagToggle['props']
+			>('yaf-widget-tag-toggle', 'tagtoggles', null, { drawers });
+			const liHTMLElement = makeElement('li');
+			liHTMLElement.appendChild(toggleHTMLElement);
+			return liHTMLElement;
+		},
+		counterWidget: (count: number) =>
+			makeElement<YafWidgetCounter, YafWidgetCounter['props']>(
+				'yaf-widget-counter',
+				null,
+				null,
+				{
+					count,
+				}
+			),
+	};
 }
-const yafMemberGroupReflection = 'yaf-member-group-reflection';
+const yafMemberGroupReflection: componentName = 'yaf-member-group-reflection';
 customElements.define(yafMemberGroupReflection, YafMemberGroupReflection);

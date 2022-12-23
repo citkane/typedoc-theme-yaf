@@ -1,22 +1,16 @@
-import { JSONOutput } from 'typedoc';
-import yafElement from '../../yafElement.js';
+import { yafWidgetFlagsProps } from '../../../types/frontendTypes.js';
+import { YafHTMLElement } from '../../index.js';
+import { makeElement } from '../../yafElement.js';
 
-export class YafWidgetFlags extends HTMLElement {
-	props!: {
-		flags: string[];
-		comment?: JSONOutput.Comment;
-	};
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-
+export class YafWidgetFlags extends YafHTMLElement<yafWidgetFlagsProps> {
+	onConnect() {
 		const { flags, comment } = this.props;
 
 		const allFlags = [...flags, ...(comment?.modifierTags || [])];
 
 		allFlags.forEach((flag) => {
 			this.appendChild(
-				yafElement.makeElement('span', 'flag', flag.replace(/^@/, ''))
+				makeElement('span', 'flag', flag.replace(/^@/, ''))
 			);
 		});
 	}

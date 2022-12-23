@@ -1,15 +1,13 @@
 import { JSONOutput } from 'typedoc';
-import { debouncer } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../yafElement.js';
-const { debounce, makeSymbolSpan, makeTypeSpan, renderSignatureType } =
-	yafElement;
+import { YafHTMLElement } from '../../../index.js';
+import {
+	makeSymbolSpan,
+	makeTypeSpan,
+	renderSignatureType,
+} from '../../../yafElement.js';
 
-export class YafSignatureMapped extends HTMLElement {
-	props!: JSONOutput.MappedType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureMapped extends YafHTMLElement<JSONOutput.MappedType> {
+	onConnect() {
 		const {
 			parameter,
 			parameterType,
@@ -18,38 +16,50 @@ export class YafSignatureMapped extends HTMLElement {
 			optionalModifier,
 			readonlyModifier,
 		} = this.props;
-		const readonlyModifierElement = readonlyModifier
-			? makeSymbolSpan(
-					readonlyModifier === '+' ? 'readonly ' : '-readonly '
-			  )
-			: undefined;
-		const nameTypeElements = nameType
-			? [
-					makeSymbolSpan(' as '),
-					renderSignatureType(nameType, 'mappedName'),
-			  ]
-			: undefined;
-		let colon = ': ';
-		if (optionalModifier) colon = optionalModifier === '+' ? '?: ' : '-?: ';
+		const { factory } = YafSignatureMapped;
+
+		const readonlyModifierHTMLElement =
+			factory.readonlyModifier(readonlyModifier);
+		const nameTypeHTMLElements = factory.nameType(nameType);
 
 		const HTMLElements = [
 			makeSymbolSpan('{'),
-			readonlyModifierElement,
+			readonlyModifierHTMLElement,
 			makeSymbolSpan('['),
 			makeTypeSpan(parameter),
 			makeSymbolSpan(' in '),
 			renderSignatureType(parameterType, 'mappedParameter'),
-			nameTypeElements,
+			nameTypeHTMLElements,
 			makeSymbolSpan(']'),
-			makeSymbolSpan(colon),
+			makeSymbolSpan(factory.colon(optionalModifier)),
 			renderSignatureType(templateType, 'mappedTemplate'),
 			makeSymbolSpan('}'),
-		]
-			.filter((element) => !!element)
-			.flat();
+		];
 
-		HTMLElements.forEach((element) => this.appendChild(element!));
+		this.appendChildren(HTMLElements.flat());
 	}
+
+	private static factory = {
+		readonlyModifier: (readonlyModifier: '-' | '+' | undefined) =>
+			readonlyModifier
+				? makeSymbolSpan(
+						readonlyModifier === '+' ? 'readonly ' : '-readonly '
+				  )
+				: undefined,
+		nameType: (nameType: JSONOutput.MappedType['nameType']) =>
+			nameType
+				? [
+						makeSymbolSpan(' as '),
+						renderSignatureType(nameType, 'mappedName'),
+				  ]
+				: undefined,
+		colon: (optionalModifier: '-' | '+' | undefined) => {
+			let colon = ': ';
+			if (optionalModifier)
+				colon = optionalModifier === '+' ? '?: ' : '-?: ';
+			return colon;
+		},
+	};
 }
 
 const yafSignatureMapped = 'yaf-signature-mapped';

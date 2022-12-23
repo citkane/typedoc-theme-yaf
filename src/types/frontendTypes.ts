@@ -1,13 +1,15 @@
-import { TypeContext } from 'typedoc';
-
+import { JSONOutput, TypeContext } from 'typedoc';
 export type { TypeContext } from 'typedoc';
 import { ReflectionKind as TdocReflectionKind } from 'typedoc';
-import YafElementDrawers from '../frontend/YafElementDrawers.js';
 import {
+	hierarchy,
 	kindSymbols,
 	needsParenthesis,
 	reflectionMap,
 	treeMenuRoot,
+	YAFDataObject,
+	YAFReflectionLink,
+	YafSignatureReflection,
 } from './types';
 
 export type ReflectionKind = typeof TdocReflectionKind;
@@ -51,8 +53,57 @@ export type localStorageKey =
 	| 'options'
 	| 'displayOptions';
 
-export type DrawerElement = HTMLElement & YafElementDrawers;
-
-export type debouncer = Record<string, unknown>;
-
 export type yafEventList = Array<[string, unknown, (HTMLElement | Window)?]>;
+
+export type yafReflectionGroup = {
+	title: string;
+	children: (YAFDataObject | YAFReflectionLink)[];
+};
+
+export interface yafHTMLExtension extends HTMLElement {
+	appendChildren(children: (HTMLElement | undefined)[] | undefined): void;
+	props: unknown;
+}
+
+export type yafSignatureProps = {
+	type: YAFDataObject['type'];
+	context: TypeContext;
+};
+
+export type yafSignatureTitleProps = {
+	hideName?: boolean;
+	arrowStyle?: boolean;
+	wrappedInPre?: boolean;
+} & YafSignatureReflection;
+
+export type yafContentHierarchyProps = {
+	hierarchy: hierarchy[] | undefined;
+	pageId?: string;
+	init?: boolean;
+};
+
+export type yafMemberGroupLinkProps = {
+	title: string;
+	children: YAFReflectionLink[];
+};
+
+export type yafMemberGroupReflectionProps = {
+	title: string;
+	children: yafReflectionGroup['children'];
+	pageId: string;
+	nested?: boolean;
+};
+
+export type yafTypeArgumentsProps = {
+	args: JSONOutput.ReferenceType['typeArguments'];
+	context: string;
+};
+
+export type yafWidgetFlagsProps = {
+	flags: string[];
+	comment?: JSONOutput.Comment;
+};
+export type yafWidgetCounterProps = {
+	count: number | string;
+	fontSize?: string;
+};

@@ -1,23 +1,20 @@
 import { JSONOutput } from 'typedoc';
-import { debouncer } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../yafElement.js';
-const { debounce, makeSymbolSpan, renderSignatureType } = yafElement;
+import { componentName } from '../../../../types/frontendTypes.js';
+import { YafHTMLElement } from '../../../index.js';
+import { makeSymbolSpan, renderSignatureType } from '../../../yafElement.js';
 
-export class YafSignatureTypeOperator extends HTMLElement {
-	props!: JSONOutput.TypeOperatorType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureTypeOperator extends YafHTMLElement<JSONOutput.TypeOperatorType> {
+	onConnect() {
 		const { operator, target } = this.props;
+
 		const HTMLElements = [
 			makeSymbolSpan(`${operator} `),
 			renderSignatureType(target, 'typeOperatorTarget'),
 		];
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
 }
 
-const yafSignatureTypeOperator = 'yaf-signature-type-operator';
+const yafSignatureTypeOperator: componentName = 'yaf-signature-type-operator';
 customElements.define(yafSignatureTypeOperator, YafSignatureTypeOperator);

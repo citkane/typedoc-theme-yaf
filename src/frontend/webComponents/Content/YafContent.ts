@@ -11,11 +11,7 @@ import {
 	YafMemberSignatures,
 	YafMemberSources,
 } from '../Member/index.js';
-import {
-	componentName,
-	debouncer,
-	yafEventList,
-} from '../../../types/frontendTypes';
+import { componentName, yafEventList } from '../../../types/frontendTypes';
 import {
 	YafContentHeader,
 	YafContentHierarchy,
@@ -25,15 +21,13 @@ import {
 import { YafTypeParameters } from '../Type/index.js';
 import appState from '../../lib/AppState.js';
 import events from '../../lib/events/eventApi.js';
-import yafElement from '../../yafElement.js';
-const { debounce, makeElement } = yafElement;
+import { makeElement } from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
 
 const { trigger, action } = events;
 
-export class YafContent extends HTMLElement {
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafContent extends YafHTMLElement {
+	onConnect() {
 		this.events.forEach((event) => events.on(...event));
 		this.initPageData();
 	}
@@ -67,47 +61,48 @@ export class YafContent extends HTMLElement {
 			id,
 			is,
 		} = data;
+		const { factory } = YafContent;
 		const { Variable, TypeAlias } = appState.reflectionKind;
 		const isVarOrTypeDeclaration =
 			[Variable, TypeAlias].includes(kind) && data.is.declaration;
-		const hasReadme = !!text.readme;
-		const hasComment = !!text.comment;
+		const hasReadme = !!text?.readme;
+		const hasComment = !!text?.comment;
 		const hasHierchy = is.declaration && hierarchy;
 
 		const HTMLElements = isVarOrTypeDeclaration
 			? [
-					this.factory.contentHeader(data),
-					this.factory.memberDeclaration(
-						data as YafDeclarationReflection
-					),
+					factory.contentHeader(data),
+					factory.memberDeclaration(data as YafDeclarationReflection),
 			  ]
 			: [
 					hasReadme
-						? this.factory.contentMarked(text.readme!)
-						: this.factory.contentHeader(data),
+						? factory.contentMarked(text.readme!)
+						: factory.contentHeader(data),
 					hasComment
-						? this.factory.contentMarked(text.comment!)
+						? factory.contentMarked(text.comment!)
 						: undefined,
 
 					has.typeParameters
-						? this.factory.typeParameters(typeParameter)
+						? factory.typeParameters(typeParameter)
 						: undefined,
 					hasHierchy
-						? this.factory.contentHierarchy(hierarchy!, id)
+						? factory.contentHierarchy(hierarchy!, id)
 						: undefined,
 					signatures
-						? this.factory.memberSignatures(signatures)
-						: this.factory.memberSources(
+						? factory.memberSignatures(signatures)
+						: factory.memberSources(
 								data as YafDeclarationReflection
 						  ),
 
-					this.factory.memberGroups(data),
+					factory.memberGroups(data),
 			  ];
 
 		this.replaceChildren();
-		HTMLElements.filter((element) => !!element).forEach((element) => {
-			this.appendChild(element!);
-			if ('drawers' in element!) element!.drawers!.renderDrawers();
+
+		HTMLElements.forEach((element) => {
+			if (!element) return;
+			this.appendChild(element);
+			if ('drawers' in element) element.drawers!.renderDrawers();
 		});
 	}
 
@@ -123,7 +118,7 @@ export class YafContent extends HTMLElement {
 		['popstate', this.initPageData, window],
 	];
 
-	private factory = {
+	private static factory = {
 		contentHeader: (data: YAFDataObject) =>
 			makeElement<YafContentHeader, YafContentHeader['props']>(
 				'yaf-content-header',
@@ -166,13 +161,17 @@ export class YafContent extends HTMLElement {
 				null,
 				signatures
 			),
-		memberSources: (data: YafDeclarationReflection) =>
-			makeElement<YafMemberSources, YafMemberSources['props']>(
-				'yaf-member-sources',
-				null,
-				null,
-				data
-			),
+		memberSources: (data: YafDeclarationReflection) => {
+			return data
+				? makeElement<YafMemberSources, YafMemberSources['props']>(
+						'yaf-member-sources',
+						null,
+						null,
+						data
+				  )
+				: undefined;
+		},
+
 		contentHierarchy: (hierarchy: hierarchy[], id: number) =>
 			makeElement<YafContentHierarchy, YafContentHierarchy['props']>(
 				'yaf-content-hierarchy',

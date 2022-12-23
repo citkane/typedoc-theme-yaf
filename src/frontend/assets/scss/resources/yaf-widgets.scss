@@ -7,10 +7,11 @@ yaf-widget-counter {
 }
 
 yaf-widget-kind {
-	width: 0.95rem;
-	height: 0.95rem;
 	display: inline-block;
-	font-size: 0.7rem;
+	width: 1.1rem;
+	height: 1.1rem;
+	font-size: 0.65rem;
+	font-weight: 600;
 	position: relative;
 	margin-right: 0.25rem;
 	user-select: none;
@@ -33,7 +34,7 @@ yaf-widget-kind {
 		background: var(--color-prettylights-syntax-entity);
 		border-radius: 50%;
 	}
-	&.enumerator {
+	&.enum {
 		background: var(--color-prettylights-syntax-entity-tag);
 	}
 	&.function {

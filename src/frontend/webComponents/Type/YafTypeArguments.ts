@@ -1,32 +1,25 @@
-import { JSONOutput } from 'typedoc';
-import yafElement from '../../yafElement.js';
+import { yafTypeArgumentsProps } from '../../../types/frontendTypes.js';
+import { YafHTMLElement } from '../../index.js';
+import { makeSymbolSpan, makeElement } from '../../yafElement.js';
 import { YafSignature } from '../Signature/YafSignature.js';
 
-export class YafTypeArguments extends HTMLElement {
-	props!: {
-		args: JSONOutput.ReferenceType['typeArguments'];
-		context: string;
-	};
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-
+export class YafTypeArguments extends YafHTMLElement<yafTypeArgumentsProps> {
+	onConnect() {
 		const { args } = this.props;
 		if (!args || !args.length) return;
 
-		this.appendChild(yafElement.makeSymbolSpan('<'));
+		this.appendChild(makeSymbolSpan('<'));
 		args.forEach((argument, i) => {
-			const signature: YafSignature =
-				yafElement.makeElement('yaf-signature');
+			const signature: YafSignature = makeElement('yaf-signature');
 			signature.props = {
 				type: argument,
 				context: 'referenceTypeArgument',
 			};
 			this.appendChild(signature);
-			if (i < args!.length - 1)
-				this.appendChild(yafElement.makeSymbolSpan(', '));
+			if (i < args!.length - 1) this.appendChild(makeSymbolSpan(', '));
 		});
 
-		this.appendChild(yafElement.makeSymbolSpan('>'));
+		this.appendChild(makeSymbolSpan('>'));
 	}
 }
 const yafTypeArguments = 'yaf-type-arguments';

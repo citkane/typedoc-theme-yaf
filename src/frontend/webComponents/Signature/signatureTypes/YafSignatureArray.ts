@@ -1,15 +1,15 @@
-import { componentName, debouncer } from '../../../../types/frontendTypes.js';
+import { componentName } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../yafElement.js';
-const { debounce, makeSymbolSpan, needsParenthesis, renderSignatureType } =
-	yafElement;
+import { YafHTMLElement } from '../../../index.js';
+import {
+	makeSymbolSpan,
+	needsParenthesis,
+	renderSignatureType,
+} from '../../../yafElement.js';
 
-export class YafSignatureArray extends HTMLElement {
-	props!: JSONOutput.ArrayType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureArray extends YafHTMLElement<JSONOutput.ArrayType> {
+	array = 'array';
+	onConnect() {
 		const { elementType } = this.props;
 
 		const HTMLElements = [
@@ -21,7 +21,7 @@ export class YafSignatureArray extends HTMLElement {
 			HTMLElements.push(makeSymbolSpan(')'));
 		}
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements);
 	}
 }
 const yafSignatureArray: componentName = 'yaf-signature-array';

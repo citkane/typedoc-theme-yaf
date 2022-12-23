@@ -1,6 +1,5 @@
 import { JSONOutput } from 'typedoc';
-import { YAFDataObject, YAFReflectionLink } from '../../../types/types.js';
-import { debouncer } from '../../../types/frontendTypes.js';
+import { YAFDataObject } from '../../../types/types.js';
 import { YafMember } from '../Member/YafMember.js';
 import errorHandlers from '../../lib/ErrorHandlers.js';
 import {
@@ -8,19 +7,16 @@ import {
 	YafMemberGroupReflection,
 } from '../Member/index.js';
 import appState from '../../lib/AppState.js';
-import yafElement from '../../yafElement.js';
-const { debounce, makeElement } = yafElement;
+import { makeElement } from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
 
 /**
  *
  */
-export class YafContentMembers extends HTMLElement {
-	props!: YAFDataObject;
+export class YafContentMembers extends YafHTMLElement<YAFDataObject> {
 	pageId!: string;
 
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+	onConnect() {
 		const { groups, children, id, kind } = this.props;
 		this.pageId = String(id);
 
@@ -29,7 +25,7 @@ export class YafContentMembers extends HTMLElement {
 			(group) => group.title === 'Constructors'
 		);
 		const hasConstructor =
-			constructorGroup && constructorGroup.children?.length;
+			constructorGroup && constructorGroup.children?.length === 1;
 
 		const HTMLElements = [
 			hasConstructor
@@ -42,20 +38,18 @@ export class YafContentMembers extends HTMLElement {
 				?.sort((a, b) => a.title.localeCompare(b.title))
 				.map((group) => {
 					const isConstructorGroup =
-						group.title === 'Constructors' &&
-						group.children &&
-						group.children.length === 1;
+						group.title === 'Constructors' && hasConstructor;
 
-					if (isConstructorGroup) return undefined;
-					if (isLinkList)
-						return this.factory.linkGroup(group, children || []);
-					return this.factory.reflectionGroup(group, children || []);
+					if (isConstructorGroup || !group.children?.length)
+						return undefined;
+
+					return isLinkList
+						? this.factory.linkGroup(group, children || [])
+						: this.factory.reflectionGroup(group, children || []);
 				}),
-		];
+		].flat();
 
-		HTMLElements.flat()
-			.filter((element) => !!element)
-			.forEach((element) => this.appendChild(element!));
+		this.appendChildren(HTMLElements);
 	}
 
 	private factory = {
@@ -90,19 +84,10 @@ export class YafContentMembers extends HTMLElement {
 			group: JSONOutput.ReflectionGroup,
 			children: YAFDataObject[]
 		) => {
-			const linkChildren = group.children
-				?.map((id) => {
-					const child =
-						children.find((child) => child.id === id) ||
-						appState.reflectionMap[id];
-					child.id = String(id);
-					!child &&
-						errorHandlers.notFound(
-							`Did not find reflectionMap id: ${id}`
-						);
-					return appState.reflectionMap[id] ? child : undefined;
-				})
-				.filter((child) => !!child);
+			const serialisedChildren = YafMember.serialiseLinkGroup(
+				group,
+				children
+			);
 
 			return makeElement<YafMemberGroupLink, YafMemberGroupLink['props']>(
 				'yaf-member-group-link',
@@ -110,7 +95,7 @@ export class YafContentMembers extends HTMLElement {
 				null,
 				{
 					title: group.title,
-					children: <YAFReflectionLink[]>linkChildren || [],
+					children: serialisedChildren,
 				}
 			);
 		},
@@ -118,7 +103,7 @@ export class YafContentMembers extends HTMLElement {
 			group: JSONOutput.ReflectionGroup,
 			children: YAFDataObject[]
 		) => {
-			const groupChildren = YafMemberGroupReflection.mapReflectionGroup(
+			const serialisedGroup = YafMember.serialiseReflectionGroup(
 				group,
 				children
 			);
@@ -128,13 +113,14 @@ export class YafContentMembers extends HTMLElement {
 				YafMemberGroupReflection['props']
 			>('yaf-member-group-reflection', null, null, {
 				title: group.title,
-				children: <YAFDataObject[]>groupChildren || [],
+				children: serialisedGroup.children,
 				pageId: this.pageId,
 			});
 		},
 	};
 	private linkReferencPageTypes = (<(keyof typeof appState.reflectionKind)[]>[
 		'Namespace',
+		'Module',
 		'Project',
 	]).map((kindString) => appState.reflectionKind[kindString]);
 }

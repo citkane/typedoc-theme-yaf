@@ -1,39 +1,53 @@
 import { YafSignatureReflection } from '../../../types/types.js';
-import yafElement from '../../yafElement.js';
+import appState from '../../lib/AppState.js';
 import { YafSignatureBody, YafSignatureTitle } from '../Signature/index.js';
+import { makeFlags, makeElement } from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
 
-export class YafMemberSignatures extends HTMLElement {
-	props!: YafSignatureReflection[];
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-
-		this.props?.forEach((signature) => {
+export class YafMemberSignatures extends YafHTMLElement<
+	YafSignatureReflection[]
+> {
+	onConnect() {
+		this.props.forEach((signature) => {
 			const { flags, comment } = signature;
+			const { factory } = YafMemberSignatures;
 
-			if (this.props.length > 1) {
-				const flagsElement = yafElement.makeFlags(flags, comment);
-				this.appendChild(flagsElement);
-			}
+			const flagsHTMLElement =
+				this.props.length > 1 ? makeFlags(flags, comment) : undefined;
+			const titleHTMLElement = factory.signatureTitle(signature);
+			const bodyHTMLElement = factory.signatureBody(signature);
 
-			const pre = yafElement.makeElement('pre', 'highlight');
-			pre.appendChild(
-				yafElement.makeElement<
-					YafSignatureTitle,
-					YafSignatureTitle['props']
-				>('yaf-signature-title', null, null, signature)
-			);
-
-			this.appendChild(pre);
-
-			const body = yafElement.makeElement<
-				YafSignatureBody,
-				YafSignatureBody['props']
-			>('yaf-signature-body', null, null, signature);
-
-			this.appendChild(body);
+			this.appendChildren([
+				flagsHTMLElement,
+				titleHTMLElement,
+				bodyHTMLElement,
+			]);
 		});
 	}
+
+	private static factory = {
+		signatureTitle: (signature: YafSignatureReflection) =>
+			makeElement<YafSignatureTitle, YafSignatureTitle['props']>(
+				'yaf-signature-title',
+				null,
+				null,
+				{
+					...signature,
+					hideName: false,
+					arrowStyle:
+						signature.kind ===
+						appState.reflectionKind.CallSignature,
+					wrappedInPre: true,
+				}
+			),
+		signatureBody: (signature: YafSignatureReflection) =>
+			makeElement<YafSignatureBody, YafSignatureBody['props']>(
+				'yaf-signature-body',
+				null,
+				null,
+				signature
+			),
+	};
 }
 
 const yafMemberSignatures = 'yaf-member-signatures';

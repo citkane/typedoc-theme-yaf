@@ -2,10 +2,10 @@
 	"$schema": "https://typedoc.org/schema.json",
 	"out": "docs",
 	"entryPoints": [
-		"./src/index.ts",
-		"./src/shared/types.ts",
-		"./src/frontend/index.ts",
-		"./src/examples/index.ts"
+		"./src/backend",
+		"./src/frontend",
+		"./src/examples",
+		"./src/types"
 	],
 	"externalPattern": ["**/node_modules/**"],
 	"excludeExternals": true,

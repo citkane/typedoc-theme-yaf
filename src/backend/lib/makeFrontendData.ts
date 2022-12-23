@@ -2,6 +2,7 @@ import {
 	DeclarationReflection,
 	ProjectReflection,
 	ReflectionKind,
+	ReflectionType,
 	Type,
 	TypeContext,
 } from 'typedoc';
@@ -78,13 +79,17 @@ export const makeNeedsParenthesis = () => {
  */
 export const makeNavTree = (
 	reflection: DeclarationReflection | ProjectReflection,
-	menuNode: treeMenuRoot = {}
+	menuNode: treeMenuRoot = {},
+	isDeclarationChild = false
 ): treeMenuRoot => {
 	if (reflection.isProject()) {
 		reflection.children?.forEach((child) => makeNavTree(child, menuNode));
 	} else {
-		const { hash, query } =
-			YafSerializer.formatReflectionLocation(reflection);
+		const { hash, query } = YafSerializer.formatReflectionLocation(
+			reflection,
+			isDeclarationChild
+		);
+
 		menuNode[reflection.id] = {
 			name: reflection.name,
 			query,
@@ -100,6 +105,16 @@ export const makeNavTree = (
 		reflection.children?.forEach((child) => {
 			makeNavTree(child, menuNode[reflection.id].children);
 		});
+
+		if (reflection.type instanceof ReflectionType) {
+			reflection.type.declaration.children?.forEach((child) => {
+				const childClone = YafSerializer.fixedReflectionChild(
+					child,
+					reflection
+				);
+				makeNavTree(childClone, menuNode[reflection.id].children, true);
+			});
+		}
 	}
 	return menuNode;
 };

@@ -1,21 +1,16 @@
 import { JSONOutput } from 'typedoc';
-import { debouncer } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../yafElement.js';
-const { debounce, renderSignatureType, makeSymbolSpan } = yafElement;
+import { YafHTMLElement } from '../../../index.js';
+import { renderSignatureType, makeSymbolSpan } from '../../../yafElement.js';
 
-export class YafSignatureOptional extends HTMLElement {
-	props!: JSONOutput.OptionalType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureOptional extends YafHTMLElement<JSONOutput.OptionalType> {
+	onConnect() {
 		const { elementType } = this.props;
 		const HTMLElements = [
 			renderSignatureType(elementType, 'optionalElement'),
 			makeSymbolSpan('?'),
 		];
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
 }
 

@@ -1,122 +1,100 @@
 import {
-	htmlString,
 	YAFDataObject,
 	YafDeclarationReflection,
-	YafTypeParameterReflection,
+	YafSignatureReflection,
 } from '../../../types/types';
-import { YafSignatureParametersType } from '../Signature/index.js';
-import { componentName, debouncer } from '../../../types/frontendTypes';
-import { YafContentMarked } from '../Content/index.js';
-import { YafTypeParameters } from '../Type/index.js';
-import { YafMemberGroupReflection } from './index.js';
-import yafElement from '../../yafElement.js';
-
-const {
-	debounce,
-	makeElement,
-	makeSymbolSpan,
-	makeValueSpan,
-	makeNameSpan,
-	renderSignatureType,
-} = yafElement;
+import {
+	YafMember,
+	YafMemberGroupReflection,
+	YafMemberSignatures,
+} from './index.js';
+import { componentName } from '../../../types/frontendTypes';
+import { JSONOutput } from 'typedoc';
+import { makeElement } from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
 
 /**
  *
  */
-export class YafMemberDeclaration extends HTMLElement {
-	props!: YafDeclarationReflection;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
-		//console.log(this.props);
-
-		const { name, typeParameters, type, defaultValue, text } = this.props;
-		const hasParameters = typeParameters && typeParameters.length;
-		const hasComment = !!text?.comment;
+export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflection> {
+	onConnect() {
+		const { name, type } = this.props;
+		const { factory } = YafMemberDeclaration;
 		const isReflection = type?.type === 'reflection';
-
-		const HTMLPreElement = makeElement('pre', 'highlight');
-		const HTMLSignatureElements = [
-			makeNameSpan(name),
-			hasParameters ? this.factory.parameters(typeParameters) : undefined,
-			type ? renderSignatureType(type, 'none') : undefined,
-			defaultValue ? this.factory.defaultValue(defaultValue) : undefined,
-		]
-			.filter((element) => !!element)
-			.flat();
-		HTMLSignatureElements.forEach((element) =>
-			HTMLPreElement.appendChild(element!)
-		);
+		const isReflectionSignature =
+			isReflection && !!type.declaration?.signatures;
+		const isReflectionGroup = isReflection && !!type.declaration?.groups;
 
 		const HTMLElements = [
-			HTMLPreElement,
-			hasComment ? this.factory.comment(text.comment!) : undefined,
-			typeParameters
-				? this.factory.typeParameters(typeParameters)
+			!isReflectionSignature
+				? factory.memberSignatures(this.props)
 				: undefined,
-			isReflection ? this.factory.reflection(type, name) : undefined,
+			isReflectionGroup ? factory.memberGroups(type, name) : undefined,
+			isReflectionSignature ? factory.memberSignatures(type) : undefined,
 		]
 			.filter((element) => !!element)
 			.flat();
 
-		HTMLElements.forEach((element) => this.appendChild(element!));
+		this.appendChildren(HTMLElements);
+
+		/**
+		 * NOTE: Calls `renderDrawers()` from the root of the drawer tree only.
+		 */
+		(HTMLElements as unknown as YafMemberGroupReflection[]).forEach(
+			(element) => {
+				if (element?.drawers) element.drawers.renderDrawers(true);
+			}
+		);
 	}
-	private factory = {
-		parameters: (typeParameters: YafTypeParameterReflection[]) =>
-			makeElement<YafTypeParameters, YafTypeParameters['props']>(
-				'yaf-type-parameters',
-				null,
-				null,
-				typeParameters
-			),
 
-		defaultValue: (defaultValue: string) => [
-			makeSymbolSpan(' = '),
-			makeValueSpan(defaultValue),
-		],
-
-		typeParameters: (typeParameters: YafTypeParameterReflection[]) =>
-			makeElement<
-				YafSignatureParametersType,
-				YafSignatureParametersType['props']
-			>('yaf-signature-parameters-type', null, null, typeParameters),
-
-		reflection: (type: typeof this.props.type, parentName: string) => {
+	private static factory = {
+		memberGroups: (type: JSONOutput.ReflectionType, parentName: string) => {
 			if (
 				!type.declaration ||
 				!type.declaration.children ||
 				!type.declaration.children?.length
 			)
 				return undefined;
-			console.log(type);
+
 			const { groups, children, id } = type.declaration;
+			const serialisedGroups = groups?.map((group) =>
+				YafMember.serialiseReflectionGroup(
+					group,
+					(children as YAFDataObject[]) || []
+				)
+			);
 			return (
-				groups?.map((group) => {
-					const groupChildren =
-						YafMemberGroupReflection.mapReflectionGroup(
-							group,
-							(children as YAFDataObject[]) || []
-						);
+				serialisedGroups?.map((group) => {
 					return makeElement<
 						YafMemberGroupReflection,
 						YafMemberGroupReflection['props']
 					>('yaf-member-group-reflection', null, null, {
 						title: `${parentName}: ${group.title}`,
-						children: <YAFDataObject[]>groupChildren || [],
+						children: group.children,
 						pageId: String(id),
 						nested: true,
 					});
 				}) || undefined
 			);
 		},
-		comment: (comment: htmlString) =>
-			makeElement<YafContentMarked, YafContentMarked['props']>(
-				'yaf-content-marked',
+		memberSignatures: (
+			member: JSONOutput.ReflectionType | YafDeclarationReflection
+		) => {
+			const declaration = (<JSONOutput.ReflectionType>member).declaration;
+			const signatures = declaration
+				? (declaration.signatures as YafSignatureReflection[])
+				: undefined;
+
+			return makeElement<
+				YafMemberSignatures,
+				YafMemberSignatures['props']
+			>(
+				'yaf-member-signatures',
 				null,
 				null,
-				comment
-			),
+				signatures || [member as YafDeclarationReflection]
+			);
+		},
 	};
 }
 const yafMemberDeclaration: componentName = 'yaf-member-declaration';

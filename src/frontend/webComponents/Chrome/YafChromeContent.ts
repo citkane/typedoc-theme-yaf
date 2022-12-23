@@ -1,11 +1,7 @@
-import {
-	componentName,
-	debouncer,
-	yafEventList,
-} from '../../../types/frontendTypes.js';
+import { componentName, yafEventList } from '../../../types/frontendTypes.js';
+import { YafHTMLElement } from '../../index.js';
 import events from '../../lib/events/eventApi.js';
-import yafElement from '../../yafElement.js';
-const { debounce, getHtmlTemplate, scrollToAnchor } = yafElement;
+import { getHtmlTemplate, scrollToAnchor } from '../../yafElement.js';
 
 const { trigger } = events;
 
@@ -15,10 +11,10 @@ const { trigger } = events;
  * This component deals primarily with opening drawers and scrolling to content.\
  * It reacts to location input events.
  */
-export class YafChromeContent extends HTMLElement {
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
+export class YafChromeContent extends YafHTMLElement {
+	onConnect() {
 		this.events.forEach((event) => events.on(...event));
+
 		this.appendChild(getHtmlTemplate(yafChromeContent));
 	}
 

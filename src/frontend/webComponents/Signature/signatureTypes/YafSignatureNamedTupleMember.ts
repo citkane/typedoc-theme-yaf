@@ -1,23 +1,22 @@
-import { debouncer } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
-import yafElement from '../../../yafElement.js';
-const { debounce, makeNameSpan, makeSymbolSpan, renderSignatureType } =
-	yafElement;
+import {
+	makeNameSpan,
+	makeSymbolSpan,
+	renderSignatureType,
+} from '../../../yafElement.js';
+import { YafHTMLElement } from '../../../index.js';
 
-export class YafSignatureNamedTupleMember extends HTMLElement {
-	props!: JSONOutput.NamedTupleMemberType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureNamedTupleMember extends YafHTMLElement<JSONOutput.NamedTupleMemberType> {
+	onConnect() {
 		const { name, isOptional, element } = this.props;
+
 		const HTMLElements = [
 			makeNameSpan(name),
 			makeSymbolSpan(isOptional ? '?:' : ':'),
 			renderSignatureType(element, 'tupleElement'),
 		];
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
 }
 

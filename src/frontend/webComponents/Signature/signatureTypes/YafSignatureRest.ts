@@ -1,14 +1,10 @@
 import { JSONOutput } from 'typedoc';
-import { debouncer } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../yafElement.js';
-const { debounce, makeSymbolSpan, renderSignatureType } = yafElement;
+import { componentName } from '../../../../types/frontendTypes.js';
+import { YafHTMLElement } from '../../../index.js';
+import { makeSymbolSpan, renderSignatureType } from '../../../yafElement.js';
 
-export class YafSignatureRest extends HTMLElement {
-	props!: JSONOutput.RestType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureRest extends YafHTMLElement<JSONOutput.RestType> {
+	onConnect() {
 		const { elementType } = this.props;
 
 		const HTMLElements = [
@@ -16,9 +12,9 @@ export class YafSignatureRest extends HTMLElement {
 			renderSignatureType(elementType, 'restElement'),
 		];
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
 }
 
-const yafSignatureRest = 'yaf-signature-rest';
+const yafSignatureRest: componentName = 'yaf-signature-rest';
 customElements.define(yafSignatureRest, YafSignatureRest);

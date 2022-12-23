@@ -1,24 +1,17 @@
 import { JSONOutput } from 'typedoc';
-import { debouncer } from '../../../../types/frontendTypes.js';
-import yafElement from '../../../yafElement.js';
-const { debounce, renderSignatureType, makeSymbolSpan } = yafElement;
+import { YafHTMLElement } from '../../../index.js';
+import { renderSignatureType, makeSymbolSpan } from '../../../yafElement.js';
 
-export class YafSignatureIntersection extends HTMLElement {
-	props!: JSONOutput.IntersectionType;
-
-	connectedCallback() {
-		if (debounce(this as debouncer)) return;
-
+export class YafSignatureIntersection extends YafHTMLElement<JSONOutput.IntersectionType> {
+	onConnect() {
 		const { types } = this.props;
-		const HTMLElements: HTMLElement[] = [];
 
-		types.forEach((type, i) => {
-			HTMLElements.push(renderSignatureType(type, 'intersectionElement'));
-			if (i >= types.length - 1) return;
-			HTMLElements.push(makeSymbolSpan(' & '));
-		});
+		const HTMLElements = types.map((type, i) => [
+			renderSignatureType(type, 'intersectionElement'),
+			i < types.length - 1 ? makeSymbolSpan(' & ') : undefined,
+		]);
 
-		HTMLElements.forEach((element) => this.appendChild(element));
+		this.appendChildren(HTMLElements.flat());
 	}
 }
 

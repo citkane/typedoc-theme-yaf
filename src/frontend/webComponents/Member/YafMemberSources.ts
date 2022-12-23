@@ -2,39 +2,31 @@ import {
 	YafDeclarationReflection,
 	YafSignatureReflection,
 } from '../../../types/types.js';
-import yafElement from '../../yafElement.js';
+import { YafHTMLElement } from '../../index.js';
+import { makeElement, makeLinkElement } from '../../yafElement.js';
 
-export class YafMemberSources extends HTMLElement {
-	props!: YafSignatureReflection | YafDeclarationReflection;
-
-	connectedCallback() {
-		if (yafElement.debounce(this as Record<string, unknown>)) return;
-
+export class YafMemberSources extends YafHTMLElement<
+	YafSignatureReflection | YafDeclarationReflection
+> {
+	onConnect() {
 		const { sources } = this.props;
 
-		if (sources) {
-			const header = yafElement.makeElement('h5', null, 'Defined in:');
-			this.appendChild(header);
+		const headerHTMLElement = makeElement('h5', null, 'Defined in:');
+		const ulHTMLElement = makeElement('ul');
+		const sourcelistHTMLElements = sources?.map((source) => {
+			const { fileName, line, url } = source;
+			const liHTMLElement = makeElement('li');
+			url
+				? liHTMLElement.appendChild(
+						makeLinkElement(url, undefined, `${fileName}:${line}`)
+				  )
+				: (liHTMLElement.innerText = `${fileName}:${line}`);
 
-			const ul = yafElement.makeElement('ul');
-			sources?.forEach((source) => {
-				const { fileName, line, url } = source;
-				const li = yafElement.makeElement('li');
-				if (url) {
-					const link = yafElement.makeLinkElement(
-						url,
-						undefined,
-						`${fileName}:${line}`
-					);
-					li.appendChild(link);
-				} else {
-					li.innerText = `${fileName}:${line}`;
-				}
-				ul.appendChild(li);
-			});
+			return liHTMLElement;
+		});
 
-			this.appendChild(ul);
-		}
+		ulHTMLElement.appendChildren(sourcelistHTMLElements);
+		this.appendChildren([headerHTMLElement, ulHTMLElement]);
 	}
 }
 
