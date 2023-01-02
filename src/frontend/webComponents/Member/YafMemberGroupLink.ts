@@ -1,5 +1,5 @@
 import { YAFReflectionLink } from '../../../types/types';
-import { appState, events } from '../../lib/index.js';
+import { appState, events } from '../../handlers/index.js';
 import { YafWidgetCounter } from '../Widget/index.js';
 import {
 	makeElement,

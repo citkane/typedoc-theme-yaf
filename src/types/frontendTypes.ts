@@ -92,6 +92,7 @@ export type yafMemberGroupReflectionProps = {
 	children: yafReflectionGroup['children'];
 	pageId: string;
 	nested?: boolean;
+	idPrefix?: string;
 };
 
 export type yafTypeArgumentsProps = {

@@ -3,7 +3,7 @@ import {
 	yafSignatureTitleProps,
 } from '../../../types/frontendTypes.js';
 import { YafTypeParameters } from '../Type/index.js';
-import appState from '../../lib/AppState.js';
+import appState from '../../handlers/AppState.js';
 import {
 	makeSymbolSpan,
 	makeTitleSpan,

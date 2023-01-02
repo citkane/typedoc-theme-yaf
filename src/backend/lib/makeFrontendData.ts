@@ -10,6 +10,7 @@ import * as typeClasses from 'typedoc';
 
 import {
 	treeMenuRoot,
+	treeMenuBranch,
 	YAFDataObject,
 	YAFReflectionLink,
 } from '../../types/types';
@@ -80,15 +81,24 @@ export const makeNeedsParenthesis = () => {
 export const makeNavTree = (
 	reflection: DeclarationReflection | ProjectReflection,
 	menuNode: treeMenuRoot = {},
-	isDeclarationChild = false
+	isDeclarationChild = false,
+	parentBranch?: treeMenuBranch
 ): treeMenuRoot => {
 	if (reflection.isProject()) {
 		reflection.children?.forEach((child) => makeNavTree(child, menuNode));
 	} else {
-		const { hash, query } = YafSerializer.formatReflectionLocation(
-			reflection,
-			isDeclarationChild
-		);
+		const { hash, query } =
+			parentBranch?.hash && parentBranch?.hash.length
+				? {
+						hash: `${parentBranch.hash}.${reflection.name}`,
+						query: parentBranch.query,
+				  }
+				: YafSerializer.formatReflectionLocation(
+						reflection,
+						isDeclarationChild
+				  );
+
+		console.log('branch;', parentBranch);
 
 		menuNode[reflection.id] = {
 			name: reflection.name,
@@ -103,7 +113,12 @@ export const makeNavTree = (
 				: undefined,
 		};
 		reflection.children?.forEach((child) => {
-			makeNavTree(child, menuNode[reflection.id].children);
+			makeNavTree(
+				child,
+				menuNode[reflection.id].children,
+				false,
+				menuNode[reflection.id]
+			);
 		});
 
 		if (reflection.type instanceof ReflectionType) {
@@ -112,7 +127,12 @@ export const makeNavTree = (
 					child,
 					reflection
 				);
-				makeNavTree(childClone, menuNode[reflection.id].children, true);
+				makeNavTree(
+					childClone,
+					menuNode[reflection.id].children,
+					true,
+					menuNode[reflection.id]
+				);
 			});
 		}
 	}

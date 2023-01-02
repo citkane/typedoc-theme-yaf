@@ -22,7 +22,7 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 	drawers!: YafElementDrawers;
 
 	onConnect() {
-		const { title, children, pageId, nested } = this.props;
+		const { title, children, pageId, nested, idPrefix } = this.props;
 		const { factory } = YafMemberGroupReflection;
 		this.id = `member_${pageId}_${title}`;
 
@@ -33,7 +33,10 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 		const handleIconHTMLElement = makeIconSpan('expand_less');
 		const iconHTMLElement = makeElement('span', 'icon');
 		const groupCountHTMLElement = factory.counterWidget(children.length);
-		const drawerLiHTMLElements = factory.drawerListChildren(children);
+		const drawerLiHTMLElements = factory.drawerListChildren(
+			children,
+			idPrefix
+		);
 
 		iconHTMLElement.appendChild(handleIconHTMLElement);
 		drawerTriggerHTMLElement.appendChildren([
@@ -67,10 +70,15 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 	}
 
 	private static factory = {
-		drawerListChildren: (children: (YAFDataObject | YAFReflectionLink)[]) =>
+		drawerListChildren: (
+			children: (YAFDataObject | YAFReflectionLink)[],
+			idPrefix = ''
+		) =>
 			children.map((child) => {
 				const liHTMLElement = this.factory.listItem(child.flags);
-				liHTMLElement.id = child.name;
+				const id = `${idPrefix ? idPrefix + '.' : ''}${child.name}`;
+				child.idPrefix = id;
+				liHTMLElement.id = id;
 				liHTMLElement.appendChild(this.factory.member(child));
 
 				return liHTMLElement;

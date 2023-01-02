@@ -1,6 +1,6 @@
 import { componentName } from '../../../types/frontendTypes.js';
 import { YafHTMLElement } from '../../index.js';
-import appState from '../../lib/AppState.js';
+import appState from '../../handlers/AppState.js';
 
 export class YafWidgetKind extends YafHTMLElement<{ kind: string }> {
 	onConnect() {

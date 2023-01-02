@@ -19,8 +19,8 @@ import {
 	YafContentMembers,
 } from '.';
 import { YafTypeParameters } from '../Type/index.js';
-import appState from '../../lib/AppState.js';
-import events from '../../lib/events/eventApi.js';
+import appState from '../../handlers/AppState.js';
+import events from '../../handlers/events/eventApi.js';
 import { makeElement } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
 

@@ -1,12 +1,12 @@
 import { JSONOutput } from 'typedoc';
 import { YAFDataObject } from '../../../types/types.js';
 import { YafMember } from '../Member/YafMember.js';
-import errorHandlers from '../../lib/ErrorHandlers.js';
+import errorHandlers from '../../handlers/ErrorHandlers.js';
 import {
 	YafMemberGroupLink,
 	YafMemberGroupReflection,
 } from '../Member/index.js';
-import appState from '../../lib/AppState.js';
+import appState from '../../handlers/AppState.js';
 import { makeElement } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
 

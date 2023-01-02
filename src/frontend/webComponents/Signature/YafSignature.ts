@@ -4,7 +4,7 @@ import {
 } from '../../../types/frontendTypes.js';
 import { YAFDataObject } from '../../../types/types.js';
 import { YafHTMLElement } from '../../index.js';
-import appState from '../../lib/AppState.js';
+import appState from '../../handlers/AppState.js';
 import { makeElement, makeNameSpan } from '../../yafElement.js';
 
 /**
@@ -17,6 +17,7 @@ import { makeElement, makeNameSpan } from '../../yafElement.js';
 export class YafSignature extends YafHTMLElement<yafSignatureProps> {
 	onConnect() {
 		const { context, type } = this.props;
+
 		if (!type || type.type === 'unknown')
 			return this.appendChild(makeNameSpan(type ? type.name : 'unknown'));
 

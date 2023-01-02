@@ -3,8 +3,8 @@ import {
 	yafDisplayOptions,
 	yafState,
 } from '../types/frontendTypes.js';
-import appState from './lib/AppState.js';
-import events from './lib/events/eventApi.js';
+import appState from './handlers/AppState.js';
+import events from './handlers/events/eventApi.js';
 
 export type DrawerElement = HTMLElement & YafElementDrawers;
 const { trigger } = events;

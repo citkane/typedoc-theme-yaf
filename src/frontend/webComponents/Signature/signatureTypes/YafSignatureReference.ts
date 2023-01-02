@@ -1,7 +1,7 @@
 import { componentName } from '../../../../types/frontendTypes.js';
 import { JSONOutput } from 'typedoc';
 import { YafTypeArguments } from '../../Type/YafTypeArguments.js';
-import appState from '../../../lib/AppState.js';
+import appState from '../../../handlers/AppState.js';
 import {
 	makeNameSpan,
 	makeLinkElement,

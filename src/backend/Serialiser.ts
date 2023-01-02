@@ -183,8 +183,16 @@ export class YafSerializer {
 
 		if (YafSerializer.hasVisibleComponent(object) && !!object.comment) {
 			object.text.comment = this.context.markdown(
-				object.comment.summary as CommentDisplayPart[]
+				object.comment.summary.map((part) => {
+					if ('tag' in part && part.tag === '@link')
+						return {
+							kind: 'text',
+							text: `[${part.text}](${part.target})`,
+						};
+					return part;
+				}) as CommentDisplayPart[]
 			) as htmlString;
+
 			object.comment.blockTags?.forEach((tag) => {
 				const tagString =
 					tag.tag.charAt(1).toLocaleUpperCase() +

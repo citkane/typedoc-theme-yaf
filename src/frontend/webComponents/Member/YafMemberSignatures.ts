@@ -1,5 +1,5 @@
 import { YafSignatureReflection } from '../../../types/types.js';
-import appState from '../../lib/AppState.js';
+import appState from '../../handlers/AppState.js';
 import { YafSignatureBody, YafSignatureTitle } from '../Signature/index.js';
 import { makeFlags, makeElement } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';

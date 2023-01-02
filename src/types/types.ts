@@ -49,6 +49,7 @@ export interface YAFDataObject
 	typeParameter: YafTypeParameterReflection[];
 	parameters: YafParameterReflection[];
 	hierarchy?: hierarchy[];
+	idPrefix?: string;
 }
 
 export interface YafDeclarationReflection
@@ -57,6 +58,7 @@ export interface YafDeclarationReflection
 	typeParameters?: YafTypeParameterReflection[] | undefined;
 	text?: yafReflectionText;
 	type: JSONOutput.ReflectionType;
+	idPrefix?: string;
 }
 export interface YafSignatureReflection extends JSONOutput.SignatureReflection {
 	parameters?: YafParameterReflection[];
@@ -107,6 +109,7 @@ export type YAFReflectionLink = {
 	groups?: undefined;
 	getSignature?: undefined;
 	setSignature?: undefined;
+	idPrefix?: string;
 };
 export type reflectionMap = {
 	[key: string]: YAFReflectionLink;

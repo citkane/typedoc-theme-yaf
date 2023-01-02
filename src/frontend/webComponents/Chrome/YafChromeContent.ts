@@ -1,6 +1,6 @@
 import { componentName, yafEventList } from '../../../types/frontendTypes.js';
 import { YafHTMLElement } from '../../index.js';
-import events from '../../lib/events/eventApi.js';
+import events from '../../handlers/events/eventApi.js';
 import { getHtmlTemplate, scrollToAnchor } from '../../yafElement.js';
 
 const { trigger } = events;

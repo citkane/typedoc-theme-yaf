@@ -1,6 +1,6 @@
 import { YafHTMLElement } from '../../index.js';
 import { hierarchy } from '../../../types/types';
-import appState from '../../lib/AppState.js';
+import appState from '../../handlers/AppState.js';
 import {
 	makeElement,
 	makeIconSpan,

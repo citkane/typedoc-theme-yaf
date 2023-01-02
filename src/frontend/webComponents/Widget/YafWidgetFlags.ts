@@ -8,11 +8,11 @@ export class YafWidgetFlags extends YafHTMLElement<yafWidgetFlagsProps> {
 
 		const allFlags = [...flags, ...(comment?.modifierTags || [])];
 
-		allFlags.forEach((flag) => {
-			this.appendChild(
-				makeElement('span', 'flag', flag.replace(/^@/, ''))
-			);
-		});
+		const HTMLElements = allFlags.map((flag) =>
+			makeElement('span', 'flag', flag.replace(/^@/, ''))
+		);
+
+		this.appendChildren(HTMLElements);
 	}
 }
 

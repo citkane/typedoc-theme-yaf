@@ -10,7 +10,7 @@ import { YAFDataObject } from '../types/types';
 import { YafNavigationLink } from './webComponents/Navigation/index.js';
 import { YafSignature } from './webComponents/Signature/index.js';
 
-import errorHandlers from './lib/ErrorHandlers.js';
+import errorHandlers from './handlers/ErrorHandlers.js';
 import YafElementDrawers from './YafElementDrawers.js';
 import { YafWidgetFlags } from './webComponents/Widget/index.js';
 
@@ -23,6 +23,7 @@ export const appendChildren =
 			if (child) element.appendChild(child);
 		});
 	};
+
 export const makeElement = <
 	T = HTMLElement,
 	P = Record<string, unknown> | string

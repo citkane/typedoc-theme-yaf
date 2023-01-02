@@ -1,10 +1,11 @@
 import {
 	displayStates,
 	yafDisplayOptions,
+	yafEventList,
 } from '../../../types/frontendTypes.js';
 import { YafHTMLElement } from '../../index.js';
-import appState from '../../lib/AppState.js';
-import events from '../../lib/events/eventApi.js';
+import appState from '../../handlers/AppState.js';
+import events from '../../handlers/events/eventApi.js';
 import { makeElement, flashElementBackground } from '../../yafElement.js';
 import YafElementDrawers from '../../YafElementDrawers.js';
 
@@ -22,13 +23,18 @@ export class YafWidgetTagToggle extends YafHTMLElement<{
 		newValue: displayStates
 	) {
 		if (!oldValue || oldValue === newValue) return;
-		const span = this.querySelector(`.${name}`);
-		if (!span) return;
-		span.textContent = span.textContent!.replace(newValue, oldValue);
+		const HTMLElement = this.querySelector(`.${name}`);
+		if (HTMLElement?.textContent)
+			HTMLElement.textContent = HTMLElement.textContent.replace(
+				newValue,
+				oldValue
+			);
 	}
 	onConnect() {
 		const { drawers } = this.props;
+		const { factory } = YafWidgetTagToggle;
 		const counts = drawers.flagCounts;
+
 		(<yafDisplayOptions[]>Object.keys(counts)).forEach((flag) => {
 			const count = counts[flag];
 			if (!count) return;
@@ -44,28 +50,36 @@ export class YafWidgetTagToggle extends YafHTMLElement<{
 				const newState = appState.toggleDisplayOption(flag);
 				events.dispatch(action.options.display(flag, newState));
 				events.dispatch(action.drawers.resetHeight());
-				setTimeout(() => {
-					(<HTMLElement>e.target).scrollIntoView({
-						behavior: 'smooth',
-						block: 'center',
-					});
-					flashElementBackground(e.target as HTMLElement);
-				});
+				factory.handleClickAnimations(e);
 			};
 
-			events.on(trigger.options.display, ({ detail }: CustomEvent) => {
-				const { key, value } = detail;
-				this.setAttribute(key, value);
-			});
+			this.eventList.forEach((event) => events.on(...event));
 		});
 	}
 	disconnectedCallback() {
-		console.warn('toggle disconnected');
-		events.off(trigger.options.display, ({ detail }: CustomEvent) => {
-			const { key, value } = detail;
-			this.setAttribute(key, value);
-		});
+		this.eventList.forEach((event) => events.off(...event));
 	}
+
+	private eventList: yafEventList = [
+		[
+			trigger.options.display,
+			({ detail }: CustomEvent) => {
+				const { key, value } = detail;
+				this.setAttribute(key, value);
+			},
+		],
+	];
+
+	private static factory = {
+		handleClickAnimations: (e: MouseEvent) =>
+			setTimeout(() => {
+				(<HTMLElement>e.target).scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+				});
+				flashElementBackground(e.target as HTMLElement);
+			}),
+	};
 }
 const yafWidgetTagToggle = 'yaf-widget-tag-toggle';
 customElements.define(yafWidgetTagToggle, YafWidgetTagToggle);

@@ -7,7 +7,7 @@ import {
 import { YafMemberDeclaration } from './YafMemberDeclaration.js';
 import { YafMemberGetterSetter } from './YafMemberGetterSetter.js';
 import { YafMemberSignatures } from './YafMemberSignatures.js';
-import events from '../../lib/events/eventApi.js';
+import events from '../../handlers/events/eventApi.js';
 import {
 	makeFlags,
 	makeElement,
@@ -15,8 +15,8 @@ import {
 	makeIconSpan,
 } from '../../yafElement.js';
 import { yafReflectionGroup } from '../../../types/frontendTypes.js';
-import appState from '../../lib/AppState.js';
-import errorHandlers from '../../lib/ErrorHandlers.js';
+import appState from '../../handlers/AppState.js';
+import errorHandlers from '../../handlers/ErrorHandlers.js';
 import { JSONOutput } from 'typedoc';
 import { YafHTMLElement } from '../../index.js';
 

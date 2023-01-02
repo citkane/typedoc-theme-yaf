@@ -1,5 +1,5 @@
-import appState from '../../lib/AppState.js';
-import events from '../../lib/events/eventApi.js';
+import appState from '../../handlers/AppState.js';
+import events from '../../handlers/events/eventApi.js';
 import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
 import {
 	makeIconSpan,

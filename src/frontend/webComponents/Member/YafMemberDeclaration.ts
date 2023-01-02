@@ -18,7 +18,7 @@ import { YafHTMLElement } from '../../index.js';
  */
 export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflection> {
 	onConnect() {
-		const { name, type } = this.props;
+		const { name, type, idPrefix } = this.props;
 		const { factory } = YafMemberDeclaration;
 		const isReflection = type?.type === 'reflection';
 		const isReflectionSignature =
@@ -29,7 +29,9 @@ export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflectio
 			!isReflectionSignature
 				? factory.memberSignatures(this.props)
 				: undefined,
-			isReflectionGroup ? factory.memberGroups(type, name) : undefined,
+			isReflectionGroup
+				? factory.memberGroups(type, name, idPrefix)
+				: undefined,
 			isReflectionSignature ? factory.memberSignatures(type) : undefined,
 		]
 			.filter((element) => !!element)
@@ -48,7 +50,11 @@ export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflectio
 	}
 
 	private static factory = {
-		memberGroups: (type: JSONOutput.ReflectionType, parentName: string) => {
+		memberGroups: (
+			type: JSONOutput.ReflectionType,
+			parentName: string,
+			idPrefix: string | undefined
+		) => {
 			if (
 				!type.declaration ||
 				!type.declaration.children ||
@@ -73,6 +79,7 @@ export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflectio
 						children: group.children,
 						pageId: String(id),
 						nested: true,
+						idPrefix,
 					});
 				}) || undefined
 			);

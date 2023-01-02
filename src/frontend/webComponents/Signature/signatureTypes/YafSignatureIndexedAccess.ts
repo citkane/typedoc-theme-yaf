@@ -1,6 +1,6 @@
 import { JSONOutput } from 'typedoc';
 import { YafHTMLElement } from '../../../index.js';
-import appState from '../../../lib/AppState.js';
+import appState from '../../../handlers/AppState.js';
 import {
 	renderSignatureType,
 	makeLinkElement,
