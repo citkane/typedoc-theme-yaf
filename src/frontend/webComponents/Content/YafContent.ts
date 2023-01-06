@@ -20,9 +20,9 @@ import {
 } from '.';
 import { YafTypeParameters } from '../Type/index.js';
 import appState from '../../handlers/AppState.js';
-import events from '../../handlers/events/eventApi.js';
 import { makeElement } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
+import { events } from '../../handlers/index.js';
 
 const { trigger, action } = events;
 
@@ -37,30 +37,23 @@ export class YafContent extends YafHTMLElement {
 
 	private initPageData = () => {
 		const url = new URL(window.location.href);
-		const scrollAction = action.content.scrollTo(
-			url.hash ? url.hash.replace('#', '') : 0
-		);
-		const getParam = url.searchParams;
-		let page = getParam.get('page');
+		let page = url.searchParams.get('page');
 		page = decodeURIComponent(page || '');
 
 		appState.getPageData(page || 'index').then((data) => {
 			this.id = String(data.id);
 			this.renderPageContent(data);
-			events.dispatch(scrollAction);
+			events.dispatch(
+				action.content.scrollTo(
+					url.hash ? url.hash.replace('#', '') : 0
+				)
+			);
+			events.dispatch(action.content.breadcrumb(data.id));
 		});
 	};
 	private renderPageContent(data: YAFDataObject) {
-		const {
-			kind,
-			typeParameter,
-			signatures,
-			text,
-			has,
-			hierarchy,
-			id,
-			is,
-		} = data;
+		const { kind, typeParameter, signatures, text, hierarchy, id, is } =
+			data;
 		const { factory } = YafContent;
 		const { Variable, TypeAlias } = appState.reflectionKind;
 		const isVarOrTypeDeclaration =
@@ -82,7 +75,7 @@ export class YafContent extends YafHTMLElement {
 						? factory.contentMarked(text.comment!)
 						: undefined,
 
-					has.typeParameters
+					typeParameter
 						? factory.typeParameters(typeParameter)
 						: undefined,
 					hasHierchy
@@ -106,8 +99,8 @@ export class YafContent extends YafHTMLElement {
 		});
 	}
 
-	private returnPageId = (e: ReturnType<typeof action.get.pageContentId>) =>
-		e.detail.callBack(this.id);
+	private returnPageId = (e: ReturnType<typeof action.content.getPageId>) =>
+		e.detail.callBack(Number(this.id));
 
 	/**
 	 * @event
@@ -138,7 +131,7 @@ export class YafContent extends YafHTMLElement {
 				'yaf-member-declaration',
 				null,
 				null,
-				data
+				{ data, idPrefix: '' }
 			),
 		memberGroups: (data: YAFDataObject) =>
 			makeElement<YafContentMembers, YafContentMembers['props']>(

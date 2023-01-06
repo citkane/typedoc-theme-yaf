@@ -12,7 +12,7 @@ export class YafMemberSources extends YafHTMLElement<
 		const { sources } = this.props;
 
 		const headerHTMLElement = makeElement('h5', null, 'Defined in:');
-		const ulHTMLElement = makeElement('ul');
+		const ulHTMLElement = makeElement('ul', 'references');
 		const sourcelistHTMLElements = sources?.map((source) => {
 			const { fileName, line, url } = source;
 			const liHTMLElement = makeElement('li');

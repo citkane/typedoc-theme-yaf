@@ -26,6 +26,7 @@ export class AppState {
 		window.yaf = { flushStateCache: this.flushStateCache };
 	}
 	async initCache() {
+		const { deepFreeze } = AppState;
 		const Promises = [
 			AppState.fetchDataFromFile('yafReflectionMap'),
 			AppState.fetchDataFromFile('yafReflectionKind'),
@@ -44,11 +45,12 @@ export class AppState {
 
 			this.state = {
 				pageData: {},
-				reflectionMap: reflectionMap as reflectionMap,
-				reflectionKind: relectionKind as ReflectionKind,
-				kindSymbols: kindSymbols as kindSymbols,
-				needsParenthesis: needsParenthesis as needsParenthesis,
-				navigationMenu: navigationMenu as treeMenuRoot,
+				reflectionMap: deepFreeze<reflectionMap>(reflectionMap),
+				reflectionKind: deepFreeze<ReflectionKind>(relectionKind),
+				kindSymbols: deepFreeze<kindSymbols>(kindSymbols),
+				needsParenthesis:
+					deepFreeze<needsParenthesis>(needsParenthesis),
+				navigationMenu: deepFreeze<treeMenuRoot>(navigationMenu),
 				drawers: AppState.getLocalStorageItem('drawers') || {},
 				scrollTop: AppState.getLocalStorageItem('scrollTop') || {},
 				options: {
@@ -105,6 +107,9 @@ export class AppState {
 			this.reflectionKind.SetSignature,
 		];
 	}
+	get projectName() {
+		return this.reflectionMap['project']?.name;
+	}
 
 	toggleDisplayOption = (flag: yafDisplayOptions) => {
 		const displayState = this.options.display[flag];
@@ -121,11 +126,17 @@ export class AppState {
 			? Promise.resolve(<YAFDataObject>this.state.pageData[fileName])
 			: AppState.fetchDataFromFile<YAFDataObject>(fileName).then(
 					(data) => {
-						this.state.pageData[fileName] = data;
+						this.state.pageData[fileName] =
+							AppState.deepFreeze(data);
 						return <YAFDataObject>this.state.pageData[fileName];
 					}
 			  );
-
+	getBreadcrumb = (id: number, crumbArray: number[] = []): number[] => {
+		crumbArray.unshift(id);
+		const link = this.reflectionMap[id];
+		if (link.parentId) return this.getBreadcrumb(link.parentId, crumbArray);
+		return crumbArray;
+	};
 	private flushStateCache = () => {
 		localStorage.clear();
 		this.initCache().then(() => AppState.saveToLocalStorage(this.state));
@@ -178,6 +189,17 @@ export class AppState {
 			'displayOptions',
 			JSON.stringify(state.options.display)
 		);
+	};
+
+	private static deepFreeze = <T>(property: unknown): T => {
+		if (!property || typeof property !== 'object') return property as T;
+		if (!Object.isFrozen(property)) Object.freeze(property);
+		if (Array.isArray(property)) {
+			property.forEach((child) => this.deepFreeze(child));
+		} else {
+			Object.values(property).forEach((child) => this.deepFreeze(child));
+		}
+		return property as T;
 	};
 }
 

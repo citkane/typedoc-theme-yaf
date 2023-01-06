@@ -1,75 +1,48 @@
-import * as actions from './eventFunctions.js';
-
-export const trigger = {
-	content: {
-		setLocation: 'yaf.content.setLocation',
-		scrollTo: 'yaf.content.scrollTo',
-	},
-	menu: {
-		rollMenuDown: 'yaf.menu.rollMenuDown',
-		rollMenuUp: 'yaf.menu.rollMenuUp',
-		scrollTo: 'yaf.menu.scrollTo',
-	},
-	drawers: {
-		resetHeight: 'yaf.drawer.resetHeight',
-	},
-	fetch: {
-		reflectionById: 'yaf.fetch.reflectionById',
-	},
-	get: {
-		reflectionLinkById: 'yaf.get.reflectionLinkById',
-		pageContentId: 'yaf.get.pageContentId',
-	},
-	options: {
-		display: 'yaf.options.display',
-	},
-};
+import * as actions from './index.js';
+import { trigger } from './triggers.js';
 
 export class Events {
 	trigger = trigger;
 	action = {
 		content: {
-			setLocation: actions.contentSetLocation,
+			setLocation: actions.content.setLocation,
 			scrollTo: actions.scrollTo.bind(null, 'content'),
+			scrollTop: actions.content.scrollTop,
+			getPageId: actions.content.getPageId,
+			breadcrumb: actions.content.breadcrumb,
 		},
 		menu: {
-			rollMenuDown: actions.rollMenuDown,
-			rollMenuUp: actions.rollMenuUp,
+			rollMenuDown: actions.menu.rollMenuDown,
+			rollMenuUp: actions.menu.rollMenuUp,
 			scrollTo: actions.scrollTo.bind(null, 'menu'),
 		},
 		drawers: {
-			resetHeight: actions.resetDrawerHeight,
-		},
-		fetch: {
-			reflectionById: actions.fetchReflectionById,
-		},
-		get: {
-			reflectionLinkById: actions.getReflectionById,
-			pageContentId: actions.getPageContentId,
+			resetHeight: actions.drawers.resetDrawerHeight,
 		},
 		options: {
-			display: actions.displayOptions,
+			display: actions.options.display,
 		},
 	};
 	dispatch = (
 		action: CustomEvent | Event,
-		element: HTMLElement = this.body
+		element: HTMLElement = Events.body
 	) => element.dispatchEvent(action);
 	on = (
 		trigger: string,
 		callBack: unknown,
-		element: HTMLElement | Window = this.body
+		element: HTMLElement | Window = Events.body
 	) => {
 		element.addEventListener(trigger, callBack as EventListener);
 	};
 	off = (
 		trigger: string,
 		callBack: unknown,
-		element: HTMLElement | Window = this.body
+		element: HTMLElement | Window = Events.body
 	) => {
 		element.removeEventListener(trigger, callBack as EventListener);
 	};
-	body = document.querySelector('body') as HTMLBodyElement;
+
+	private static body = document.querySelector('body') as HTMLBodyElement;
 }
 
 const events = new Events();

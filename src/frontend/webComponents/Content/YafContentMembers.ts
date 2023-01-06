@@ -1,5 +1,5 @@
 import { JSONOutput } from 'typedoc';
-import { YAFDataObject } from '../../../types/types.js';
+import { YAFDataObject, YAFReflectionLink } from '../../../types/types.js';
 import { YafMember } from '../Member/YafMember.js';
 import errorHandlers from '../../handlers/ErrorHandlers.js';
 import {
@@ -14,11 +14,9 @@ import { YafHTMLElement } from '../../index.js';
  *
  */
 export class YafContentMembers extends YafHTMLElement<YAFDataObject> {
-	pageId!: string;
-
 	onConnect() {
 		const { groups, children, id, kind } = this.props;
-		this.pageId = String(id);
+		const { factory } = YafContentMembers;
 
 		const isLinkList = this.linkReferencPageTypes.includes(kind);
 		const constructorGroup = groups?.find(
@@ -29,30 +27,36 @@ export class YafContentMembers extends YafHTMLElement<YAFDataObject> {
 
 		const HTMLElements = [
 			hasConstructor
-				? this.factory.constructorElement(
-						constructorGroup,
-						children || []
-				  )
+				? factory.constructorElement(constructorGroup, children || [])
 				: undefined,
 			groups
-				?.sort((a, b) => a.title.localeCompare(b.title))
-				.map((group) => {
-					const isConstructorGroup =
-						group.title === 'Constructors' && hasConstructor;
+				? [...groups]
+						?.sort((a, b) => a.title.localeCompare(b.title))
+						.map((group) => {
+							const isConstructorGroup =
+								group.title === 'Constructors' &&
+								hasConstructor;
 
-					if (isConstructorGroup || !group.children?.length)
-						return undefined;
+							if (isConstructorGroup || !group.children?.length)
+								return undefined;
 
-					return isLinkList
-						? this.factory.linkGroup(group, children || [])
-						: this.factory.reflectionGroup(group, children || []);
-				}),
+							return isLinkList
+								? factory.linkGroup(group, children || [])
+								: factory.reflectionGroup(
+										group,
+										children || [],
+										String(id)
+								  );
+						})
+				: undefined,
 		].flat();
 
 		this.appendChildren(HTMLElements);
+
+		YafMemberGroupReflection.renderDrawersFromRoot(this);
 	}
 
-	private factory = {
+	private static factory = {
 		/**
 		 * Returns a HTMLElement for the consructor member
 		 * @param constructorGroup
@@ -64,13 +68,13 @@ export class YafContentMembers extends YafHTMLElement<YAFDataObject> {
 			children: YAFDataObject[]
 		) => {
 			const childId = constructorGroup.children![0];
-			const constructor = children.find((child) => child.id === childId);
-			if (constructor) {
+			const data = children.find((child) => child.id === childId);
+			if (data) {
 				const HTMLElement = makeElement<YafMember, YafMember['props']>(
 					'yaf-member',
 					null,
 					null,
-					constructor
+					{ data, idPrefix: '' }
 				);
 				HTMLElement.id = 'constructor';
 				return HTMLElement;
@@ -84,10 +88,7 @@ export class YafContentMembers extends YafHTMLElement<YAFDataObject> {
 			group: JSONOutput.ReflectionGroup,
 			children: YAFDataObject[]
 		) => {
-			const serialisedChildren = YafMember.serialiseLinkGroup(
-				group,
-				children
-			);
+			const serialisedChildren = this.serialiseLinkGroup(group, children);
 
 			return makeElement<YafMemberGroupLink, YafMemberGroupLink['props']>(
 				'yaf-member-group-link',
@@ -101,7 +102,8 @@ export class YafContentMembers extends YafHTMLElement<YAFDataObject> {
 		},
 		reflectionGroup: (
 			group: JSONOutput.ReflectionGroup,
-			children: YAFDataObject[]
+			children: YAFDataObject[],
+			pageId: string
 		) => {
 			const serialisedGroup = YafMember.serialiseReflectionGroup(
 				group,
@@ -114,7 +116,7 @@ export class YafContentMembers extends YafHTMLElement<YAFDataObject> {
 			>('yaf-member-group-reflection', null, null, {
 				title: group.title,
 				children: serialisedGroup.children,
-				pageId: this.pageId,
+				pageId,
 			});
 		},
 	};
@@ -123,6 +125,22 @@ export class YafContentMembers extends YafHTMLElement<YAFDataObject> {
 		'Module',
 		'Project',
 	]).map((kindString) => appState.reflectionKind[kindString]);
+
+	private static serialiseLinkGroup = (
+		group: JSONOutput.ReflectionGroup,
+		children: YAFDataObject[]
+	) =>
+		(group.children
+			?.map((id) => {
+				const child =
+					children.find((child) => child.id == id) ||
+					appState.reflectionMap[id];
+				const childClone = { ...child };
+				childClone.id = id;
+
+				return childClone;
+			})
+			.filter((child) => !!child) as YAFReflectionLink[]) || [];
 }
 
 const yafContentMembers = 'yaf-content-members';

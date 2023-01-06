@@ -1,9 +1,9 @@
 import { componentName, yafEventList } from '../../../types/frontendTypes.js';
+import { action, events } from '../../handlers/index.js';
 import { YafHTMLElement } from '../../index.js';
-import events from '../../handlers/events/eventApi.js';
 import { getHtmlTemplate, scrollToAnchor } from '../../yafElement.js';
 
-const { trigger } = events;
+const { action, trigger } = events;
 
 /**
  * **The app chrome wrapping around the main content portal.**
@@ -12,6 +12,7 @@ const { trigger } = events;
  * It reacts to location input events.
  */
 export class YafChromeContent extends YafHTMLElement {
+	scrollTimer!: ReturnType<typeof setTimeout>;
 	onConnect() {
 		this.events.forEach((event) => events.on(...event));
 
@@ -22,11 +23,20 @@ export class YafChromeContent extends YafHTMLElement {
 		this.events.forEach((event) => events.off(...event));
 	}
 
-	private focusContent = ({ detail }: CustomEvent) =>
+	private focusContent = ({
+		detail,
+	}: CustomEvent<action['content']['scrollTo']>) =>
 		scrollToAnchor(this, detail.target);
 
+	private emitScroll = () => {
+		if (this.scrollTimer) clearTimeout(this.scrollTimer);
+		this.scrollTimer = setTimeout(() => {
+			events.dispatch(action.content.scrollTop(this.scrollTop));
+		}, 100);
+	};
 	private events: yafEventList = [
 		[trigger.content.scrollTo, this.focusContent],
+		['scroll', this.emitScroll, this],
 	];
 }
 

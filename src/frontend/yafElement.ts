@@ -115,7 +115,10 @@ export const makeFlags = (
  * @param flags
  * @returns
  */
-export const normaliseFlags = (flags: JSONOutput.ReflectionFlags) => {
+export const normaliseFlags = (
+	flags: JSONOutput.ReflectionFlags | undefined
+) => {
+	if (!flags) return [];
 	const flagsArray = Object.keys(flags)
 		.map((flag) =>
 			flag.replace('is', '').replace('has', '').toLowerCase().trim()

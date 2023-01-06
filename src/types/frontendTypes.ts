@@ -1,5 +1,6 @@
 import { JSONOutput, TypeContext } from 'typedoc';
 export type { TypeContext } from 'typedoc';
+
 import { ReflectionKind as TdocReflectionKind } from 'typedoc';
 import {
 	hierarchy,
@@ -57,7 +58,7 @@ export type yafEventList = Array<[string, unknown, (HTMLElement | Window)?]>;
 
 export type yafReflectionGroup = {
 	title: string;
-	children: (YAFDataObject | YAFReflectionLink)[];
+	children: Omit<YAFDataObject & YAFReflectionLink, 'query'>[];
 };
 
 export interface yafHTMLExtension extends HTMLElement {

@@ -2,6 +2,8 @@
  * @module Types
  */
 
+import { JSONOutput } from 'typedoc';
+
 declare global {
 	interface Window {
 		searchData: object;
@@ -10,7 +12,6 @@ declare global {
 		};
 	}
 }
-import { JSONOutput } from 'typedoc';
 
 export type htmlString = `<${string}>${string}</${string}>` | `<${string} />`;
 export type yafReflectionText = {
@@ -50,6 +51,7 @@ export interface YAFDataObject
 	parameters: YafParameterReflection[];
 	hierarchy?: hierarchy[];
 	idPrefix?: string;
+	parentId?: number;
 }
 
 export interface YafDeclarationReflection
@@ -59,6 +61,7 @@ export interface YafDeclarationReflection
 	text?: yafReflectionText;
 	type: JSONOutput.ReflectionType;
 	idPrefix?: string;
+	location: YAFDataObject['location'];
 }
 export interface YafSignatureReflection extends JSONOutput.SignatureReflection {
 	parameters?: YafParameterReflection[];
@@ -83,33 +86,23 @@ export type hierarchy = {
 	children?: hierarchy[];
 };
 export type treeMenuRoot = {
-	[key: number]: treeMenuBranch;
+	[key: string]: treeMenuBranch;
 };
 export type treeMenuBranch = {
-	name: string;
-	query: string;
-	hash: string | '';
-	kind: number;
-	id: number;
-	flags: JSONOutput.ReflectionFlags;
 	children: treeMenuRoot;
-	parentDrawerElement?: HTMLElement;
-	inheritedFrom?: string | undefined;
+	target?: string;
+	parent?: string;
 };
 
 export type YAFReflectionLink = {
+	id: number;
+	parentId?: number;
 	name: string;
-	fileName: string;
-	id?: string;
-	kind?: number;
+	query: string;
+	hash?: string;
+	kind: number;
 	target?: number;
-	flags?: undefined;
-	signatures?: undefined;
-	comment?: undefined;
-	groups?: undefined;
-	getSignature?: undefined;
-	setSignature?: undefined;
-	idPrefix?: string;
+	flags?: JSONOutput.ReflectionFlags;
 };
 export type reflectionMap = {
 	[key: string]: YAFReflectionLink;

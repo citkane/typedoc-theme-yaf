@@ -1,6 +1,6 @@
 import { clickEvent } from '../../types/frontendTypes.js';
 import { YafNavigationLink } from '../webComponents/Navigation/index.js';
-import events from './events/eventApi.js';
+import { events } from './index.js';
 
 const { action } = events;
 

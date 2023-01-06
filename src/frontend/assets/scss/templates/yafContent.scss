@@ -1,12 +1,25 @@
 & {
 	display: block;
 	max-width: 900px;
+	padding: 2rem;
 	.markdown-body ul {
 		list-style: inside;
 	}
 	h5 {
 		margin-bottom: 0.25rem;
 		color: var(--color-fg-muted);
+	}
+	ul.references {
+		list-style: circle;
+		font-size: 0.9rem;
+		font-weight: 100;
+		a {
+			color: var(--color-fg-subtle);
+			text-decoration: underline;
+		}
+		a:hover {
+			color: var(--color-fg-default);
+		}
 	}
 }
 
@@ -76,6 +89,9 @@ yaf-content-hierarchy {
 		cursor: pointer;
 		display: flex;
 		align-items: center;
+	}
+	ul {
+		font-size: 0.9rem;
 	}
 	li.target {
 		font-weight: 600;

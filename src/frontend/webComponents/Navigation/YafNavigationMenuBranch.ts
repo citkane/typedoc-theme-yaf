@@ -1,6 +1,5 @@
-import { treeMenuBranch } from '../../../types/types.js';
+import { treeMenuBranch, YAFReflectionLink } from '../../../types/types.js';
 import appState from '../../handlers/AppState.js';
-import events from '../../handlers/events/eventApi.js';
 import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
 import { componentName, yafEventList } from '../../../types/frontendTypes.js';
 import {
@@ -17,16 +16,23 @@ import {
 	YafWidgetTagToggle,
 } from '../Widget/index.js';
 import { YafHTMLElement } from '../../index.js';
+import { events } from '../../handlers/index.js';
 const { trigger } = events;
 
 /**
  *
  */
-export class YafNavigationMenuBranch extends YafHTMLElement<treeMenuBranch> {
+export class YafNavigationMenuBranch extends YafHTMLElement<{
+	link: YAFReflectionLink;
+	branch: treeMenuBranch;
+	parentDrawerElement?: HTMLElement;
+}> {
 	drawers!: YafElementDrawers;
 
 	onConnect() {
-		const { children, id, parentDrawerElement, kind } = this.props;
+		const { children } = this.props.branch;
+		const { kind, id } = this.props.link;
+		const { parentDrawerElement } = this.props;
 		const { factory } = YafNavigationMenuBranch;
 
 		this.id = `menu_${id}`;
@@ -36,7 +42,7 @@ export class YafNavigationMenuBranch extends YafHTMLElement<treeMenuBranch> {
 		const drawerHTMLElement = makeElement('ul');
 		const drawerTriggerHTMLElement = makeElement('span', 'trigger');
 		const drawerHeaderHTMLElement = factory.makeDrawerheader(
-			this.props,
+			this.props.link,
 			'span',
 			drawerTriggerHTMLElement,
 			childCount
@@ -85,39 +91,40 @@ export class YafNavigationMenuBranch extends YafHTMLElement<treeMenuBranch> {
 		) => {
 			if (!childCount) return [];
 
-			const { children } = self.props;
-			const newMenuElements: HTMLElement[] =
-				YafNavigationMenu.treeBranchSort(Object.values(children)).map(
-					(branch) => {
-						const childCount = Object.keys(branch.children).length;
-						if (childCount)
-							return this.factory.makeBranch(branch, self);
+			const { children } = self.props.branch;
+			const sortedBranches = YafNavigationMenu.treeBranchSort(children);
+			const { links, tree } = sortedBranches;
+			const newMenuElements: HTMLElement[] = links.map((link) => {
+				const childCount = Object.keys(tree[link.id].children).length;
+				if (childCount)
+					return this.factory.makeBranch(tree[link.id], link, self);
 
-						const menuLiHTMLElement = this.factory.makeDrawerheader(
-							branch,
-							'li',
-							drawerTrigger,
-							childCount
-						);
-						menuLiHTMLElement.id = `menu_${branch.id}`;
-
-						return menuLiHTMLElement;
-					}
+				const menuLiHTMLElement = this.factory.makeDrawerheader(
+					link,
+					'li',
+					drawerTrigger,
+					childCount
 				);
+				menuLiHTMLElement.id = `menu_${link.id}`;
+
+				return menuLiHTMLElement;
+			});
 			return newMenuElements;
 		},
-		makeBranch: (branch: treeMenuBranch, self: YafNavigationMenuBranch) => {
-			branch.parentDrawerElement = self;
-
+		makeBranch: (
+			branch: treeMenuBranch,
+			link: YAFReflectionLink,
+			self: YafNavigationMenuBranch
+		) => {
 			const liHTMLElement = makeElement<HTMLLIElement>('li');
 			const branchHTMLElement = makeElement<
 				YafNavigationMenuBranch,
 				YafNavigationMenuBranch['props']
 			>(
 				'yaf-navigation-menu-branch',
-				normaliseFlags(branch.flags).join(' '),
+				normaliseFlags(self.props.link.flags).join(' '),
 				null,
-				branch
+				{ branch, link, parentDrawerElement: self }
 			);
 
 			liHTMLElement.appendChild(branchHTMLElement);
@@ -125,17 +132,17 @@ export class YafNavigationMenuBranch extends YafHTMLElement<treeMenuBranch> {
 			return liHTMLElement;
 		},
 		makeDrawerheader: (
-			branch: treeMenuBranch,
+			reflectionLink: YAFReflectionLink,
 			wrapper: string,
 			drawerTriggerHTMLElement: HTMLElement,
 			childCount: number
 		) => {
-			const { query, hash, name, kind } = branch;
+			const { query, hash, name, kind, flags } = reflectionLink;
 			let href = `?page=${query}`;
 			if (hash) href += `#${hash}`;
 			const classes = childCount
 				? 'header parent'
-				: `header ${normaliseFlags(branch.flags).join(' ')}`.trim();
+				: `header ${normaliseFlags(flags).join(' ')}`.trim();
 
 			const headerHTMLElement = makeElement(wrapper, classes);
 			const headerLinkHTMLElement = makeLinkElement(href);

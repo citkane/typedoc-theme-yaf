@@ -1,3 +1,6 @@
+:root {
+	--headerHeight: 2rem;
+}
 yaf-chrome-left,
 yaf-chrome-content {
 	display: block;
@@ -11,15 +14,43 @@ yaf-chrome-left {
 	width: var(--dim-menu-width);
 	left: 0;
 	overflow: hidden;
-	border-right: 1px solid var(--color-border-default);
 }
 yaf-chrome-content {
 	width: calc(100vw - var(--dim-menu-width));
 	right: 0;
-	padding: 2rem;
+	padding-top: var(--headerHeight);
 }
 @media screen and (max-width: 900px) {
 	yaf-chrome-left {
 		display: none;
+	}
+}
+yaf-chrome-header {
+	display: block;
+	width: 100%;
+	height: var(--headerHeight);
+	background: var(--color-accent-fg);
+	position: fixed;
+	z-index: 100;
+	top: 0;
+	display: flex;
+	align-items: stretch;
+	#breadcrumb {
+		display: inline-block;
+		display: flex;
+		align-items: stretch;
+		color: var(--color-canvas-subtle);
+	}
+	a {
+		height: 100%;
+		text-decoration: none;
+		color: var(--color-canvas-subtle);
+		padding: 0 0.5rem;
+		display: flex;
+		align-items: center;
+	}
+	.divider {
+		display: flex;
+		align-items: center;
 	}
 }

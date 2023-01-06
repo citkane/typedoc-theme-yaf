@@ -7,7 +7,6 @@ import {
 import { YafMemberDeclaration } from './YafMemberDeclaration.js';
 import { YafMemberGetterSetter } from './YafMemberGetterSetter.js';
 import { YafMemberSignatures } from './YafMemberSignatures.js';
-import events from '../../handlers/events/eventApi.js';
 import {
 	makeFlags,
 	makeElement,
@@ -19,12 +18,14 @@ import appState from '../../handlers/AppState.js';
 import errorHandlers from '../../handlers/ErrorHandlers.js';
 import { JSONOutput } from 'typedoc';
 import { YafHTMLElement } from '../../index.js';
+import { events } from '../../handlers/index.js';
 
 const { action } = events;
 
-export class YafMember extends YafHTMLElement<
-	YAFDataObject | YAFReflectionLink
-> {
+export class YafMember extends YafHTMLElement<{
+	data: Omit<YAFDataObject & YAFReflectionLink, 'query'>;
+	idPrefix: string;
+}> {
 	onConnect() {
 		const {
 			name,
@@ -35,7 +36,8 @@ export class YafMember extends YafHTMLElement<
 			groups,
 			getSignature,
 			setSignature,
-		} = this.props;
+		} = this.props.data;
+		const { idPrefix } = this.props;
 
 		const flagsElement = flags ? makeFlags(flags, comment) : undefined;
 		const headerElement = makeElement('h3', 'header');
@@ -62,7 +64,7 @@ export class YafMember extends YafHTMLElement<
 
 		switch (memberType) {
 			case 'signatures':
-				inner.appendChild(this.factory.signatures(signatures!));
+				inner.appendChild(this.factory.signatures(signatures));
 				break;
 			case 'getterOrSetter':
 				inner.appendChild(this.factory.getterOrSetter());
@@ -71,7 +73,7 @@ export class YafMember extends YafHTMLElement<
 				console.error('TODO: is this ever hit?', this.props);
 				break;
 			case 'memberDeclaration':
-				inner.appendChild(this.factory.memberDeclaration());
+				inner.appendChild(this.factory.memberDeclaration(idPrefix));
 		}
 
 		this.appendChildren([headerElement, inner]);
@@ -80,7 +82,7 @@ export class YafMember extends YafHTMLElement<
 	}
 
 	private scrollMenuToTarget = () =>
-		events.dispatch(action.menu.scrollTo(String(this.props.id)));
+		events.dispatch(action.menu.scrollTo(String(this.props.data.id)));
 
 	private factory = {
 		signatures: (signatures: YafSignatureReflection[]) =>
@@ -95,14 +97,14 @@ export class YafMember extends YafHTMLElement<
 				'yaf-member-getter-setter',
 				null,
 				null,
-				this.props as YAFDataObject
+				this.props.data as YAFDataObject
 			),
-		memberDeclaration: () =>
+		memberDeclaration: (idPrefix: string) =>
 			makeElement<YafMemberDeclaration, YafMemberDeclaration['props']>(
 				'yaf-member-declaration',
 				null,
 				null,
-				<YafDeclarationReflection>this.props
+				{ data: this.props.data as YafDeclarationReflection, idPrefix }
 			),
 	};
 
@@ -125,30 +127,10 @@ export class YafMember extends YafHTMLElement<
 						`Did not find reflection id: ${child}`
 					);
 				return !!child;
-			});
+			}) as Omit<YAFDataObject & YAFReflectionLink, 'query'>[];
 
 		return { title: group.title, children: mappedChildren || [] };
 	};
-
-	public static serialiseLinkGroup = (
-		group: JSONOutput.ReflectionGroup,
-		children: YAFDataObject[]
-	) =>
-		(group.children
-			?.map((id) => {
-				const child =
-					children.find((child) => child.id === id) ||
-					appState.reflectionMap[id];
-				child.id = String(id);
-				!child &&
-					errorHandlers.notFound(
-						`Did not find reflectionMap id: ${id}`
-					);
-				return appState.reflectionMap[id]
-					? (child as YAFReflectionLink)
-					: undefined;
-			})
-			.filter((child) => !!child) as YAFReflectionLink[]) || [];
 }
 
 const yafMember = 'yaf-member';

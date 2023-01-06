@@ -75,7 +75,7 @@ export class YafContentHierarchy extends YafHTMLElement<yafContentHierarchyProps
 			const parentLi = makeElement('li');
 			parentLi.appendChild(
 				makeLinkElement(
-					`?page=${linkData.fileName}`,
+					`?page=${linkData.query}#${linkData.hash}`,
 					undefined,
 					item.name
 				)

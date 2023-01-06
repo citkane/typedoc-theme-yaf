@@ -1,5 +1,6 @@
 import {
 	DeclarationReflection,
+	JSONOutput,
 	ProjectReflection,
 	ReflectionKind,
 	ReflectionType,
@@ -10,11 +11,9 @@ import * as typeClasses from 'typedoc';
 
 import {
 	treeMenuRoot,
-	treeMenuBranch,
 	YAFDataObject,
 	YAFReflectionLink,
 } from '../../types/types';
-import { YafSerializer } from '../Serialiser';
 
 export const makeYafKindSymbols = (icons: Record<string, () => unknown>) => {
 	const symbols = {};
@@ -40,15 +39,65 @@ export const makeYafReflectionMap = (
 	data: YAFDataObject[],
 	map: Record<string, YAFReflectionLink> = {}
 ) => {
-	data.forEach((reflection) => {
-		map[String(reflection.id)] = {
-			name: reflection.name,
-			fileName: reflection.location.query,
-		};
+	if (!data) return;
 
-		if (reflection.children) makeYafReflectionMap(reflection.children, map);
+	data.forEach((objectReflection) => {
+		const { id, name, location, kind, flags, parentId } = objectReflection;
+		const mapId =
+			kind === ReflectionKind.Project ? 'project' : objectReflection.id;
+
+		map[mapId] = defaultReflectionLink(
+			id,
+			parentId,
+			name,
+			location,
+			kind,
+			flags
+		);
+
+		const hasChildren = objectReflection.children;
+		const hasSignatures = objectReflection.signatures;
+
+		const hasDeclarations =
+			objectReflection.type && 'declaration' in objectReflection.type;
+
+		if (hasChildren) {
+			makeYafReflectionMap(objectReflection.children, map);
+		}
+		if (hasSignatures) {
+			makeYafReflectionMap(
+				objectReflection.signatures as YAFDataObject[],
+				map
+			);
+		}
+		if (hasDeclarations) {
+			makeYafReflectionMap(
+				(objectReflection.type as JSONOutput.ReflectionType).declaration
+					.children as YAFDataObject[],
+				map
+			);
+		}
 	});
 	return map;
+};
+
+const defaultReflectionLink = (
+	id: number,
+	parentId: number | undefined,
+	name: string,
+	location: { query: string; hash: string },
+	kind: ReflectionKind,
+	flags: JSONOutput.ReflectionFlags
+) => {
+	return {
+		id,
+		parentId,
+		name,
+		query: location.query,
+		hash: location.hash,
+		kind,
+		flags,
+	};
 };
 
 export const makeNeedsParenthesis = () => {
@@ -80,61 +129,29 @@ export const makeNeedsParenthesis = () => {
  */
 export const makeNavTree = (
 	reflection: DeclarationReflection | ProjectReflection,
-	menuNode: treeMenuRoot = {},
-	isDeclarationChild = false,
-	parentBranch?: treeMenuBranch
+	menuNode: treeMenuRoot = {}
 ): treeMenuRoot => {
 	if (reflection.isProject()) {
-		reflection.children?.forEach((child) => makeNavTree(child, menuNode));
-	} else {
-		const { hash, query } =
-			parentBranch?.hash && parentBranch?.hash.length
-				? {
-						hash: `${parentBranch.hash}.${reflection.name}`,
-						query: parentBranch.query,
-				  }
-				: YafSerializer.formatReflectionLocation(
-						reflection,
-						isDeclarationChild
-				  );
-
-		console.log('branch;', parentBranch);
-
-		menuNode[reflection.id] = {
-			name: reflection.name,
-			query,
-			hash,
-			kind: reflection.kind,
-			id: reflection.id,
+		menuNode['project'] = {
 			children: {},
-			flags: YafSerializer.extendDefaultFlags(reflection),
-			inheritedFrom: reflection.inheritedFrom
-				? reflection.inheritedFrom.qualifiedName
-				: undefined,
 		};
-		reflection.children?.forEach((child) => {
-			makeNavTree(
-				child,
-				menuNode[reflection.id].children,
-				false,
-				menuNode[reflection.id]
-			);
-		});
-
-		if (reflection.type instanceof ReflectionType) {
-			reflection.type.declaration.children?.forEach((child) => {
-				const childClone = YafSerializer.fixedReflectionChild(
-					child,
-					reflection
-				);
-				makeNavTree(
-					childClone,
-					menuNode[reflection.id].children,
-					true,
-					menuNode[reflection.id]
-				);
-			});
-		}
+		reflection.children?.forEach((child) => makeNavTree(child, menuNode));
+		return menuNode;
 	}
+
+	const { id, children, type } = reflection;
+	menuNode[id] = {
+		children: {},
+	};
+
+	children?.forEach((child) => {
+		makeNavTree(child, menuNode[id].children);
+	});
+	if (type instanceof ReflectionType) {
+		type.declaration.children?.forEach((child) => {
+			makeNavTree(child, menuNode[reflection.id].children);
+		});
+	}
+
 	return menuNode;
 };

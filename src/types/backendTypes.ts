@@ -1,3 +1,10 @@
+import {
+	DeclarationReflection,
+	ProjectReflection,
+	ReferenceReflection,
+	Reflection,
+	SignatureReflection,
+} from 'typedoc';
 import { htmlString } from './types';
 
 export interface highlighter {
@@ -10,3 +17,15 @@ export type dataLocation = {
 	hash: string;
 	query: string;
 };
+
+export interface serialiserReflection extends Reflection {
+	version?: DeclarationReflection['version'];
+	typeHierarchy?: DeclarationReflection['typeHierarchy'];
+	readme?: ProjectReflection['readme'];
+	type?:
+		| DeclarationReflection['type']
+		| SignatureReflection['type']
+		| ReferenceReflection['type'];
+	children?: DeclarationReflection['children'];
+	signatures?: DeclarationReflection['signatures'];
+}

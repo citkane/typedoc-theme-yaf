@@ -1,10 +1,11 @@
 import {
 	drawerState,
 	yafDisplayOptions,
+	yafEventList,
 	yafState,
 } from '../types/frontendTypes.js';
 import appState from './handlers/AppState.js';
-import events from './handlers/events/eventApi.js';
+import { action, events } from './handlers/index.js';
 
 export type DrawerElement = HTMLElement & YafElementDrawers;
 const { trigger } = events;
@@ -50,29 +51,27 @@ export default class YafElementDrawers {
 				);
 			}
 		);
-
-		events.on('click', () => this.toggleDrawerState(), this.drawerTrigger);
-		events.on('resize', () => this.heightControl.debounceReset(), window);
-		events.on(trigger.drawers.resetHeight, () =>
-			this.heightControl.resetHeights(true)
-		);
-		events.on(trigger.options.display, ({ detail }: CustomEvent) => {
-			const { key, value } = detail;
-			this.drawerParent.setAttribute(key, value);
-		});
+		this.drawerTrigger.onclick = () => this.toggleDrawerState();
+		this.eventsList.forEach((event) => events.on(...event));
 	}
 	drawerHasDisconnected = () => {
-		events.off('click', () => this.toggleDrawerState(), this.drawerTrigger);
-		events.off('resize', () => this.heightControl.debounceReset(), window);
-
-		events.on(trigger.drawers.resetHeight, () =>
-			this.heightControl.resetHeights(true)
-		);
-		events.off(trigger.options.display, ({ detail }: CustomEvent) => {
-			const { key, value } = detail;
-			this.drawerParent.setAttribute(key, value);
-		});
+		this.eventsList.forEach((event) => events.off(...event));
 	};
+
+	private eventsList: yafEventList = [
+		['resize', () => this.heightControl.debounceReset(), window],
+		[
+			trigger.drawers.resetHeight,
+			() => this.heightControl.resetHeights(true),
+		],
+		[
+			trigger.options.display,
+			({ detail }: CustomEvent<action['options']['display']>) => {
+				const { key, value } = detail;
+				this.drawerParent.setAttribute(key, value);
+			},
+		],
+	];
 
 	renderDrawers = (init = false) => {
 		if (init && !this.isRoot) return;

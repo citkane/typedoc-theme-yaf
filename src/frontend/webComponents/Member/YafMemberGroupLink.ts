@@ -31,17 +31,20 @@ export class YafMemberGroupLink extends YafHTMLElement<yafMemberGroupLinkProps> 
 		]);
 
 		children.forEach((child) => {
-			child = this.serialiseReferencedChild(child);
-
 			const liHTMLElement = makeElement(`li`);
+			liHTMLElement.id = child.name;
+
+			child = this.serialiseReferencedChild(child);
 			const linkHTMLElement = makeLinkElement(
-				`?page=${child.fileName}`,
+				child.hash
+					? `?page=${child.query}#${child.hash}`
+					: `?page=${child.query}`,
 				undefined,
 				child.name
 			);
 
 			liHTMLElement.appendChild(linkHTMLElement);
-			liHTMLElement.id = child.name;
+
 			liHTMLElement.onclick = () =>
 				events.dispatch(action.content.scrollTo(`menu_${child.id}`));
 
@@ -73,15 +76,15 @@ export class YafMemberGroupLink extends YafHTMLElement<yafMemberGroupLinkProps> 
 
 		switch (referenceType) {
 			case 'ReExports':
-				child.fileName = appState.reflectionMap[child.id!].fileName;
+				child.query = appState.reflectionMap[child.id!].query;
 				child.name = `Re-exported: "${child.name}"`;
 				break;
 			case 'ReExportsLink':
-				child.fileName = appState.reflectionMap[child.target!].fileName;
+				child.query = appState.reflectionMap[child.target!].query;
 				child.name = `Re-exported: "${child.name}"`;
 				break;
 			case 'ReExportsRenameLink':
-				child.fileName = appState.reflectionMap[child.target!].fileName;
+				child.query = appState.reflectionMap[child.target!].query;
 				child.name = `Re-named/exported: "${target!.name}" to "${
 					child.name
 				}"`;

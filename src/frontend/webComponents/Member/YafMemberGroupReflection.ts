@@ -57,13 +57,14 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 			drawerTriggerHTMLElement,
 			this.id
 		);
+
+		drawerHTMLElement.prepend(factory.tagToggles(this.drawers));
+
 		/**
-		 * NOTE: `drawers.renderDrawers()` is called from `YafMemberDeclaration`.
+		 * NOTE: `drawers.renderDrawers()` is called from `YafMemberDeclaration` or `YafContentMembers`.
 		 * That is the root of the drawer tree and propogates downwards to branches
 		 * from within the `renderDrawers` method itself.
 		 */
-
-		drawerHTMLElement.prepend(factory.tagToggles(this.drawers));
 	}
 	disconnectedCallback() {
 		this.drawers.drawerHasDisconnected();
@@ -71,26 +72,28 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 
 	private static factory = {
 		drawerListChildren: (
-			children: (YAFDataObject | YAFReflectionLink)[],
+			children: Omit<YAFDataObject & YAFReflectionLink, 'query'>[],
 			idPrefix = ''
 		) =>
 			children.map((child) => {
 				const liHTMLElement = this.factory.listItem(child.flags);
 				const id = `${idPrefix ? idPrefix + '.' : ''}${child.name}`;
-				child.idPrefix = id;
 				liHTMLElement.id = id;
-				liHTMLElement.appendChild(this.factory.member(child));
+				liHTMLElement.appendChild(this.factory.member(child, id));
 
 				return liHTMLElement;
 			}),
 		listItem: (flags: JSONOutput.ReflectionFlags | undefined) =>
 			makeElement('li', flags ? normaliseFlags(flags).join(' ') : ''),
-		member: (child: YAFDataObject | YAFReflectionLink) =>
+		member: (
+			data: Omit<YAFDataObject & YAFReflectionLink, 'query'>,
+			idPrefix: string
+		) =>
 			makeElement<YafMember, YafMember['props']>(
 				'yaf-member',
 				null,
 				null,
-				child
+				{ data, idPrefix }
 			),
 		tagToggles: (drawers: YafElementDrawers) => {
 			const toggleHTMLElement = makeElement<
@@ -110,6 +113,19 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 					count,
 				}
 			),
+	};
+
+	/**
+	 * Calls `renderDrawers()` from the root of the drawer tree only.
+	 * @param parent
+	 */
+	static renderDrawersFromRoot = (parent: HTMLElement) => {
+		const drawerHTMLElements = [...parent.children].filter(
+			(child) => 'drawers' in child
+		);
+		drawerHTMLElements.forEach((drawer) =>
+			(drawer as unknown as YafElementDrawers).drawers.renderDrawers()
+		);
 	};
 }
 const yafMemberGroupReflection: componentName = 'yaf-member-group-reflection';

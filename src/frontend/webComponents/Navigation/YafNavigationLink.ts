@@ -1,9 +1,9 @@
 import { clickEvent, componentName } from '../../../types/frontendTypes.js';
 import { YafHTMLElement } from '../../index.js';
-import events from '../../handlers/events/eventApi.js';
 import router from '../../handlers/Router.js';
 import { makeElement } from '../../yafElement.js';
 import appState from '../../handlers/AppState.js';
+import { events } from '../../handlers/index.js';
 
 export class YafNavigationLink extends YafHTMLElement {
 	aHTMLElement!: HTMLAnchorElement;
@@ -20,21 +20,15 @@ export class YafNavigationLink extends YafHTMLElement {
 
 		if (factory.isNumberPath(targetURL.pathname)) {
 			const reflectionId = targetURL.pathname.replace(/^\//, '');
-			const refelectionLink = appState.reflectionMap[reflectionId];
+			const reflectionLink = appState.reflectionMap[reflectionId];
 
-			console.log(reflectionId, refelectionLink);
+			if (!reflectionLink) return;
 
-			if (!refelectionLink) return;
-
-			const hash = refelectionLink.fileName.endsWith(refelectionLink.name)
-				? undefined
-				: refelectionLink.name;
+			const { query, hash } = reflectionLink;
 
 			this.setAttribute(
 				'href',
-				hash
-					? `?page=${refelectionLink.fileName}#${hash}`
-					: `?page=${refelectionLink.fileName}`
+				hash ? `?page=${query}#${hash}` : `?page=${query}`
 			);
 			targetURL = router.getTargetURL(this);
 		}

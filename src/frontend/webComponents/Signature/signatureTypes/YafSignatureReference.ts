@@ -17,7 +17,7 @@ export class YafSignatureReference extends YafHTMLElement<JSONOutput.ReferenceTy
 		const { externalUrl, id, name, typeArguments } = this.props;
 		const { factory } = YafSignatureReference;
 		const fileLink = id ? appState.reflectionMap[id] : undefined;
-		const fileLinkName = fileLink ? fileLink.fileName : undefined;
+		const fileLinkName = fileLink ? fileLink.query : undefined;
 
 		const nameHTMLElement = externalUrl
 			? factory.externalUrl(externalUrl, name)

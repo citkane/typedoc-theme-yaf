@@ -1,10 +1,11 @@
-import { treeMenuBranch } from '../../../types/types.js';
 import appState from '../../handlers/AppState.js';
-import events from '../../handlers/events/eventApi.js';
 import { componentName, yafEventList } from '../../../types/frontendTypes.js';
 import { makeElement, scrollToAnchor } from '../../yafElement.js';
 import { YafNavigationMenuBranch } from './index.js';
 import { YafHTMLElement } from '../../index.js';
+import { treeMenuRoot } from '../../../types/types.js';
+import ErrorHandlers from '../../handlers/ErrorHandlers.js';
+import { action, events } from '../../handlers/index.js';
 
 const { trigger } = events;
 
@@ -17,21 +18,26 @@ export class YafNavigationMenu extends YafHTMLElement {
 		const navHTMLElement = makeElement('nav');
 		const menuHTMLElement = makeElement('menu');
 
-		const menuEntries = YafNavigationMenu.treeBranchSort(
-			Object.values(menuData)
-		).map((menuBranch) => {
+		const sortedBranches = YafNavigationMenu.treeBranchSort(menuData);
+		const { links, tree } = sortedBranches;
+
+		const listHTMLElements = links.map((link) => {
+			if (link.kind === appState.reflectionKind.Project) return undefined;
 			const liHTMLElement = makeElement<HTMLLIElement>('li');
 			const menuItemHTMLElement = makeElement<
 				YafNavigationMenuBranch,
 				YafNavigationMenuBranch['props']
-			>('yaf-navigation-menu-branch', null, null, menuBranch);
+			>('yaf-navigation-menu-branch', null, null, {
+				link,
+				branch: tree[link.id],
+			});
 			menuItemHTMLElement.setAttribute('root', '');
 			liHTMLElement.appendChild(menuItemHTMLElement);
 
 			return liHTMLElement;
 		});
 
-		menuHTMLElement.appendChildren(menuEntries);
+		menuHTMLElement.appendChildren(listHTMLElements);
 		navHTMLElement.appendChild(menuHTMLElement);
 		this.appendChild(navHTMLElement);
 
@@ -57,7 +63,9 @@ export class YafNavigationMenu extends YafHTMLElement {
 	private recordScrollTop = () => {
 		appState.setScrollTop('menu', this.scrollTop);
 	};
-	private focusIndex = ({ detail }: CustomEvent) =>
+	private focusIndex = ({
+		detail,
+	}: CustomEvent<action['menu']['scrollTo']>) =>
 		scrollToAnchor(this, `menu_${detail.target}`);
 
 	private eventsList: yafEventList = [
@@ -65,10 +73,23 @@ export class YafNavigationMenu extends YafHTMLElement {
 		[trigger.menu.scrollTo, this.focusIndex],
 	];
 
-	static treeBranchSort = (branches: treeMenuBranch[]) =>
-		branches
+	static treeBranchSort = (tree: treeMenuRoot) => {
+		const branchLinkList = Object.keys(tree)
+			.map((id) => {
+				const reflectionLink = appState.reflectionMap[id];
+				if (!reflectionLink)
+					ErrorHandlers.notFound(
+						`id "${id}" not found on reflectionMap`
+					);
+				return reflectionLink;
+			})
+			.filter((reflectionLink) => !!reflectionLink);
+		const sortedBranchLinkList = branchLinkList
 			.sort((a, b) => b.name.localeCompare(a.name))
 			.sort((a, b) => (a.kind > b.kind ? -1 : 1));
+
+		return { links: sortedBranchLinkList, tree };
+	};
 }
 const yafNavigationMenu: componentName = 'yaf-navigation-menu';
 customElements.define(yafNavigationMenu, YafNavigationMenu);

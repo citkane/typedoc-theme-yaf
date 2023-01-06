@@ -2,7 +2,7 @@ const foo = ['bar'];
 
 /**
  * An example object
- * @group childGroup
+ * @group Nested Reflection
  */
 export const reflection = {
 	func() {
@@ -10,8 +10,6 @@ export const reflection = {
 	},
 	/**
 	 * A comment on a reflection child
-	 *
-	 * @group childGroup
 	 * @returns
 	 */
 	func2: () => console.log('another function'),
@@ -20,11 +18,14 @@ export const reflection = {
 	prop2: 2,
 	prop3: foo[0],
 	nested: {
-		prop: 'Im a prop!',
-		func() {
+		/**
+		 * A nested property
+		 */
+		nestedProp: 'Im a nested prop!',
+		nestedFunc() {
 			console.log('a function');
 		},
-		reflection: {
+		nestedReflection: {
 			prop: 'Im a prop!',
 		},
 	},

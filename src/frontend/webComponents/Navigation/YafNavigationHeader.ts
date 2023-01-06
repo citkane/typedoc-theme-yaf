@@ -1,5 +1,4 @@
 import appState from '../../handlers/AppState.js';
-import events from '../../handlers/events/eventApi.js';
 import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
 import {
 	makeIconSpan,
@@ -10,6 +9,7 @@ import {
 import { kindSymbols } from '../../../types/types.js';
 import { YafHTMLElement } from '../../index.js';
 import { YafWidgetKind } from '../Widget/index.js';
+import { events } from '../../handlers/index.js';
 const { action } = events;
 
 /**
@@ -22,27 +22,24 @@ export class YafNavigationHeader extends YafHTMLElement {
 	onConnect() {
 		const { factory } = YafNavigationHeader;
 		const drawerTriggerHTMLElement = makeElement('span', 'info');
-		const navigationControlsHTMLElement = makeElement(
-			'div',
-			'controls-navigation'
+		const navigationControlsHTMLElement = factory.navigationControls(
+			drawerTriggerHTMLElement
 		);
-		const homeLinkHTMLElement = makeLinkElement('/', 'button');
 		const drawerHTMLElement = factory.infoDrawer(
 			this.keyKinds,
 			appState.kindSymbols
 		);
 
-		homeLinkHTMLElement.appendChild(makeIconSpan('home'));
 		drawerTriggerHTMLElement.appendChildren([
 			makeIconSpan('question_mark', 18),
 			makeIconSpan('highlight_off'),
 		]);
-		navigationControlsHTMLElement.appendChildren([
-			homeLinkHTMLElement,
-			factory.menuRollControls(drawerTriggerHTMLElement),
-		]);
 
-		this.appendChildren([navigationControlsHTMLElement, drawerHTMLElement]);
+		this.appendChildren([
+			factory.projectTitle(),
+			navigationControlsHTMLElement,
+			drawerHTMLElement,
+		]);
 
 		this.drawers = new YafElementDrawers(
 			this as unknown as DrawerElement,
@@ -57,6 +54,29 @@ export class YafNavigationHeader extends YafHTMLElement {
 	}
 
 	private static factory = {
+		projectTitle: () => {
+			const homeLinkHTMLElement = makeLinkElement('/', 'button');
+			const titleHTMLElement = makeElement('div');
+			titleHTMLElement.id = 'projectTitle';
+			homeLinkHTMLElement.appendChild(makeIconSpan('home'));
+			titleHTMLElement.appendChildren([
+				homeLinkHTMLElement,
+				makeElement('span', 'title', appState.projectName),
+			]);
+
+			return titleHTMLElement;
+		},
+		navigationControls: (drawerTriggerHTMLElement: HTMLElement) => {
+			const navigationControlsHTMLElement = makeElement(
+				'div',
+				'controls-navigation'
+			);
+			navigationControlsHTMLElement.appendChildren([
+				makeElement('yaf-navigation-searchbar'),
+				this.factory.menuRollControls(drawerTriggerHTMLElement),
+			]);
+			return navigationControlsHTMLElement;
+		},
 		menuRollControls: (drawerTriggerHTMLElement: HTMLElement) => {
 			const openAllHTMLElement = makeElement('span', 'open button');
 			const closeAllHTMLElement = makeElement('span', 'close button');

@@ -5,9 +5,9 @@ import {
 } from '../../../types/frontendTypes.js';
 import { YafHTMLElement } from '../../index.js';
 import appState from '../../handlers/AppState.js';
-import events from '../../handlers/events/eventApi.js';
 import { makeElement, flashElementBackground } from '../../yafElement.js';
 import YafElementDrawers from '../../YafElementDrawers.js';
+import { action, events } from '../../handlers/index.js';
 
 const { action, trigger } = events;
 
@@ -63,7 +63,7 @@ export class YafWidgetTagToggle extends YafHTMLElement<{
 	private eventList: yafEventList = [
 		[
 			trigger.options.display,
-			({ detail }: CustomEvent) => {
+			({ detail }: CustomEvent<action['options']['display']>) => {
 				const { key, value } = detail;
 				this.setAttribute(key, value);
 			},

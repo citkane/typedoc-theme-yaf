@@ -26,7 +26,7 @@ import {
 	makeYafKindSymbols,
 	makeYafReflectionMap,
 } from './lib/makeFrontendData';
-import { YafSerializer } from './Serialiser';
+import { YafSerialiser } from './serialiser/YafSerialiser';
 import { highlighter } from '../types/backendTypes';
 
 /**
@@ -41,7 +41,7 @@ export class YafTheme extends DefaultTheme {
 	project: ProjectReflection;
 	projectObject: JSONOutput.ProjectReflection;
 	menuData: treeMenuRoot;
-	yafSerialiser: YafSerializer;
+	yafSerialiser: YafSerialiser;
 	reflectionMapData: reflectionMap;
 	needsParenthesis: needsParenthesis;
 
@@ -91,12 +91,12 @@ export class YafTheme extends DefaultTheme {
 	 */
 	prepareYafTheme = (output: RendererEvent) => {
 		this.project = output.project;
+
 		this.projectObject = this.application.serializer.toObject(this.project);
-		this.yafSerialiser = new YafSerializer(
+		this.yafSerialiser = new YafSerialiser(
 			this.projectObject as YAFDataObject,
 			this.project as ProjectReflection & DeclarationReflection,
-			this.context,
-			this.application.serializer
+			this.context
 		);
 
 		this.saveYafThemeAssets();
@@ -107,7 +107,6 @@ export class YafTheme extends DefaultTheme {
 	 */
 	saveYafThemeAssets = () => {
 		YafTheme.copyThemeFiles(this.rootDir, this.docDir);
-		console.log(this.rootDir, this.docDir);
 		YafTheme.saveDataFile(
 			'yafNavigationMenu',
 			this.docDir,
@@ -130,9 +129,10 @@ export class YafTheme extends DefaultTheme {
 			makeNeedsParenthesis()
 		);
 		this.yafSerialiser.dataObjectArray.forEach((object) => {
-			const fileName = object.is.project
-				? 'index'
-				: object.location.query;
+			const fileName =
+				object.kind === ReflectionKind.Project
+					? 'index'
+					: object.location.query;
 			YafTheme.saveDataFile(fileName, this.docDir, object);
 		});
 	};

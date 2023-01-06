@@ -42,7 +42,7 @@ export class YafSignatureIndexedAccess extends YafHTMLElement<JSONOutput.Indexed
 			indexTypeElement: HTMLElement
 		) => {
 			const linkElement = makeLinkElement(
-				`?page=${appState.reflectionMap[referenceId].fileName}`
+				`?page=${appState.reflectionMap[referenceId].query}`
 			);
 			linkElement.appendChild(indexTypeElement);
 			return linkElement;

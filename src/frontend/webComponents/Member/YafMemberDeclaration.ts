@@ -16,9 +16,13 @@ import { YafHTMLElement } from '../../index.js';
 /**
  *
  */
-export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflection> {
+export class YafMemberDeclaration extends YafHTMLElement<{
+	data: YafDeclarationReflection;
+	idPrefix: string;
+}> {
 	onConnect() {
-		const { name, type, idPrefix } = this.props;
+		const { name, type } = this.props.data;
+		const { idPrefix } = this.props;
 		const { factory } = YafMemberDeclaration;
 		const isReflection = type?.type === 'reflection';
 		const isReflectionSignature =
@@ -27,7 +31,7 @@ export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflectio
 
 		const HTMLElements = [
 			!isReflectionSignature
-				? factory.memberSignatures(this.props)
+				? factory.memberSignatures(this.props.data)
 				: undefined,
 			isReflectionGroup
 				? factory.memberGroups(type, name, idPrefix)
@@ -39,14 +43,7 @@ export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflectio
 
 		this.appendChildren(HTMLElements);
 
-		/**
-		 * NOTE: Calls `renderDrawers()` from the root of the drawer tree only.
-		 */
-		(HTMLElements as unknown as YafMemberGroupReflection[]).forEach(
-			(element) => {
-				if (element?.drawers) element.drawers.renderDrawers(true);
-			}
-		);
+		YafMemberGroupReflection.renderDrawersFromRoot(this);
 	}
 
 	private static factory = {
@@ -71,6 +68,7 @@ export class YafMemberDeclaration extends YafHTMLElement<YafDeclarationReflectio
 			);
 			return (
 				serialisedGroups?.map((group) => {
+					console.log(idPrefix);
 					return makeElement<
 						YafMemberGroupReflection,
 						YafMemberGroupReflection['props']

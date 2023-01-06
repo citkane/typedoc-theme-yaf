@@ -11,26 +11,31 @@ import {
 	YafSignatureReflection,
 	YafTypeParameterReflection,
 } from '../../../types/types.js';
-import { makeElement, renderSignatureType } from '../../yafElement.js';
+import {
+	makeElement,
+	makeLinkElement,
+	renderSignatureType,
+} from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
+import { YafMemberSources } from '../Member/index.js';
+import appState from '../../handlers/AppState.js';
 
 export class YafSignatureBody extends YafHTMLElement<YafSignatureReflection> {
 	onConnect() {
-		const { text, typeParameter, parameters, type, kind } = this.props;
+		const { text, typeParameter, parameters, type, kind, inheritedFrom } =
+			this.props;
+
 		const { factory } = YafSignatureBody;
 		const isCallSignature = YafSignature.isCallSignature(kind);
 
 		const HTMLElements = [
 			factory.textComment(text),
+			factory.sources(this.props),
 			factory.typeParameters(typeParameter),
 			factory.parameters(parameters),
+			factory.inherited(inheritedFrom),
 			factory.returns(type, isCallSignature),
 		];
-
-		if (type?.type === 'reflection')
-			console.warn(
-				'Please check if a reflection declaration should/could ever be in a signature body.'
-			);
 
 		this.appendChildren(HTMLElements.flat());
 	}
@@ -61,16 +66,67 @@ export class YafSignatureBody extends YafHTMLElement<YafSignatureReflection> {
 						YafSignatureParameters['props']
 				  >('yaf-signature-parameters', parameters)
 				: undefined,
+		sources: (reflection: YafSignatureReflection) => {
+			if (!reflection.sources?.length) return undefined;
+			return this.factory.makeElement<
+				YafMemberSources,
+				YafMemberSources['props']
+			>('yaf-member-sources', reflection);
+		},
 		returns: (
 			type: YafSignatureReflection['type'],
 			isCallSignature: boolean
-		) =>
-			type && isCallSignature
-				? [
-						makeElement('h5', null, 'Returns:'),
-						renderSignatureType(type, 'none'),
-				  ]
-				: undefined,
+		) => {
+			if (!(type && isCallSignature)) return undefined;
+
+			const ulHTMLElement = makeElement('ul', 'references');
+			const liHTMLElement = makeElement('li');
+
+			liHTMLElement.appendChild(renderSignatureType(type, 'none'));
+			ulHTMLElement.appendChild(liHTMLElement);
+
+			return [makeElement('h5', null, 'Returns:'), ulHTMLElement];
+		},
+		inherited: (inheritedFrom: YafSignatureReflection['inheritedFrom']) => {
+			if (!inheritedFrom) return undefined;
+
+			let data;
+			if (inheritedFrom.id) {
+				const reflection = appState.reflectionMap[inheritedFrom.id];
+				let name = reflection.name.split(' ').pop();
+				const refName = reflection.query.split('.').pop();
+				const isConstructor = name === refName;
+				name = isConstructor
+					? `${refName}.constructor`
+					: `${refName}.${name}`;
+
+				data = {
+					name,
+					link: isConstructor
+						? `?page=${reflection.query}#constructor`
+						: `?page=${reflection.query}#${name}`,
+				};
+			} else {
+				data = { name: inheritedFrom.name, link: null };
+			}
+			const headingEHTMLElement = makeElement(
+				'h5',
+				null,
+				'Inherited from:'
+			);
+			const ulHTMLElement = makeElement('ul', 'references');
+			const liHTMLElement = makeElement(
+				'li',
+				null,
+				data.link ? '' : data.name
+			);
+			if (data.link)
+				liHTMLElement.appendChild(
+					makeLinkElement(data.link, undefined, data.name)
+				);
+			ulHTMLElement.appendChild(liHTMLElement);
+			return [headingEHTMLElement, ulHTMLElement];
+		},
 	};
 }
 

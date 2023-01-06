@@ -29,6 +29,7 @@ yaf-signature-parameters-type {
 		}
 	}
 }
+
 yaf-member {
 	margin-bottom: 3rem;
 
@@ -88,21 +89,14 @@ yaf-member-signatures {
 	pre {
 		border-radius: 0;
 	}
-	yaf-signature-body {
-		padding-bottom: 3rem;
-		margin-bottom: 3rem;
-		border-bottom: 1px solid var(--color-border-muted);
-	}
+	padding-bottom: 1rem;
+	margin-bottom: 3rem;
+	border-bottom: 1px solid var(--color-border-muted);
 }
 yaf-member-getter-setter {
 	& > .wrapper {
 		margin-bottom: 2rem;
 		padding-bottom: 2rem;
 		border-bottom: 1px solid var(--color-border-muted);
-	}
-}
-yaf-member-sources {
-	ul {
-		list-style: circle;
 	}
 }

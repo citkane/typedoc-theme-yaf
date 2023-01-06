@@ -19,7 +19,7 @@ yaf-member-group-link {
 	h3 .trigger {
 		cursor: pointer;
 	}
-	ul {
+	& > ul {
 		border: 0;
 		padding: 0;
 	}
