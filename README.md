@@ -62,4 +62,4 @@ The theme does not (majorly) interfere with the default TypeDoc data constructio
 - Implement end user notes (using local storage)
 - Migrate code view from external links to local rendering. Enable bookmarks, notes for same.
 ### Long term
-- Either collaborate with TypeDoc to standardise the default JSON output, or purpose build a TSDoc document parser and migrate to be a standalone documentation product.
+- Either collaborate with TypeDoc to standardise it's default JSON output, or purpose build a TSDoc document parser and migrate this theme to be a standalone documentation product.
