@@ -6,7 +6,7 @@ A theme that is focussed on nested project exploration, graphical clarity and an
 
 <a href="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg"><img src="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg" height="400px" width="auto"/></a>
 
-### <a href="">Live Example</a>
+#### <a href="">Live Example</a>
 
 ## Usage
 This theme couples and cross links your documentation content to a contextual menu tree.
