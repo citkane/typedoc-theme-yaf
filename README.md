@@ -13,8 +13,6 @@ This theme couples and cross links your documentation content to a contextual me
 
 The expanding menu contains links to all depths of information. Conversely, you can click on any content heading to expand, scroll and highlight your place in the documentation tree.
 
-@TODO feature: 
-Provide tabbed bookmarks for convenient cross referencing between documentation locations. 
 
 ### Installation
 **ALPHA:** This is not yet on NPM, so until then, instead of the below, do a git clone, run the `build` script and then npm install from your build folder location. 
@@ -41,6 +39,9 @@ This facilitates a user experience where place-keeping while reading and navigat
 Options to show or hide complexity, such as private or inherited items, are left to the end user. Toggle buttons are contextually placed and easy to both understand and use.
 
 The length of content is handily compressed with folding "drawers". The open/close state of these as well as the page scroll position is persisted, so the end user spends less time finding items on long pages and more time reading them.
+
+@TODO feature: 
+Provide tabbed bookmarks for convenient cross referencing between documentation locations. 
 
 The SPA is built with zero dependencies using [Web Components](https://en.wikipedia.org/wiki/Web_Components).
 
