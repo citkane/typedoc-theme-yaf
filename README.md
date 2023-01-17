@@ -34,9 +34,9 @@ Proceed with building your documentation.
 Note that the `index.html` output for the documentation build will be a SPA entry point, so very little will happen if you open it with your browser locally. You will have to serve it with a server application of your choice, eg. the VS-Code [Live Server](https://github.com/ritwickdey/vscode-live-server) plugin.
 
 ## Frontend Strategy
-The frontend decouples itself from the default TypeDoc theme '.html' fragment strategy and creates a single page application (SPA) which consumes '.json' data fragments.
+The frontend decouples itself from the default TypeDoc theme `.html` fragment strategy and creates a single page application (SPA) which consumes `.json` data fragments.
 
-This facilitates a user experience where reading and navigation place-keeping is maintained across document pages, page reloads and browser sessions.
+This facilitates a user experience where place-keeping while reading and navigating is maintained across document pages, page reloads and browser sessions.
 
 The SPA is built with zero dependencies using [Web Components](https://en.wikipedia.org/wiki/Web_Components).
 
@@ -47,3 +47,13 @@ The backend takes as input the default TypeDoc [`ProjectReflection`](https://typ
 The theme does not (majorly) interfere with the default TypeDoc data construction flow, but rather serialises the standard output into it's own needs.   
 
 ## Contribution and Development
+
+## Roadmap
+### Short Term
+- Implement search functionality
+- Implement document versioning
+- Implement reflection reference linkages across mono-repo workspaces  
+### Medium Term
+- Implement tabbed bookmarks
+### Long term
+- Either collaborate with TypeDoc to standardise the default JSON output, or purpose build a TSDoc document parser and migrate to be a standalone documentation product.
