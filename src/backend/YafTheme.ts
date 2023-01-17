@@ -26,7 +26,7 @@ import {
 	makeYafKindSymbols,
 	makeYafReflectionMap,
 } from './lib/makeFrontendData';
-import { YafSerialiser } from './serialiser/YafSerialiser';
+import { YafSerialiser } from './YafSerialiser';
 import { highlighter } from '../types/backendTypes';
 
 /**

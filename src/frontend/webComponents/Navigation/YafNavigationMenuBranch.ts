@@ -96,8 +96,6 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 			const { links, tree } = sortedBranches;
 			const newMenuElements: HTMLElement[] = links.map((link) => {
 				const childCount = Object.keys(tree[link.id].children).length;
-				if (childCount)
-					return this.factory.makeBranch(tree[link.id], link, self);
 
 				const menuLiHTMLElement = this.factory.makeDrawerheader(
 					link,
@@ -105,6 +103,14 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 					drawerTrigger,
 					childCount
 				);
+				if (childCount) {
+					return this.factory.makeBranch(
+						tree[link.id],
+						link,
+						self,
+						menuLiHTMLElement
+					);
+				}
 				menuLiHTMLElement.id = `menu_${link.id}`;
 
 				return menuLiHTMLElement;
@@ -114,9 +120,10 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 		makeBranch: (
 			branch: treeMenuBranch,
 			link: YAFReflectionLink,
-			self: YafNavigationMenuBranch
+			self: YafNavigationMenuBranch,
+			liHTMLElement: HTMLElement
 		) => {
-			const liHTMLElement = makeElement<HTMLLIElement>('li');
+			//const liHTMLElement = makeElement<HTMLLIElement>('li');
 			const branchHTMLElement = makeElement<
 				YafNavigationMenuBranch,
 				YafNavigationMenuBranch['props']
@@ -138,13 +145,23 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 			childCount: number
 		) => {
 			const { query, hash, name, kind, flags } = reflectionLink;
+			const flagClasses = normaliseFlags(flags).join(' ').trim();
+			const isBranchList = wrapper === 'li' && childCount;
 			let href = `?page=${query}`;
 			if (hash) href += `#${hash}`;
-			const classes = childCount
+			const classes = isBranchList
+				? flagClasses
+				: childCount
 				? 'header parent'
-				: `header ${normaliseFlags(flags).join(' ')}`.trim();
+				: `header ${flagClasses}`;
+
+			if (reflectionLink.name === 'fixerFactory')
+				console.table({ reflectionLink, classes, childCount, wrapper });
 
 			const headerHTMLElement = makeElement(wrapper, classes);
+
+			if (isBranchList) return headerHTMLElement;
+
 			const headerLinkHTMLElement = makeLinkElement(href);
 			const nameHTMLElement = makeNameSpan(name);
 			const linkSymbolHTMLElement = makeElement<
@@ -158,6 +175,8 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 				linkSymbolHTMLElement,
 				headerLinkHTMLElement,
 			]);
+
+			if (!childCount) return headerHTMLElement;
 
 			return childCount
 				? this.factory.extendHeader(

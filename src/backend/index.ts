@@ -1,3 +1,2 @@
-export * as lib from './lib';
-export * from './serialiser/YafSerialiser';
+export * from './YafSerialiser';
 export * from './YafTheme';
