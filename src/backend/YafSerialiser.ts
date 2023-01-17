@@ -21,7 +21,7 @@ import {
  */
 export class YafSerialiser {
 	/**
-	 * An array of data objects, each of which is the data for a page in the documentation frontend.
+	 * An array of serialised data objects, each of which is the data for a page in the documentation frontend.
 	 */
 	dataObjectArray: YAFDataObject[];
 	/**
@@ -49,6 +49,8 @@ export class YafSerialiser {
 
 	/**
 	 * A collection of static data serialiser methods
+	 *
+	 * @group Factories
 	 */
 	private static serialiseFactory = {
 		/**
@@ -69,9 +71,11 @@ export class YafSerialiser {
 			hashPrefix?: string
 		) => {
 			const { mutateComment, mutateReadme } = this.mutationFactory;
-			const { extendDefaultFlags } = this.factory;
-			const { serialiseHierarchy, serialiseReflectionLocation } =
-				this.serialiseFactory;
+			const {
+				serialiseHierarchy,
+				serialiseReflectionLocation,
+				extendDefaultFlags,
+			} = this.serialiseFactory;
 
 			const { fixObjectCallKind } = this.fixerFactory;
 
@@ -124,7 +128,7 @@ export class YafSerialiser {
 		): dataLocation => {
 			if (!rootReflection) return { hash: '', query: 'index' };
 
-			const { isPage } = this.factory;
+			const { isPage } = this.utilities;
 			const locationArray = `${rootReflection.getFriendlyFullName()}.${
 				reflection.name
 			}`.split('.');
@@ -171,9 +175,26 @@ export class YafSerialiser {
 
 			return parsedHierarchy;
 		},
+		/**
+		 * Adds a new `isInherited` flag to the standard TypeDoc flags.
+		 * @param reflectionObject
+		 * @returns
+		 */
+		extendDefaultFlags: (reflectionObject: YAFDataObject) => {
+			const { flags } = reflectionObject;
+			if (
+				reflectionObject.inheritedFrom &&
+				ReflectionKind[reflectionObject.kind] !== 'Constructor'
+			)
+				flags['isInherited'] = true;
+
+			return flags;
+		},
 	};
 	/**
-	 * Performs various data serialisations by means of data mutation for various good enough reasons.
+	 * A collection of methods which perform data serialisations by means of data mutation for various good enough reasons.
+	 *
+	 * @group Factories
 	 */
 	private static mutationFactory = {
 		/**
@@ -211,7 +232,7 @@ export class YafSerialiser {
 		) => {
 			const { mutateComment } = this.mutationFactory;
 			const { hasVisibleTextComponent: hasVisibleComponent } =
-				this.factory;
+				this.utilities;
 
 			if (!object.text) object.text = {};
 
@@ -246,7 +267,9 @@ export class YafSerialiser {
 		},
 	};
 	/**
-	 * The high level functions to parse the standard TypeDoc data into the desired `typedoc-theme-yaf` outputs.
+	 * A collection of high high level methods to parse the standard TypeDoc data into the desired `typedoc-theme-yaf` outputs.
+	 *
+	 * @group Factories
 	 */
 	private static parserFactory = {
 		/**
@@ -348,7 +371,7 @@ export class YafSerialiser {
 			objects: YAFDataObject[] = []
 		) => {
 			const { parseDataObjectToArray } = YafSerialiser.parserFactory;
-			const { isPage } = this.factory;
+			const { isPage } = this.utilities;
 			const thisChildren: YAFDataObject[] = [];
 			const newPages: YAFDataObject[] = [];
 			object.children?.forEach((child: YAFDataObject) => {
@@ -368,6 +391,8 @@ export class YafSerialiser {
 	/**
 	 * Ladies and Gents, hang onto your purses and wallets caus' the fixer is gonna fix your
 	 * standard typeDoc JSON into a super recursive frontend object!!
+	 *
+	 * @group Factories
 	 */
 	private static fixerFactory = {
 		/**
@@ -391,7 +416,7 @@ export class YafSerialiser {
 		) => {
 			const { signatures: objectSignatures } = object;
 			const { parseReflectionToYafDataObject } = this.parserFactory;
-			const { extendDefaultFlags } = this.factory;
+			const { extendDefaultFlags } = this.serialiseFactory;
 
 			if (!objectSignatures) return undefined;
 
@@ -563,24 +588,11 @@ export class YafSerialiser {
 	};
 
 	/**
-	 * A collection of utility methods to manipulate data
+	 * A collection of utility methods to report on data.
+	 *
+	 * @group Factories
 	 */
-	private static factory = {
-		/**
-		 * Adds a new `isInherited` flag to the standard TypeDoc flags.
-		 * @param reflectionObject
-		 * @returns
-		 */
-		extendDefaultFlags: (reflectionObject: YAFDataObject) => {
-			const { flags } = reflectionObject;
-			if (
-				reflectionObject.inheritedFrom &&
-				ReflectionKind[reflectionObject.kind] !== 'Constructor'
-			)
-				flags['isInherited'] = true;
-
-			return flags;
-		},
+	private static utilities = {
 		/**
 		 * Indicates if the reflection kind has its own documentation page.
 		 * @param kind

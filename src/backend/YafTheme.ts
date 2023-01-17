@@ -12,42 +12,26 @@ import {
 	Renderer,
 	RendererEvent,
 	ReflectionKind,
+	Type,
+	TypeContext,
+	ReflectionType,
 } from 'typedoc';
-import {
-	YAFDataObject,
-	reflectionMap,
-	treeMenuRoot,
-	needsParenthesis,
-} from '../types/types';
-import { getHighlighted } from './lib/highlighter';
-import {
-	makeNavTree,
-	makeNeedsParenthesis,
-	makeYafKindSymbols,
-	makeYafReflectionMap,
-} from './lib/makeFrontendData';
+import * as typeClasses from 'typedoc';
+import { YAFDataObject, treeMenuRoot, YAFReflectionLink } from '../types/types';
+import { getHighlighted } from './highlighter';
 import { YafSerialiser } from './YafSerialiser';
 import { highlighter } from '../types/backendTypes';
 
 /**
- * The YAF extension to the default typedoc theme.
+ * This extends the TypeDoc default theme and provides a collection of overrides and methods to serialise and save data fragments
+ * for consumption by the theme single page application (SPA) frontend.
  *
- * @todo Report issue regarding asynchronous callbacks to typedoc.
- * @version 0.1.0
  */
 export class YafTheme extends DefaultTheme {
+	/**
+	 * A placeholder for the replacement MD highlighter which is injected at {@link backend.load}.
+	 */
 	static highlighter: highlighter;
-
-	project: ProjectReflection;
-	projectObject: JSONOutput.ProjectReflection;
-	menuData: treeMenuRoot;
-	yafSerialiser: YafSerialiser;
-	reflectionMapData: reflectionMap;
-	needsParenthesis: needsParenthesis;
-
-	docDir = this.application.options.getValue('out') || 'docs';
-	rootDir = path.join(__dirname, '..', '..', '../');
-	context = this.getRenderContext();
 
 	constructor(renderer: Renderer) {
 		super(renderer);
@@ -90,95 +74,274 @@ export class YafTheme extends DefaultTheme {
 	 * @param output
 	 */
 	prepareYafTheme = (output: RendererEvent) => {
-		this.project = output.project;
+		const context = this.getRenderContext();
+		const { saveYafThemeAssets } = YafTheme.fileFactory;
+		const docDir = this.application.options.getValue('out') || 'docs';
+		const rootDir = path.join(__dirname, '..', '..', '../');
 
-		this.projectObject = this.application.serializer.toObject(this.project);
-		this.yafSerialiser = new YafSerialiser(
-			this.projectObject as YAFDataObject,
-			this.project as ProjectReflection & DeclarationReflection,
-			this.context
+		const project = output.project;
+
+		const projectObject = this.application.serializer.toObject(project);
+		const yafSerialiser = new YafSerialiser(
+			projectObject as YAFDataObject,
+			project as ProjectReflection & DeclarationReflection,
+			context
 		);
 
-		this.saveYafThemeAssets();
-	};
-
-	/**
-	 * Copies / saves various theme assets and data files for consumption by the front-end.
-	 */
-	saveYafThemeAssets = () => {
-		YafTheme.copyThemeFiles(this.rootDir, this.docDir);
-		YafTheme.saveDataFile(
-			'yafNavigationMenu',
-			this.docDir,
-			makeNavTree(this.project)
-		);
-		YafTheme.saveDataFile(
-			'yafReflectionMap',
-			this.docDir,
-			makeYafReflectionMap(this.yafSerialiser.dataObjectArray)
-		);
-		YafTheme.saveDataFile(
-			'yafKindSymbols',
-			this.docDir,
-			makeYafKindSymbols(this.context.icons)
-		);
-		YafTheme.saveDataFile('yafReflectionKind', this.docDir, ReflectionKind);
-		YafTheme.saveDataFile(
-			'yafNeedsParenthesis',
-			this.docDir,
-			makeNeedsParenthesis()
-		);
-		this.yafSerialiser.dataObjectArray.forEach((object) => {
-			const fileName =
-				object.kind === ReflectionKind.Project
-					? 'index'
-					: object.location.query;
-			YafTheme.saveDataFile(fileName, this.docDir, object);
-		});
-	};
-
-	/**
-	 * Copies various theme resource files into the documentation target directory.
-	 * @param rootDir The absolute path to the project root
-	 * @param outDir The absolute path to the root documentation out directory
-	 */
-	private static copyThemeFiles = (rootDir: string, outDir: string) => {
-		const assetsSrc = path.join(
+		saveYafThemeAssets(
 			rootDir,
-			'dist',
-			'src',
-			'frontend',
-			'assets'
+			docDir,
+			yafSerialiser.dataObjectArray,
+			project,
+			context
 		);
-		const indexSrc = path.join(assetsSrc, 'index.html');
-		const frontendSrc = path.join(rootDir, 'dist', 'src', 'frontend');
+	};
+	/**
+	 * A collection of methods to work with data and files.
+	 *
+	 * @group Factories
+	 */
+	private static fileFactory = {
+		/**
+		 * Copies / saves various theme assets and data files for consumption by the front-end.
+		 */
+		saveYafThemeAssets: (
+			rootDir: string,
+			docDir: string,
+			dataObjectArray: YafSerialiser['dataObjectArray'],
+			project: ProjectReflection,
+			context: DefaultThemeRenderContext
+		) => {
+			const { copyThemeFiles, saveDataFile } = this.fileFactory;
+			const {
+				makeNavTree,
+				makeYafReflectionMap,
+				makeYafKindSymbols,
+				makeNeedsParenthesis,
+			} = this.factory;
 
-		const frontendDest = path.join(outDir, 'frontend');
-		const indexDest = path.join(outDir, 'index.html');
+			copyThemeFiles(rootDir, docDir);
+			saveDataFile('yafNavigationMenu', docDir, makeNavTree(project));
+			saveDataFile(
+				'yafReflectionMap',
+				docDir,
+				makeYafReflectionMap(dataObjectArray)
+			);
+			saveDataFile(
+				'yafKindSymbols',
+				docDir,
+				makeYafKindSymbols(context.icons)
+			);
+			saveDataFile('yafReflectionKind', docDir, ReflectionKind);
+			saveDataFile('yafNeedsParenthesis', docDir, makeNeedsParenthesis());
+			dataObjectArray.forEach((object) => {
+				const fileName =
+					object.kind === ReflectionKind.Project
+						? 'index'
+						: object.location.query;
+				saveDataFile(fileName, docDir, object);
+			});
+		},
 
-		fs.copySync(frontendSrc, frontendDest);
-		fs.copySync(indexSrc, indexDest);
+		/**
+		 * Copies various theme resource files into the documentation target directory.
+		 * @param rootDir The absolute path to the project root
+		 * @param outDir The absolute path to the root documentation out directory
+		 */
+		copyThemeFiles: (rootDir: string, outDir: string) => {
+			const assetsSrc = path.join(
+				rootDir,
+				'dist',
+				'src',
+				'frontend',
+				'assets'
+			);
+			const indexSrc = path.join(assetsSrc, 'index.html');
+			const frontendSrc = path.join(rootDir, 'dist', 'src', 'frontend');
+
+			const frontendDest = path.join(outDir, 'frontend');
+			const indexDest = path.join(outDir, 'index.html');
+
+			fs.copySync(frontendSrc, frontendDest);
+			fs.copySync(indexSrc, indexDest);
+		},
+
+		/**
+		 * saves a data object to a data .json file for consumption by the front-end.
+		 * @param fileName the file name with or without .json extension
+		 * @param docDir the absolute path to the document directory
+		 * @param data
+		 * @param dataDir the data subdirectory path under the document directory
+		 */
+		saveDataFile: (
+			fileName: string,
+			docDir: string,
+			data: { [key: symbol]: unknown } | YAFDataObject,
+			dataDir: string | false = 'frontend/data'
+		) => {
+			fileName = fileName.replace(/.JSON$/i, '.json');
+			if (!fileName.endsWith('.json')) fileName = `${fileName}.json`;
+			const dirPath = dataDir ? path.join(docDir, dataDir) : docDir;
+			const filePath = path.join(dirPath, fileName);
+
+			fs.ensureDirSync(path.dirname(filePath));
+			fs.writeJsonSync(filePath, data);
+		},
 	};
 
 	/**
-	 * saves a data object to a data .json file for consumption by the front-end.
-	 * @param fileName the file name with or without .json extension
-	 * @param docDir the absolute path to the document directory
-	 * @param data
-	 * @param dataDir the data subdirectory path under the document directory
+	 * A collection of methods to create data for saving as frontend assets.
+	 *
+	 * @group Factories
 	 */
-	private static saveDataFile = (
-		fileName: string,
-		docDir: string,
-		data: { [key: symbol]: unknown } | YAFDataObject,
-		dataDir: string | false = 'frontend/data'
-	) => {
-		fileName = fileName.replace(/.JSON$/i, '.json');
-		if (!fileName.endsWith('.json')) fileName = `${fileName}.json`;
-		const dirPath = dataDir ? path.join(docDir, dataDir) : docDir;
-		const filePath = path.join(dirPath, fileName);
+	private static factory = {
+		makeYafKindSymbols: (icons: Record<string, () => unknown>) => {
+			const symbols = {};
 
-		fs.ensureDirSync(path.dirname(filePath));
-		fs.writeJsonSync(filePath, data);
+			Object.keys(icons)
+				.filter((key) => !!ReflectionKind[key])
+				.forEach((key) => {
+					const functionString = String(icons[key])
+						.split('()')[1]
+						.split('ReflectionKind.')[1]
+						.split(/[^A-Z]/i)[0];
+
+					symbols[key] = {
+						className: functionString.toLocaleLowerCase(),
+						symbol: functionString[0],
+					};
+				});
+
+			return symbols;
+		},
+		makeYafReflectionMap: (
+			data: YAFDataObject[],
+			map: Record<string, YAFReflectionLink> = {}
+		) => {
+			if (!data) return;
+
+			const { defaultReflectionLink, makeYafReflectionMap } =
+				this.factory;
+
+			data.forEach((objectReflection) => {
+				const { id, name, location, kind, flags, parentId } =
+					objectReflection;
+				const mapId =
+					kind === ReflectionKind.Project
+						? 'project'
+						: objectReflection.id;
+
+				map[mapId] = defaultReflectionLink(
+					id,
+					parentId,
+					name,
+					location,
+					kind,
+					flags
+				);
+
+				const hasChildren = objectReflection.children;
+				const hasSignatures = objectReflection.signatures;
+
+				const hasDeclarations =
+					objectReflection.type &&
+					'declaration' in objectReflection.type;
+
+				if (hasChildren) {
+					makeYafReflectionMap(objectReflection.children, map);
+				}
+				if (hasSignatures) {
+					makeYafReflectionMap(
+						objectReflection.signatures as YAFDataObject[],
+						map
+					);
+				}
+				if (hasDeclarations) {
+					makeYafReflectionMap(
+						(objectReflection.type as JSONOutput.ReflectionType)
+							.declaration.children as YAFDataObject[],
+						map
+					);
+				}
+			});
+			return map;
+		},
+		defaultReflectionLink: (
+			id: number,
+			parentId: number | undefined,
+			name: string,
+			location: { query: string; hash: string },
+			kind: ReflectionKind,
+			flags: JSONOutput.ReflectionFlags
+		) => {
+			return {
+				id,
+				parentId,
+				name,
+				query: location.query,
+				hash: location.hash,
+				kind,
+				flags,
+			};
+		},
+
+		makeNeedsParenthesis: () => {
+			const map = {};
+
+			(<(new (array) => Type)[]>Object.values(typeClasses))
+				.filter(
+					(f) =>
+						typeof f === 'function' &&
+						String(f).indexOf('extends Type') > -1
+				)
+				.forEach((f) => {
+					const newClass = new f([]);
+					map[newClass.type] = {};
+					Object.values(TypeContext).forEach((context) => {
+						map[newClass.type][context] =
+							newClass.needsParenthesis(context);
+					});
+				});
+
+			return map;
+		},
+
+		/**
+		 * Builds a data tree for the main navigation menu
+		 * @param menuNode
+		 * @param reflection
+		 * @returns a hierarchical tree representation of the main navigation menu.
+		 */
+		makeNavTree: (
+			reflection: DeclarationReflection | ProjectReflection,
+			menuNode: treeMenuRoot = {}
+		): treeMenuRoot => {
+			const { makeNavTree } = this.factory;
+			if (reflection.isProject()) {
+				menuNode['project'] = {
+					children: {},
+				};
+				reflection.children?.forEach((child) =>
+					makeNavTree(child, menuNode)
+				);
+				return menuNode;
+			}
+
+			const { id, children, type } = reflection;
+			menuNode[id] = {
+				children: {},
+			};
+
+			children?.forEach((child) => {
+				makeNavTree(child, menuNode[id].children);
+			});
+			if (type instanceof ReflectionType) {
+				type.declaration.children?.forEach((child) => {
+					makeNavTree(child, menuNode[reflection.id].children);
+				});
+			}
+
+			return menuNode;
+		},
 	};
 }

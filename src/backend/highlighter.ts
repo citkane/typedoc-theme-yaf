@@ -10,13 +10,9 @@ import { highlighter } from '../types/backendTypes';
  *
  * It then constructs the various functions required to return HTML markup from text.
  *
- * @returns An interface of functions to facilitate highlighting in typedoc-theme-yaf
- * @todo Allow for user options to extend the starry-night `common` language parser modules.
+ * @returns A collection of functions to convert a string into highlighted HTML.
  */
 export const loadHighlighter = async (): Promise<highlighter> => {
-	/* WORKAROUND:
-	 * "starry-night" and "hast-util-to-html" are ESM only modules, but "typdoc" does not support ESM
-	 */
 	const dynamicImport = new Function('specifier', 'return import(specifier)');
 	const { toHtml } = (await dynamicImport('hast-util-to-html')) as {
 		toHtml: () => htmlString;
@@ -24,7 +20,6 @@ export const loadHighlighter = async (): Promise<highlighter> => {
 	const { createStarryNight, common } = await dynamicImport(
 		'@wooorm/starry-night'
 	);
-	/* END WORKAROUND */
 
 	const starryNight = await createStarryNight(common);
 	return {
@@ -37,12 +32,16 @@ export const loadHighlighter = async (): Promise<highlighter> => {
 };
 
 /**
- * A factory function to convert a string into language highlighted HTML code using the
- * [starry-night](https://github.com/wooorm/starry-night) highlighter.
+ * `typedoc-theme-yaf` aims to be visually compatible and consistent with `GitHub` as far as practical.
+ *
+ * This is not practical with the TypeDoc default `shiki` highlighter module, so this is replaced with the
+ * [starry-night](https://github.com/wooorm/starry-night) highlighter. This provides compatibility with
+ * [github-markdown-css](https://github.com/sindresorhus/github-markdown-css).
+ *
  * @param highlighter
  * @param text
  * @param lang
- * @returns the highlighted HTML markup or the original string for unknown language types.
+ * @returns An HTML string with `github-markdown-css` compatible markup.
  */
 export const getHighlighted = (
 	highlighter: highlighter,

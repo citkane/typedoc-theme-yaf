@@ -1,19 +1,15 @@
-/**
- * This is the server side code which constructs the front-end assets for typedoc-theme yaf.
- *
- * Unlike the default theme, this theme produces .json data files instead of .html for consumption by the front-end.
- * All templating is moved to the front-end within native web components.
- *
- * @module backend
- */
-
 import { Application } from 'typedoc';
-import { loadHighlighter } from './backend/lib/highlighter';
+import { loadHighlighter } from './backend/highlighter';
 
 import { YafTheme } from './backend/YafTheme';
 
 /**
- * The theme entry point as per the typedoc {@link https://github.com/TypeStrong/typedoc/blob/master/internal-docs/custom-themes.md documentation}.
+ * This is the theme entry point as per the {@link https://github.com/TypeStrong/typedoc/blob/master/internal-docs/custom-themes.md TypeDoc documentation}.
+ *
+ * Note that the theme is defined asynchronously within the {@link backend.highlighter.loadHighlighter} method call.
+ *
+ * The default `shiki` highlighter is replaced for {@link backend.highlighter.getHighlighted reasons}.\
+ * This is a workaround in order to dynamically load the replacement ESM [starry-night](https://github.com/wooorm/starry-night) Markdown Highlighter.
  * @param app
  */
 export function load(app: Application) {
@@ -22,7 +18,3 @@ export function load(app: Application) {
 		app.renderer.defineTheme('yaf', YafTheme);
 	});
 }
-
-export { YafTheme } from './backend/YafTheme';
-export { YafSerialiser } from './backend/YafSerialiser';
-export * as lib from './backend/lib/highlighter';

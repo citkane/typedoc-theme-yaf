@@ -2,7 +2,7 @@
 
 **ALPHA:** This is not yet mobile or production ready.
 
-A theme that is focussed on nested project exploration, graphical clarity and an optimised end user experience.
+A theme that optimises deep project exploration, graphical clarity and a fluent end user experience.
 
 <a href="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg"><img src="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg" height="400px" width="auto"/></a>
 
@@ -40,7 +40,7 @@ Options to show or hide complexity, such as private or inherited items, are left
 
 The length of content is handily compressed with folding "drawers". The open/close state of these as well as the page scroll position is persisted, so the end user spends less time finding items on long pages and more time reading them.
 
-@TODO feature: 
+TODO feature: 
 Provide tabbed bookmarks for convenient cross referencing between documentation locations. 
 
 The SPA is built with zero dependencies using [Web Components](https://en.wikipedia.org/wiki/Web_Components).
@@ -60,7 +60,9 @@ The theme does not (majorly) interfere with the default TypeDoc data constructio
 - Implement reflection reference linkages across mono-repo workspaces  
 ### Medium Term
 - Implement tabbed bookmarks
-- Implement end user notes (using local storage)
+- Implement end user sticky notes (using local storage)
 - Migrate code view from external links to local rendering. Enable bookmarks, notes for same.
+- Support diagrams in MarkDown
+- Main navigation menu extension, eg. `.md` defined tutorials and documentation with hierarchical chapters.
 ### Long term
-- Either collaborate with TypeDoc to standardise it's default JSON output, or purpose build a TSDoc document parser and migrate this theme to be a standalone documentation product.
+- Either collaborate with TypeDoc to normalise it's default JSON output, or purpose build a TSDoc document parser and migrate this theme to be a standalone documentation product.
