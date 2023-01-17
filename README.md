@@ -2,7 +2,7 @@
 
 **ALPHA:** This is not yet mobile or production ready.
 
-A theme that optimises deep project exploration, graphical clarity and a fluent end user experience.
+A theme that optimises deep project exploration, graphical clarity and a fluid end user experience.
 
 <a href="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg"><img src="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg" height="400px" width="auto"/></a>
 
