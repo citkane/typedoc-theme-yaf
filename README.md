@@ -38,6 +38,10 @@ The frontend decouples itself from the default TypeDoc theme `.html` fragment st
 
 This facilitates a user experience where place-keeping while reading and navigating is maintained across document pages, page reloads and browser sessions.
 
+Options to show or hide complexity, such as private or inherited items, are left to the end user. Toggle buttons are contextually placed and easy to both understand and use.
+
+The length of content is handily compressed with folding "drawers". The open/close state of these as well as the page scroll position is persisted, so the end user spends less time finding items on long pages and more time reading them.
+
 The SPA is built with zero dependencies using [Web Components](https://en.wikipedia.org/wiki/Web_Components).
 
 
@@ -55,5 +59,7 @@ The theme does not (majorly) interfere with the default TypeDoc data constructio
 - Implement reflection reference linkages across mono-repo workspaces  
 ### Medium Term
 - Implement tabbed bookmarks
+- Implement end user notes (using local storage)
+- Migrate code view from external links to local rendering. Enable bookmarks, notes for same.
 ### Long term
 - Either collaborate with TypeDoc to standardise the default JSON output, or purpose build a TSDoc document parser and migrate to be a standalone documentation product.
