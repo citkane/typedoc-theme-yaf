@@ -1,0 +1,27 @@
+yaf-signature-body,
+yaf-signature-parameters,
+yaf-signature-parameters-type {
+	display: block;
+}
+
+yaf-signature-parameters,
+yaf-signature-parameters-type {
+	table {
+		display: table;
+		width: 100%;
+		th {
+			background: var(--color-attention-subtle);
+		}
+		td {
+			vertical-align: top;
+		}
+		td.type {
+			pre {
+				padding: 0;
+				background: none;
+				display: block;
+				white-space: pre-wrap;
+			}
+		}
+	}
+}

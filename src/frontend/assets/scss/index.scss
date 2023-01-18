@@ -1,12 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Sharp');
-@import 'resources/reset.scss';
-@import 'resources/colours.scss';
-@import 'resources/yaf-widgets.scss';
+@import 'reset.scss';
+@import 'colours.scss';
 
-@import 'templates/typedocThemeYaf.scss';
-@import 'templates/yafChrome.scss';
+@import 'typedocThemeYaf.scss';
 
+/*
 yaf-chrome-left {
 	@import 'templates/yafNavigation.scss';
 }
@@ -24,3 +23,4 @@ yaf-content {
 		@import 'templates/yafContentDeclaration.scss';
 	}
 }
+*/

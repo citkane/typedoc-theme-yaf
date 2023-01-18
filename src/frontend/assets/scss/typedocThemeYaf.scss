@@ -2,7 +2,7 @@
 	box-sizing: border-box;
 }
 :root {
-	--dim-header-height: 2.5rem;
+	--dim-header-height: 2rem;
 	--dim-footer-height: 1.5rem;
 	--dim-menu-width: 450px;
 	--font: 'Roboto';
@@ -65,6 +65,9 @@ typedoc-theme-yaf {
 	*[private='hide'] > ul > .private {
 		display: none !important;
 	}
+
+	@import 'components/yafWidget.scss';
+	@import 'components/yafChrome.scss';
 }
 .material-icons-sharp {
 	&.md-18 {

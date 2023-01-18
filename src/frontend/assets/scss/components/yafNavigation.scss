@@ -230,4 +230,11 @@ yaf-navigation-footer {
 	border-top: 1px solid var(--color-border-default);
 	border-right: 1px solid var(--color-border-default);
 	flex: 0 0 var(--dim-footer-height);
+	padding: 1rem;
+	color: var(--color-fg-muted);
+}
+
+yaf-navigation-searchbar {
+	padding-left: 1rem;
+	color: var(--color-fg-muted);
 }
