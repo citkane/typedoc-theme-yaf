@@ -1,4 +1,10 @@
-import { DeclarationHierarchy, JSONOutput, ProjectReflection } from 'typedoc';
+import {
+	DeclarationHierarchy,
+	JSONOutput,
+	ParameterReflection,
+	ProjectReflection,
+	ReferenceType,
+} from 'typedoc';
 import {
 	CommentDisplayPart,
 	DeclarationReflection,
@@ -70,6 +76,15 @@ export class YafSerialiser {
 			rootReflection?: serialiserReflection,
 			hashPrefix?: string
 		) => {
+			//console.log(Object.keys(reflection));
+			/*
+			console.log(
+				reflection.sources
+					? reflection.sources[0].fullFileName
+					: undefined
+			);
+			*/
+
 			const { mutateComment, mutateReadme } = this.mutationFactory;
 			const {
 				serialiseHierarchy,
@@ -239,11 +254,12 @@ export class YafSerialiser {
 			if (hasVisibleComponent(object) && !!object.comment) {
 				object.text.comment = context.markdown(
 					object.comment.summary.map((part) => {
-						if ('tag' in part && part.tag === '@link')
+						if ('tag' in part && part.tag === '@link') {
 							return {
 								kind: 'text',
 								text: `[${part.text}](${part.target})`,
 							};
+						}
 						return part;
 					}) as CommentDisplayPart[]
 				) as htmlString;
@@ -370,7 +386,8 @@ export class YafSerialiser {
 			object: YAFDataObject,
 			objects: YAFDataObject[] = []
 		) => {
-			const { parseDataObjectToArray } = YafSerialiser.parserFactory;
+			const { parseDataObjectToArray } = this.parserFactory;
+			const { fixParameterLinks } = this.fixerFactory;
 			const { isPage } = this.utilities;
 			const thisChildren: YAFDataObject[] = [];
 			const newPages: YAFDataObject[] = [];
@@ -384,7 +401,10 @@ export class YafSerialiser {
 			newPages.forEach((child) => {
 				parseDataObjectToArray(child, objects);
 			});
-			return objects;
+			const projectArray = objects.map((objectReflection) =>
+				fixParameterLinks(objects, objectReflection)
+			);
+			return projectArray;
 		},
 	};
 
@@ -417,6 +437,8 @@ export class YafSerialiser {
 			const { signatures: objectSignatures } = object;
 			const { parseReflectionToYafDataObject } = this.parserFactory;
 			const { extendDefaultFlags } = this.serialiseFactory;
+			const { fixMutateParameterReferences: fixParameterReferences } =
+				this.fixerFactory;
 
 			if (!objectSignatures) return undefined;
 
@@ -427,6 +449,12 @@ export class YafSerialiser {
 					(reflectionSignature) =>
 						reflectionSignature.id == objectSignature.id
 				);
+
+				fixParameterReferences(
+					objectSignature.parameters,
+					reflectionSignature.parameters
+				);
+
 				objectSignature.flags = extendDefaultFlags(
 					objectSignature as YAFDataObject
 				);
@@ -444,6 +472,121 @@ export class YafSerialiser {
 
 			return fixedSignatures;
 		},
+		/**
+		 * The TypeDoc serialiser cannot track the id's of reflections across workspace packages in
+		 * a [monorepo](https://typedoc.org/guides/monorepo/) entryPoint strategy.
+		 *
+		 * The result is that documentation cross linkages for parameter types are lost.
+		 *
+		 * This method examines the type reflection and adds a reference to the file context, which identifies the package.\
+		 * `typedoc-theme-yaf` can the forensically find the target id when it later parses the links.
+		 *
+		 * @param objectParameters
+		 * @param reflectionParameters
+		 */
+		fixMutateParameterReferences: (
+			objectParameters: YafParameterReflection[],
+			reflectionParameters: ParameterReflection[]
+		) => {
+			reflectionParameters.forEach((reflectionParameter, i) => {
+				const objectParameter = objectParameters[i];
+				let { type: reflectionType } = reflectionParameter;
+				let { type: objectType } = objectParameter;
+				if (reflectionType && 'elementType' in reflectionType) {
+					reflectionType = reflectionType.elementType;
+					objectType = objectType['elementType'];
+				}
+				if (
+					reflectionType &&
+					reflectionType instanceof ReferenceType &&
+					!reflectionType.package
+				) {
+					const filePrefix =
+						!objectType['id'] && reflectionType['_target'].parent
+							? reflectionType['_target'].parent?.name
+									.replace(/"/g, '')
+									.trim()
+							: undefined;
+					objectType['filePrefix'] = filePrefix;
+				}
+			});
+		},
+		/**
+		 * Finds missing parameter links and fills in the target id.
+		 *
+		 * @param projectArray
+		 * @param objectReflection
+		 * @returns
+		 */
+		fixParameterLinks: (
+			projectArray: YAFDataObject[],
+			objectReflection: YAFDataObject
+		) => {
+			const { fixParameterLinks } = this.fixerFactory;
+			function filterReflections(
+				reflection: YAFDataObject,
+				name: string,
+				filePrefix: string
+			) {
+				const { sources } = reflection;
+				if (!sources) return false;
+				const fileName = sources[0].fileName.split('.')[0];
+				const isFile = sources && filePrefix.endsWith(fileName);
+
+				const hasName = name === reflection.name;
+
+				return isFile && hasName;
+			}
+			function mapParameters(parameter: YafParameterReflection) {
+				let { type } = parameter;
+				if (type && 'elementType' in type) type = type.elementType;
+				if (
+					!type ||
+					type.type !== 'reference' ||
+					!!type.id ||
+					!type['filePrefix']
+				) {
+					return parameter;
+				}
+
+				const filePrefix = String(type['filePrefix']);
+				const name = type.name;
+				const targetReflections = projectArray.filter((reflection) =>
+					filterReflections(reflection, name, filePrefix)
+				);
+
+				if (targetReflections.length > 1) {
+					console.warn(
+						`[yaf] Parameter ${name} is ambiguously linked to reflection id's ${targetReflections
+							.map((r) => r.id)
+							.join(' and ')}. The link will be ignored`
+					);
+				}
+				if (targetReflections.length === 1) {
+					type['id'] = targetReflections[0].id;
+				}
+				return parameter;
+			}
+
+			objectReflection.signatures = objectReflection.signatures?.map(
+				(signature) => {
+					signature.parameters =
+						signature.parameters?.map(mapParameters);
+					return signature;
+				}
+			);
+
+			objectReflection.children = objectReflection.children?.map(
+				(child) => fixParameterLinks(projectArray, child)
+			);
+			if (objectReflection.type && 'declaration' in objectReflection.type)
+				objectReflection.type.declaration = fixParameterLinks(
+					projectArray,
+					objectReflection.type.declaration as YAFDataObject
+				);
+			return objectReflection;
+		},
+
 		/**
 		 * The standard TypeDoc declaration Reflection gets a `Property` kind, regardless if it has a call signature.
 		 *

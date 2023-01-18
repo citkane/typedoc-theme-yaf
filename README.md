@@ -57,7 +57,8 @@ The theme does not (majorly) interfere with the default TypeDoc data constructio
 ### Short Term
 - Implement search functionality
 - Implement document versioning
-- Implement reflection reference linkages across mono-repo workspaces  
+- ~~Implement reflection reference linkages across mono-repo workspaces~~ ✅
+- Write meaningful tests and pretend that this was always a test driven design process...
 ### Medium Term
 - Implement tabbed bookmarks
 - Implement end user sticky notes (using local storage)

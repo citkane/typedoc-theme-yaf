@@ -4,7 +4,6 @@ import fs from 'fs-extra';
 import {
 	DeclarationReflection,
 	DefaultTheme,
-	DefaultThemeRenderContext,
 	JSONOutput,
 	PageEvent,
 	ProjectReflection,
@@ -21,6 +20,7 @@ import { YAFDataObject, treeMenuRoot, YAFReflectionLink } from '../types/types';
 import { getHighlighted } from './highlighter';
 import { YafSerialiser } from './YafSerialiser';
 import { highlighter } from '../types/backendTypes';
+import { YafThemeRenderContext } from './YafThemeRenderContext';
 
 /**
  * This extends the TypeDoc default theme and provides a collection of overrides and methods to serialise and save data fragments
@@ -35,7 +35,6 @@ export class YafTheme extends DefaultTheme {
 
 	constructor(renderer: Renderer) {
 		super(renderer);
-
 		this.markedPlugin.getHighlighted = (text: string, lang?: string) =>
 			getHighlighted(YafTheme.highlighter, text, lang);
 
@@ -52,8 +51,8 @@ export class YafTheme extends DefaultTheme {
 	 * so override the default function.
 	 * @returns the theme render `context`
 	 */
-	override getRenderContext(): DefaultThemeRenderContext {
-		return new DefaultThemeRenderContext(this, this.application.options);
+	override getRenderContext(): YafThemeRenderContext {
+		return new YafThemeRenderContext(this, this.application.options);
 	}
 
 	/**
@@ -110,7 +109,7 @@ export class YafTheme extends DefaultTheme {
 			docDir: string,
 			dataObjectArray: YafSerialiser['dataObjectArray'],
 			project: ProjectReflection,
-			context: DefaultThemeRenderContext
+			context: YafThemeRenderContext
 		) => {
 			const { copyThemeFiles, saveDataFile } = this.fileFactory;
 			const {
