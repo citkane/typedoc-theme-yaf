@@ -155,9 +155,6 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 				? 'header parent'
 				: `header ${flagClasses}`;
 
-			if (reflectionLink.name === 'fixerFactory')
-				console.table({ reflectionLink, classes, childCount, wrapper });
-
 			const headerHTMLElement = makeElement(wrapper, classes);
 
 			if (isBranchList) return headerHTMLElement;

@@ -8,6 +8,9 @@ import {
 	makeFlags,
 } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
+import { events } from '../../handlers/index.js';
+
+const { action } = events;
 
 export class YafContentHeader extends YafHTMLElement<YAFDataObject> {
 	onConnect() {
@@ -16,17 +19,22 @@ export class YafContentHeader extends YafHTMLElement<YAFDataObject> {
 			kindString,
 			name,
 			is,
+			id,
 			flags,
 			comment,
 			signatures,
 		} = this.props;
-		const titleElement = makeElement('h1');
-		const nameElement = makeNameSpan(name);
+
+		const titleHTMLElement = makeElement('h1');
+		const nameHTMLElement = makeNameSpan(name);
+
+		nameHTMLElement.onclick = () =>
+			events.dispatch(action.menu.scrollTo(String(id)));
 
 		if (!is.project)
-			titleElement.appendChild(makeKindSpan(kindString || 'unknown'));
+			titleHTMLElement.appendChild(makeKindSpan(kindString || 'unknown'));
 		if (typeParameters && typeParameters.length) {
-			nameElement.appendChild(
+			nameHTMLElement.appendChild(
 				makeElement<YafTypeParameters, YafTypeParameters['props']>(
 					'yaf-type-parameters',
 					null,
@@ -35,14 +43,14 @@ export class YafContentHeader extends YafHTMLElement<YAFDataObject> {
 				)
 			);
 		}
-		titleElement.appendChild(nameElement);
-		titleElement.appendChild(makeFlags(flags, comment));
+		titleHTMLElement.appendChild(nameHTMLElement);
+		titleHTMLElement.appendChild(makeFlags(flags, comment));
 		if (signatures?.length === 1)
-			titleElement.appendChild(
+			titleHTMLElement.appendChild(
 				makeFlags(signatures[0].flags, signatures[0].comment)
 			);
 
-		this.appendChild(titleElement);
+		this.appendChild(titleHTMLElement);
 	}
 }
 

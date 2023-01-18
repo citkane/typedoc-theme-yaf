@@ -7,10 +7,33 @@ yaf-member-group-link {
 		justify-content: space-between;
 		align-items: center;
 	}
+
 	h2 {
-		font-weight: 300;
+		font-weight: 400;
 		border-color: var(--color-fg-subtle);
 		color: var(--color-fg-default);
+		span.trigger {
+			display: flex;
+			align-items: center;
+			.icon {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-right: 1rem;
+				border: 1px solid var(--color-border-muted);
+				user-select: none;
+				background: var(--color-canvas-default);
+				width: 2rem;
+				height: 2rem;
+			}
+		}
+		span.trigger:hover {
+			cursor: pointer;
+			.icon {
+				background: var(--color-border-muted);
+				transition: background var(--transition-fades);
+			}
+		}
 	}
 	h3 .icon {
 		display: inline-block;
@@ -80,25 +103,4 @@ yaf-member-group-reflection {
 	}
 
 	color: var(--color-fg-muted);
-	h2 {
-		span.trigger {
-			display: flex;
-			align-items: center;
-			.icon {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				margin-right: 1rem;
-				border: 1px solid var(--color-border-muted);
-				user-select: none;
-			}
-		}
-		span.trigger:hover {
-			cursor: pointer;
-			.icon {
-				background: var(--color-border-muted);
-				transition: background var(--transition-fades);
-			}
-		}
-	}
 }

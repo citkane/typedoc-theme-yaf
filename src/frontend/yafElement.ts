@@ -184,12 +184,18 @@ export const scrollToAnchor = (
 			YafElementDrawers.findParentDrawers(targetElement);
 
 		if (!YafElementDrawers.hasClosedDrawers(drawerParents)) {
-			targetElement.scrollIntoView({ behavior: 'smooth' });
+			targetElement.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+			});
 			flashElementBackground(targetElement);
 		} else if (drawerParents.length) {
 			drawerParents.forEach((element) => element.drawers.openDrawer());
 			setTimeout(() => {
-				targetElement.scrollIntoView({ behavior: 'smooth' });
+				targetElement.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+				});
 				flashElementBackground(targetElement);
 			}, getTransitionDuration(drawerParents[0].drawers.drawer) / 2);
 		}

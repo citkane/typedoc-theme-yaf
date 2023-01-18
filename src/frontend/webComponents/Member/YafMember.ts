@@ -12,6 +12,7 @@ import {
 	makeElement,
 	makeNameSpan,
 	makeIconSpan,
+	makeLinkElement,
 } from '../../yafElement.js';
 import { yafReflectionGroup } from '../../../types/frontendTypes.js';
 import appState from '../../handlers/AppState.js';
@@ -36,21 +37,28 @@ export class YafMember extends YafHTMLElement<{
 			groups,
 			getSignature,
 			setSignature,
+			id,
 		} = this.props.data;
 		const { idPrefix } = this.props;
 
+		const { query, hash } = appState.reflectionMap[id];
+		let href = `?page=${query}`;
+		if (hash) href += `#${hash}`;
+
 		const flagsElement = flags ? makeFlags(flags, comment) : undefined;
 		const headerElement = makeElement('h3', 'header');
-		headerElement.onclick = this.scrollMenuToTarget;
-		const nameElement = makeNameSpan('');
+		headerElement.onclick = this.focusMember;
+
+		const linkHTMLElement = makeLinkElement(href, 'name', name);
+		//const nameElement = linkHTMLElement.querySelector('a');
 		const inner = makeElement('div', 'inner');
 		const hasGetterOrSetter = !!getSignature || !!setSignature;
 		const isReferenceReflection =
 			kind && appState.reflectionKind[kind] === 'Reference';
 
-		nameElement.appendChildren([makeNameSpan(name), makeIconSpan('link')]);
+		//nameElement!.appendChildren([makeNameSpan(name), makeIconSpan('link')]);
 		headerElement.appendChildren([
-			nameElement,
+			linkHTMLElement,
 			flagsElement ? flagsElement : undefined,
 		]);
 
@@ -81,8 +89,10 @@ export class YafMember extends YafHTMLElement<{
 		if (groups) console.warn('TODO', groups);
 	}
 
-	private scrollMenuToTarget = () =>
+	private focusMember = () => {
 		events.dispatch(action.menu.scrollTo(String(this.props.data.id)));
+		//events.dispatch(action.content.setLocation());
+	};
 
 	private factory = {
 		signatures: (signatures: YafSignatureReflection[]) =>
