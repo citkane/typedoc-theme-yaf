@@ -11,10 +11,13 @@
 		"test:backend": "tsc --build && nyc mocha",
 		"test:frontend": "tsc --build && wtr --watch",
 		"docs": "typedoc",
-		"build": "tsc --build && npm run build:css && node ./scripts/build.js",
-		"build:css": "sass src/frontend/assets/scss/index.scss:dist/src/frontend/assets/index.css --style compressed",
-		"build:css:watch": "sass --watch src/frontend/assets/scss/index.scss:dist/src/frontend/assets/index.css --style compressed",
-		"build:frontend:watch": "npm run build && ./scripts/watchComponents.js"
+		"build": "tsc --build && node ./scripts/build.js && npm run build:css && npm run build:postcss",
+		"build:watch": "npm run build && npm run build:watch:cssAndPost",
+		"build:css": "sass src/media/scss/index.scss:dist/src/media/index.css --style compressed",
+		"build:postcss": "postcss dist/src/media/index.css --use autoprefixer -d dist/src/media",
+		"build:watch:css": "sass src/media/scss/index.scss:dist/src/media/index.css --style compressed --watch",
+		"build:watch:postcss": "postcss dist/src/media/index.css --use autoprefixer -d dist/src/media --watch",
+		"build:watch:cssAndPost": "npm run build:watch:css & npm run build:watch:postcss"
 	},
 	"repository": {
 		"type": "git",
@@ -37,6 +40,7 @@
 		"@web/test-runner": "^0.14.0",
 		"@web/test-runner-playwright": "^0.8.10",
 		"@web/test-runner-puppeteer": "^0.10.5",
+		"autoprefixer": "^10.4.13",
 		"chai": "^4.3.6",
 		"chai-as-promised": "^7.1.1",
 		"chai-as-promised-esm": "npm:@esm-bundle/chai-as-promised@^7.1.1",
@@ -45,6 +49,7 @@
 		"eslint-config-prettier": "^8.5.0",
 		"mocha": "^10.0.0",
 		"nyc": "^15.1.0",
+		"postcss-cli": "^10.1.0",
 		"prettier": "2.7.1",
 		"sass": "^1.53.0",
 		"sinon": "^14.0.0",
