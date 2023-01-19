@@ -148,21 +148,23 @@ export class YafTheme extends DefaultTheme {
 		 * @param outDir The absolute path to the root documentation out directory
 		 */
 		copyThemeFiles: (rootDir: string, outDir: string) => {
-			const assetsSrc = path.join(
-				rootDir,
-				'dist',
-				'src',
-				'frontend',
-				'assets'
-			);
-			const indexSrc = path.join(assetsSrc, 'index.html');
+			const mediaSrc = path.join(rootDir, 'dist', 'src', 'media');
+			const mediaDest = path.join(outDir, 'media');
 			const frontendSrc = path.join(rootDir, 'dist', 'src', 'frontend');
-
 			const frontendDest = path.join(outDir, 'frontend');
+			const indexSrc = path.join(rootDir, 'src', 'index.html');
 			const indexDest = path.join(outDir, 'index.html');
 
 			fs.copySync(frontendSrc, frontendDest);
+			fs.copySync(mediaSrc, mediaDest);
 			fs.copySync(indexSrc, indexDest);
+			setTimeout(() => {
+				const assetsPath = path.join(outDir, 'assets');
+				console.log(
+					`This theme no longer needs the default theme assets, so deleting: ${assetsPath}`
+				);
+				fs.removeSync(assetsPath);
+			});
 		},
 
 		/**
@@ -176,7 +178,7 @@ export class YafTheme extends DefaultTheme {
 			fileName: string,
 			docDir: string,
 			data: { [key: symbol]: unknown } | YAFDataObject,
-			dataDir: string | false = 'frontend/data'
+			dataDir: string | false = 'data'
 		) => {
 			fileName = fileName.replace(/.JSON$/i, '.json');
 			if (!fileName.endsWith('.json')) fileName = `${fileName}.json`;

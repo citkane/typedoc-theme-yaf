@@ -18,6 +18,13 @@ import ErrorHandlers from './ErrorHandlers.js';
  */
 export class AppState {
 	private state!: yafState;
+	private static defaultDataDir = './data/';
+	private static defaultOptions: yafState['options'] = {
+		display: {
+			inherited: 'hide',
+			private: 'hide',
+		},
+	};
 
 	constructor() {
 		window.addEventListener('beforeunload', () =>
@@ -140,14 +147,6 @@ export class AppState {
 	private flushStateCache = () => {
 		localStorage.clear();
 		this.initCache().then(() => AppState.saveToLocalStorage(this.state));
-	};
-
-	private static defaultDataDir = './frontend/data/';
-	private static defaultOptions: yafState['options'] = {
-		display: {
-			inherited: 'hide',
-			private: 'hide',
-		},
 	};
 
 	private static fetchDataFromFile = async <returnType>(fileName: string) => {

@@ -20,6 +20,16 @@ yaf-chrome-left {
 		display: none;
 	}
 }
+
+yaf-chrome-content {
+	width: calc(100vw - var(--dim-menu-width));
+	right: 0;
+	padding-top: var(--dim-header-height);
+
+	@import '../github-markdown.scss';
+	@import 'yafContent.scss';
+}
+
 yaf-chrome-header {
 	display: block;
 	width: 100%;
@@ -48,12 +58,4 @@ yaf-chrome-header {
 		display: flex;
 		align-items: center;
 	}
-}
-yaf-chrome-content {
-	width: calc(100vw - var(--dim-menu-width));
-	right: 0;
-	padding-top: var(--dim-header-height);
-
-	@import '../github-markdown.scss';
-	@import 'yafContent.scss';
 }

@@ -12,11 +12,11 @@
 	"excludePrivate": false,
 	"excludeProtected": false,
 	"excludeNotDocumented": false,
-	"media": "./dist/src/frontend/assets",
+	"media": "./dist/src/media",
 	"logLevel": "Verbose",
 	"plugin": ["typedoc-theme-yaf", "typedoc-plugin-hot-dev"],
 	"theme": "yaf",
 	"hot-dev": {
-		"npmScripts": ["build:frontend:watch", "build:css:watch"]
+		"npmScripts": ["build:watch"]
 	}
 }
