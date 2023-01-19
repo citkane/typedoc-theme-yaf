@@ -4,6 +4,8 @@ import {
 	ParameterReflection,
 	ProjectReflection,
 	ReferenceType,
+	SignatureReflection,
+	SomeType,
 } from 'typedoc';
 import {
 	CommentDisplayPart,
@@ -43,6 +45,7 @@ export class YafSerialiser {
 	) {
 		const { parseDataObjectToArray, parseReflectionToYafDataObject } =
 			YafSerialiser.parserFactory;
+		const { fixMutateSignatureLinks } = YafSerialiser.fixerFactory;
 
 		const dataObject = parseReflectionToYafDataObject(
 			object as YAFDataObject,
@@ -51,6 +54,9 @@ export class YafSerialiser {
 			this
 		);
 		this.dataObjectArray = parseDataObjectToArray(dataObject);
+		this.dataObjectArray.forEach((objectReflection) =>
+			fixMutateSignatureLinks(this.dataObjectArray, objectReflection)
+		);
 	}
 
 	/**
@@ -378,16 +384,16 @@ export class YafSerialiser {
 
 		/**
 		 * Flattens the extended JSONOutput project into an array of reflections.
-		 * @param objects
+		 *
+		 * @param projectArray
 		 * @param object
 		 * @returns an array of extended JSONOutput reflections
 		 */
 		parseDataObjectToArray: (
 			object: YAFDataObject,
-			objects: YAFDataObject[] = []
+			projectArray: YAFDataObject[] = []
 		) => {
 			const { parseDataObjectToArray } = this.parserFactory;
-			const { fixParameterLinks } = this.fixerFactory;
 			const { isPage } = this.utilities;
 			const thisChildren: YAFDataObject[] = [];
 			const newPages: YAFDataObject[] = [];
@@ -397,13 +403,11 @@ export class YafSerialiser {
 					: thisChildren.push(child);
 			});
 			object.children = thisChildren;
-			objects.push(object);
+			projectArray.push(object);
 			newPages.forEach((child) => {
-				parseDataObjectToArray(child, objects);
+				parseDataObjectToArray(child, projectArray);
 			});
-			const projectArray = objects.map((objectReflection) =>
-				fixParameterLinks(objects, objectReflection)
-			);
+
 			return projectArray;
 		},
 	};
@@ -437,8 +441,7 @@ export class YafSerialiser {
 			const { signatures: objectSignatures } = object;
 			const { parseReflectionToYafDataObject } = this.parserFactory;
 			const { extendDefaultFlags } = this.serialiseFactory;
-			const { fixMutateParameterReferences: fixParameterReferences } =
-				this.fixerFactory;
+			const { fixMutateSignatureReferences } = this.fixerFactory;
 
 			if (!objectSignatures) return undefined;
 
@@ -450,9 +453,9 @@ export class YafSerialiser {
 						reflectionSignature.id == objectSignature.id
 				);
 
-				fixParameterReferences(
-					objectSignature.parameters,
-					reflectionSignature.parameters
+				fixMutateSignatureReferences(
+					objectSignature,
+					reflectionSignature
 				);
 
 				objectSignature.flags = extendDefaultFlags(
@@ -481,21 +484,42 @@ export class YafSerialiser {
 		 * This method examines the type reflection and adds a reference to the file context, which identifies the package.\
 		 * `typedoc-theme-yaf` can the forensically find the target id when it later parses the links.
 		 *
-		 * @param objectParameters
-		 * @param reflectionParameters
+		 * @param objectSignature
+		 * @param reflectionSignature
 		 */
-		fixMutateParameterReferences: (
-			objectParameters: YafParameterReflection[],
-			reflectionParameters: ParameterReflection[]
+		fixMutateSignatureReferences: (
+			objectSignature: YafSignatureReflection,
+			reflectionSignature: SignatureReflection
 		) => {
-			reflectionParameters.forEach((reflectionParameter, i) => {
-				const objectParameter = objectParameters[i];
-				let { type: reflectionType } = reflectionParameter;
-				let { type: objectType } = objectParameter;
+			reflectionSignature.parameters.forEach((reflectionParameter, i) => {
+				const objectParameter = objectSignature.parameters[i];
+				const { type: reflectionType } = reflectionParameter;
+				const { type: objectType } = objectParameter;
+				parseType(objectType, reflectionType);
+			});
+			if (reflectionSignature.type) {
+				parseType(objectSignature.type, reflectionSignature.type);
+			}
+			function parseType(objectType, reflectionType) {
+				if (reflectionType && 'types' in reflectionType) {
+					const reflectionTypes = reflectionType.types;
+					const objectTypes = objectType['types'];
+					return reflectionTypes.forEach((reflectionType, i) => {
+						const objectType = objectTypes[i];
+						addFilePrefix(reflectionType, objectType);
+					});
+				}
 				if (reflectionType && 'elementType' in reflectionType) {
 					reflectionType = reflectionType.elementType;
 					objectType = objectType['elementType'];
 				}
+
+				addFilePrefix(reflectionType, objectType);
+			}
+			function addFilePrefix(
+				reflectionType: SomeType,
+				objectType: JSONOutput.SomeType
+			) {
 				if (
 					reflectionType &&
 					reflectionType instanceof ReferenceType &&
@@ -509,7 +533,7 @@ export class YafSerialiser {
 							: undefined;
 					objectType['filePrefix'] = filePrefix;
 				}
-			});
+			}
 		},
 		/**
 		 * Finds missing parameter links and fills in the target id.
@@ -518,11 +542,33 @@ export class YafSerialiser {
 		 * @param objectReflection
 		 * @returns
 		 */
-		fixParameterLinks: (
+		fixMutateSignatureLinks: (
 			projectArray: YAFDataObject[],
 			objectReflection: YAFDataObject
 		) => {
-			const { fixParameterLinks } = this.fixerFactory;
+			const { fixMutateSignatureLinks } = this.fixerFactory;
+
+			objectReflection.signatures?.forEach((signature) => {
+				signature.parameters?.forEach((parameter) =>
+					fixTypeId(parameter.type)
+				);
+				fixTypeId(signature.type);
+			});
+
+			objectReflection.children = objectReflection.children?.map(
+				(child) => fixMutateSignatureLinks(projectArray, child)
+			);
+			if (
+				objectReflection.type &&
+				'declaration' in objectReflection.type
+			) {
+				objectReflection.type.declaration = fixMutateSignatureLinks(
+					projectArray,
+					objectReflection.type.declaration as YAFDataObject
+				);
+			}
+			return objectReflection;
+
 			function filterReflections(
 				reflection: YAFDataObject,
 				name: string,
@@ -537,8 +583,10 @@ export class YafSerialiser {
 
 				return isFile && hasName;
 			}
-			function mapParameters(parameter: YafParameterReflection) {
-				let { type } = parameter;
+			function fixTypeId(type: JSONOutput.SomeType) {
+				if (type && 'types' in type) {
+					return type.types.forEach((type) => fixTypeId(type));
+				}
 				if (type && 'elementType' in type) type = type.elementType;
 				if (
 					!type ||
@@ -546,10 +594,10 @@ export class YafSerialiser {
 					!!type.id ||
 					!type['filePrefix']
 				) {
-					return parameter;
+					return;
 				}
-
 				const filePrefix = String(type['filePrefix']);
+				delete type['filePrefix'];
 				const name = type.name;
 				const targetReflections = projectArray.filter((reflection) =>
 					filterReflections(reflection, name, filePrefix)
@@ -565,26 +613,7 @@ export class YafSerialiser {
 				if (targetReflections.length === 1) {
 					type['id'] = targetReflections[0].id;
 				}
-				return parameter;
 			}
-
-			objectReflection.signatures = objectReflection.signatures?.map(
-				(signature) => {
-					signature.parameters =
-						signature.parameters?.map(mapParameters);
-					return signature;
-				}
-			);
-
-			objectReflection.children = objectReflection.children?.map(
-				(child) => fixParameterLinks(projectArray, child)
-			);
-			if (objectReflection.type && 'declaration' in objectReflection.type)
-				objectReflection.type.declaration = fixParameterLinks(
-					projectArray,
-					objectReflection.type.declaration as YAFDataObject
-				);
-			return objectReflection;
 		},
 
 		/**
