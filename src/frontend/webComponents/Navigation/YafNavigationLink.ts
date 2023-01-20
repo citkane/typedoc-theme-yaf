@@ -9,10 +9,11 @@ export class YafNavigationLink extends YafHTMLElement {
 	aHTMLElement!: HTMLAnchorElement;
 	onConnect() {
 		const { factory } = YafNavigationLink;
-		this.aHTMLElement = makeElement<HTMLAnchorElement>(
-			'a',
-			[...this.classList].join(' ').trim()
-		);
+		this.aHTMLElement = makeElement<HTMLAnchorElement>('a');
+		this.classList.forEach((className) => {
+			this.aHTMLElement.classList.add(className);
+			this.classList.remove(className);
+		});
 
 		if (this.getAttribute('href') === '/')
 			this.setAttribute('href', router.baseUrl);
@@ -33,13 +34,16 @@ export class YafNavigationLink extends YafHTMLElement {
 			targetURL = router.getTargetURL(this);
 		}
 
-		if (targetURL.origin !== window.location.origin)
+		if (targetURL.origin !== window.location.origin) {
 			this.setAttribute('target', '_blank');
+		}
 		this.setAttribute('href', encodeURI(targetURL.href));
 
 		this.getAttributeNames().forEach((name) => {
 			const value = this.getAttribute(name);
-			if (value) this.aHTMLElement.setAttribute(name, value);
+			if (value) {
+				this.aHTMLElement.setAttribute(name, value);
+			}
 		});
 
 		this.aHTMLElement.replaceChildren(...[...this.childNodes]);

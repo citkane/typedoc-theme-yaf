@@ -12,6 +12,7 @@ import { componentName } from '../../../types/frontendTypes';
 import { JSONOutput } from 'typedoc';
 import { makeElement } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
+import { appState } from '../../handlers/index.js';
 
 /**
  *
@@ -21,7 +22,7 @@ export class YafMemberDeclaration extends YafHTMLElement<{
 	idPrefix: string;
 }> {
 	onConnect() {
-		const { name, type } = this.props.data;
+		const { type, id } = this.props.data;
 		const { idPrefix } = this.props;
 		const { factory } = YafMemberDeclaration;
 		const isReflection = type?.type === 'reflection';
@@ -34,7 +35,7 @@ export class YafMemberDeclaration extends YafHTMLElement<{
 				? factory.memberSignatures(this.props.data)
 				: undefined,
 			isReflectionGroup
-				? factory.memberGroups(type, name, idPrefix)
+				? factory.memberGroups(type, id, idPrefix)
 				: undefined,
 			isReflectionSignature ? factory.memberSignatures(type) : undefined,
 		]
@@ -49,7 +50,7 @@ export class YafMemberDeclaration extends YafHTMLElement<{
 	private static factory = {
 		memberGroups: (
 			type: JSONOutput.ReflectionType,
-			parentName: string,
+			parentId: number,
 			idPrefix: string | undefined
 		) => {
 			if (
@@ -68,12 +69,12 @@ export class YafMemberDeclaration extends YafHTMLElement<{
 			);
 			return (
 				serialisedGroups?.map((group) => {
-					console.log(idPrefix);
+					const {makeNestedGroupTitle} = this.factory;
 					return makeElement<
 						YafMemberGroupReflection,
 						YafMemberGroupReflection['props']
 					>('yaf-member-group-reflection', null, null, {
-						title: `${parentName}: ${group.title}`,
+						title: `${makeNestedGroupTitle(parentId)}:${group.title}`,
 						children: group.children,
 						pageId: String(id),
 						nested: true,
@@ -100,6 +101,17 @@ export class YafMemberDeclaration extends YafHTMLElement<{
 				signatures || [member as YafDeclarationReflection]
 			);
 		},
+		makeNestedGroupTitle: (id:number, crumbs: string[] = []): string => {
+			const {makeNestedGroupTitle} = this.factory;
+			const name = appState.reflectionMap[id].name;
+			const parent = appState.reflectionMap[id].parentId;
+			const hash = appState.reflectionMap[id].hash
+
+			//if(!hash) return crumbs.join(':');
+			crumbs.unshift(name);
+			if(parent && hash) return makeNestedGroupTitle(parent, crumbs);
+			return crumbs.join(':');
+		}
 	};
 }
 const yafMemberDeclaration: componentName = 'yaf-member-declaration';

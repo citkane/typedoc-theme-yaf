@@ -29,7 +29,9 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 		const drawerHTMLElement = makeElement(`ul`);
 		const drawerTriggerHTMLElement = makeElement('span', 'trigger');
 		const groupHeaderHTMLElement = makeElement(nested ? 'h3' : 'h2');
-		const groupTitleHTMLElement = makeTitleSpan(`${title}`);
+		const groupTitleHTMLElement = !nested
+			? makeTitleSpan(`${title}`)
+			: factory.makeNestedTitleSpan(title);
 		const handleIconHTMLElement = makeIconSpan('expand_less');
 		const iconHTMLElement = makeElement('span', 'icon');
 		const groupCountHTMLElement = factory.counterWidget(children.length);
@@ -113,6 +115,10 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 					count,
 				}
 			),
+		makeNestedTitleSpan: (titleString: string) => {
+			const fragments = titleString.split(':');
+			return makeTitleSpan(titleString);
+		},
 	};
 
 	/**

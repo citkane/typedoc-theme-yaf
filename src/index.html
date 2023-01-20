@@ -3,7 +3,10 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=0.65, maximum-scale=1, interactive-widget=resizes=content"
+		/>
 		<title>Document</title>
 		<link rel="stylesheet" href="media/index.css" />
 		<script src="frontend/index.js" type="module"></script>
@@ -13,10 +16,12 @@
 	</body>
 	<template id="typedoc-theme-yaf">
 		<yaf-chrome-left></yaf-chrome-left>
-		<yaf-chrome-content></yaf-chrome-content>
+		<yaf-chrome-right>
+			<yaf-chrome-header></yaf-chrome-header>
+			<yaf-chrome-content></yaf-chrome-content>
+		</yaf-chrome-right>
 	</template>
 	<template id="yaf-chrome-content">
-		<yaf-chrome-header></yaf-chrome-header>
 		<yaf-content></yaf-content>
 		<yaf-chrome-footer></yaf-chrome-footer>
 	</template>

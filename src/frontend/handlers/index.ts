@@ -7,7 +7,6 @@ import { content } from './events/actionsContent.js';
 import { drawers } from './events/actionsDrawers.js';
 import { menu } from './events/actionsMenu.js';
 import { options } from './events/actionsOptions.js';
-
 export interface action {
 	content: content;
 	drawers: drawers;

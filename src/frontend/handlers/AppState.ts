@@ -138,9 +138,13 @@ export class AppState {
 						return <YAFDataObject>this.state.pageData[fileName];
 					}
 			  );
-	getBreadcrumb = (id: number, crumbArray: number[] = []): number[] => {
+	getBreadcrumb = (
+		id: number,
+		crumbArray: number[] = []
+	): number[] | undefined => {
 		crumbArray.unshift(id);
 		const link = this.reflectionMap[id];
+		if (!link) return undefined;
 		if (link.parentId) return this.getBreadcrumb(link.parentId, crumbArray);
 		return crumbArray;
 	};

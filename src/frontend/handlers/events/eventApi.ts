@@ -15,6 +15,7 @@ export class Events {
 			rollMenuDown: actions.menu.rollMenuDown,
 			rollMenuUp: actions.menu.rollMenuUp,
 			scrollTo: actions.scrollTo.bind(null, 'menu'),
+			toggle: actions.menu.toggle,
 		},
 		drawers: {
 			resetHeight: actions.drawers.resetDrawerHeight,

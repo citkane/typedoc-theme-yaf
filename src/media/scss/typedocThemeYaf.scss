@@ -2,13 +2,14 @@
 	box-sizing: border-box;
 }
 :root {
-	--dim-header-height: 2rem;
+	--dim-header-height: 2.25rem;
 	--dim-footer-height: 1.5rem;
 	--dim-menu-width: 450px;
 	--font: 'Roboto';
 	--transition-fades: 300ms;
 	--transition-rotates: 600ms;
 	--transition-drawer: 600ms;
+	--media-max-width: 900px;
 }
 
 html,
@@ -18,7 +19,7 @@ body {
 }
 
 typedoc-theme-yaf {
-	display: block;
+	display: flex;
 	height: 100vh;
 	width: 100vw;
 	position: relative;
@@ -68,7 +69,9 @@ typedoc-theme-yaf {
 
 	@import 'components/yafWidget.scss';
 	@import 'components/yafChrome.scss';
+	@import 'mobile.scss';
 }
+
 .material-icons-sharp {
 	&.md-18 {
 		font-size: 18px;

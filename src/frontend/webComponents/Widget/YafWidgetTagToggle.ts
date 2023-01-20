@@ -75,7 +75,7 @@ export class YafWidgetTagToggle extends YafHTMLElement<{
 			setTimeout(() => {
 				(<HTMLElement>e.target).scrollIntoView({
 					behavior: 'smooth',
-					block: 'center',
+					block: 'start',
 				});
 				flashElementBackground(e.target as HTMLElement);
 			}),

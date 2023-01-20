@@ -7,7 +7,7 @@ import { treeMenuRoot } from '../../../types/types.js';
 import ErrorHandlers from '../../handlers/ErrorHandlers.js';
 import { action, events } from '../../handlers/index.js';
 
-const { trigger } = events;
+const { trigger, action } = events;
 
 /**
  *
@@ -65,8 +65,10 @@ export class YafNavigationMenu extends YafHTMLElement {
 	};
 	private focusIndex = ({
 		detail,
-	}: CustomEvent<action['menu']['scrollTo']>) =>
+	}: CustomEvent<action['menu']['scrollTo']>) => {
+		events.dispatch(action.menu.toggle('open'));
 		scrollToAnchor(this, `menu_${detail.target}`);
+	};
 
 	private eventsList: yafEventList = [
 		['scroll', this.recordScrollTop, this],

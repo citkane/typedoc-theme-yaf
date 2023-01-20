@@ -25,8 +25,10 @@ export class YafChromeContent extends YafHTMLElement {
 
 	private focusContent = ({
 		detail,
-	}: CustomEvent<action['content']['scrollTo']>) =>
+	}: CustomEvent<action['content']['scrollTo']>) => {
 		scrollToAnchor(this, detail.target);
+		events.dispatch(action.menu.toggle('close'));
+	};
 
 	private emitScroll = () => {
 		if (this.scrollTimer) clearTimeout(this.scrollTimer);

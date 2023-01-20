@@ -186,7 +186,7 @@ export const scrollToAnchor = (
 		if (!YafElementDrawers.hasClosedDrawers(drawerParents)) {
 			targetElement.scrollIntoView({
 				behavior: 'smooth',
-				block: 'center',
+				block: 'start',
 			});
 			flashElementBackground(targetElement);
 		} else if (drawerParents.length) {
@@ -194,7 +194,7 @@ export const scrollToAnchor = (
 			setTimeout(() => {
 				targetElement.scrollIntoView({
 					behavior: 'smooth',
-					block: 'center',
+					block: 'start',
 				});
 				flashElementBackground(targetElement);
 			}, getTransitionDuration(drawerParents[0].drawers.drawer) / 2);

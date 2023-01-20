@@ -10,8 +10,6 @@ import { YafMemberSignatures } from './YafMemberSignatures.js';
 import {
 	makeFlags,
 	makeElement,
-	makeNameSpan,
-	makeIconSpan,
 	makeLinkElement,
 } from '../../yafElement.js';
 import { yafReflectionGroup } from '../../../types/frontendTypes.js';

@@ -44,7 +44,8 @@ export type materialIcon =
 	| 'question_mark'
 	| 'home'
 	| 'highlight_off'
-	| 'link';
+	| 'menu'
+	| 'menu_open';
 
 export type clickEvent = Event & { ctrlKey: boolean };
 

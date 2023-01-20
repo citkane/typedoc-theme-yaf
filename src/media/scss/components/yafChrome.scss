@@ -1,61 +1,87 @@
 yaf-chrome-left,
+yaf-chrome-header,
 yaf-chrome-content {
 	display: block;
-	position: absolute;
+	background: var(--color-canvas-default);
+}
+yaf-chrome-left,
+yaf-chrome-content {
 	overflow: scroll;
-	height: 100%;
-	top: 0;
 	scroll-behavior: smooth;
 }
+yaf-chrome-left,
+yaf-chrome-right {
+	height: 100%;
+	//width: var(--dim-menu-width);
+	//left: 0;
+}
 yaf-chrome-left {
-	width: var(--dim-menu-width);
-	left: 0;
-	overflow: hidden;
-
+	flex: 0 0 var(--dim-menu-width);
 	@import 'yafNavigation.scss';
 }
-
-@media screen and (max-width: 900px) {
-	yaf-chrome-left {
-		display: none;
-	}
+yaf-chrome-right {
+	display: flex;
+	flex-direction: column;
+	flex: 2;
+}
+yaf-chrome-content,
+yaf-chrome-header {
+	//width: calc(100vw - var(--dim-menu-width));
+	//right: 0;
 }
 
 yaf-chrome-content {
-	width: calc(100vw - var(--dim-menu-width));
+	height: calc(100vh - var(--dim-header-height));
 	right: 0;
-	padding-top: var(--dim-header-height);
+	top: var(--dim-header-height);
 
 	@import '../github-markdown.scss';
 	@import 'yafContent.scss';
 }
 
 yaf-chrome-header {
-	display: block;
-	width: 100%;
-	height: var(--dim-header-height);
+	flex: 0 1 var(--dim-header-height);
 	background: var(--color-accent-fg);
-	position: fixed;
-	z-index: 100;
-	top: 0;
 	display: flex;
-	align-items: stretch;
+	color: var(--color-canvas-default);
+	* {
+		user-select: none;
+	}
+
+	#mobileNav,
+	#hamburger {
+		display: none;
+		.yaficon {
+			cursor: pointer;
+		}
+	}
+	#mobileNav {
+		.yaficon {
+			padding: 0 0.5rem;
+		}
+		.projectHome {
+			font-weight: 450;
+			font-size: 1.2rem;
+		}
+	}
 	#breadcrumb {
-		display: inline-block;
-		display: flex;
-		align-items: stretch;
 		color: var(--color-canvas-subtle);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		yaf-navigation-link {
+			display: block;
+		}
+		a {
+			padding: 0.5rem 0;
+			display: block;
+		}
+		.divider {
+			padding: 0 0.5rem;
+		}
 	}
 	a {
-		height: 100%;
 		text-decoration: none;
 		color: var(--color-canvas-subtle);
-		padding: 0 0.5rem;
-		display: flex;
-		align-items: center;
-	}
-	.divider {
-		display: flex;
-		align-items: center;
 	}
 }
