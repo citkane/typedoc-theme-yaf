@@ -10,6 +10,7 @@ export declare const trigger: {
         rollMenuDown: string;
         rollMenuUp: string;
         scrollTo: string;
+        toggle: string;
     };
     drawers: {
         resetHeight: string;

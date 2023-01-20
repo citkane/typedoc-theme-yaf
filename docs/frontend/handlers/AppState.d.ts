@@ -33,7 +33,7 @@ export declare class AppState {
     toggleDisplayOption: (flag: yafDisplayOptions) => "show" | "hide";
     setScrollTop: (id: string, position: number) => number;
     getPageData: (fileName: string) => Promise<YAFDataObject>;
-    getBreadcrumb: (id: number, crumbArray?: number[]) => number[];
+    getBreadcrumb: (id: number, crumbArray?: number[]) => number[] | undefined;
     private flushStateCache;
     private static fetchDataFromFile;
     private static fetchFile;

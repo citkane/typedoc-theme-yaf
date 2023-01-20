@@ -31,6 +31,8 @@ export class AppState {
         this.getBreadcrumb = (id, crumbArray = []) => {
             crumbArray.unshift(id);
             const link = this.reflectionMap[id];
+            if (!link)
+                return undefined;
             if (link.parentId)
                 return this.getBreadcrumb(link.parentId, crumbArray);
             return crumbArray;

@@ -13,7 +13,9 @@ export class YafMemberGroupReflection extends YafHTMLElement {
         const drawerHTMLElement = makeElement(`ul`);
         const drawerTriggerHTMLElement = makeElement('span', 'trigger');
         const groupHeaderHTMLElement = makeElement(nested ? 'h3' : 'h2');
-        const groupTitleHTMLElement = makeTitleSpan(`${title}`);
+        const groupTitleHTMLElement = !nested
+            ? makeTitleSpan(`${title}`)
+            : factory.makeNestedTitleSpan(title);
         const handleIconHTMLElement = makeIconSpan('expand_less');
         const iconHTMLElement = makeElement('span', 'icon');
         const groupCountHTMLElement = factory.counterWidget(children.length);
@@ -61,6 +63,10 @@ YafMemberGroupReflection.factory = {
     counterWidget: (count) => makeElement('yaf-widget-counter', null, null, {
         count,
     }),
+    makeNestedTitleSpan: (titleString) => {
+        const fragments = titleString.split(':');
+        return makeTitleSpan(titleString);
+    },
 };
 /**
  * Calls `renderDrawers()` from the root of the drawer tree only.

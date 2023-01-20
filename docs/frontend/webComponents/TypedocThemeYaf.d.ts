@@ -4,4 +4,7 @@ import { YafHTMLElement } from '../index.js';
  */
 export declare class TypedocThemeYaf extends YafHTMLElement {
     onConnect(): void;
+    disconnectedCallback(): void;
+    private toggleMenu;
+    private events;
 }

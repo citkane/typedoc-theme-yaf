@@ -10,6 +10,7 @@ export declare class YafChromeHeader extends YafHTMLElement {
     breadcrumbHTMLElement: HTMLElement;
     onConnect(): void;
     disconnectedCallback(): void;
+    private toggleMenu;
     private makeBreadcrumb;
     eventsList: yafEventList;
 }

@@ -3,7 +3,7 @@ import { makeElement, scrollToAnchor } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
 import ErrorHandlers from '../../handlers/ErrorHandlers.js';
 import { events } from '../../handlers/index.js';
-const { trigger } = events;
+const { trigger, action } = events;
 /**
  *
  */
@@ -13,7 +13,10 @@ export class YafNavigationMenu extends YafHTMLElement {
         this.recordScrollTop = () => {
             appState.setScrollTop('menu', this.scrollTop);
         };
-        this.focusIndex = ({ detail, }) => scrollToAnchor(this, `menu_${detail.target}`);
+        this.focusIndex = ({ detail, }) => {
+            events.dispatch(action.menu.toggle('open'));
+            scrollToAnchor(this, `menu_${detail.target}`);
+        };
         this.eventsList = [
             ['scroll', this.recordScrollTop, this],
             [trigger.menu.scrollTo, this.focusIndex],

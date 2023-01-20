@@ -6,7 +6,11 @@ import { events } from '../../handlers/index.js';
 export class YafNavigationLink extends YafHTMLElement {
     onConnect() {
         const { factory } = YafNavigationLink;
-        this.aHTMLElement = makeElement('a', [...this.classList].join(' ').trim());
+        this.aHTMLElement = makeElement('a');
+        this.classList.forEach((className) => {
+            this.aHTMLElement.classList.add(className);
+            this.classList.remove(className);
+        });
         if (this.getAttribute('href') === '/')
             this.setAttribute('href', router.baseUrl);
         let targetURL = router.getTargetURL(this);
@@ -19,13 +23,15 @@ export class YafNavigationLink extends YafHTMLElement {
             this.setAttribute('href', hash ? `?page=${query}#${hash}` : `?page=${query}`);
             targetURL = router.getTargetURL(this);
         }
-        if (targetURL.origin !== window.location.origin)
+        if (targetURL.origin !== window.location.origin) {
             this.setAttribute('target', '_blank');
+        }
         this.setAttribute('href', encodeURI(targetURL.href));
         this.getAttributeNames().forEach((name) => {
             const value = this.getAttribute(name);
-            if (value)
+            if (value) {
                 this.aHTMLElement.setAttribute(name, value);
+            }
         });
         this.aHTMLElement.replaceChildren(...[...this.childNodes]);
         this.replaceChildren(this.aHTMLElement);

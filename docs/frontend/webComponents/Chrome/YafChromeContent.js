@@ -11,7 +11,10 @@ const { action, trigger } = events;
 export class YafChromeContent extends YafHTMLElement {
     constructor() {
         super(...arguments);
-        this.focusContent = ({ detail, }) => scrollToAnchor(this, detail.target);
+        this.focusContent = ({ detail, }) => {
+            scrollToAnchor(this, detail.target);
+            events.dispatch(action.menu.toggle('close'));
+        };
         this.emitScroll = () => {
             if (this.scrollTimer)
                 clearTimeout(this.scrollTimer);

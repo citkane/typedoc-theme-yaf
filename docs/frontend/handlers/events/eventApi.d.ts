@@ -12,6 +12,7 @@ export declare class Events {
             rollMenuDown: string;
             rollMenuUp: string;
             scrollTo: string;
+            toggle: string;
         };
         drawers: {
             resetHeight: string;
@@ -39,6 +40,7 @@ export declare class Events {
             rollMenuDown: () => Event;
             rollMenuUp: () => Event;
             scrollTo: (target: string | 0) => CustomEvent<actions.scrollTo>;
+            toggle: (state?: "open" | "close" | undefined) => CustomEvent<actions.menu.toggle>;
         };
         drawers: {
             resetHeight: () => Event;

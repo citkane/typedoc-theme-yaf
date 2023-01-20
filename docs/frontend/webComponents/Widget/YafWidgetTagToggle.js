@@ -54,7 +54,7 @@ YafWidgetTagToggle.factory = {
     handleClickAnimations: (e) => setTimeout(() => {
         e.target.scrollIntoView({
             behavior: 'smooth',
-            block: 'center',
+            block: 'start',
         });
         flashElementBackground(e.target);
     }),
