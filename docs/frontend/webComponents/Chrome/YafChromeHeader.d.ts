@@ -8,7 +8,7 @@ import { YafHTMLElement } from '../../index.js';
  */
 export declare class YafChromeHeader extends YafHTMLElement {
     breadcrumbHTMLElement: HTMLElement;
-    onConnect(): void;
+    onConnect(): HTMLElement | undefined;
     disconnectedCallback(): void;
     private toggleMenu;
     private makeBreadcrumb;

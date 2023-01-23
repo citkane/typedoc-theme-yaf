@@ -32,9 +32,12 @@ export class YafChromeHeader extends YafHTMLElement {
         ];
     }
     onConnect() {
+        const context = this.getAttribute('context');
         this.eventsList.forEach((event) => events.on(...event));
-        this.breadcrumbHTMLElement = makeElement('span');
-        this.breadcrumbHTMLElement.id = 'breadcrumb';
+        this.breadcrumbHTMLElement = makeElement('span', 'breadcrumb');
+        if (context === 'desktop') {
+            return this.appendChild(this.breadcrumbHTMLElement);
+        }
         const mobileHTMLElement = makeElement('span');
         const openMenuHTMLElement = makeIconSpan('menu', 36);
         const closeMenHTMLElement = makeIconSpan('menu_open', 36);
