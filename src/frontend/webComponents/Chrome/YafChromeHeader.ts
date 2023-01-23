@@ -18,14 +18,21 @@ const { trigger, action } = events;
 export class YafChromeHeader extends YafHTMLElement {
 	breadcrumbHTMLElement!: HTMLElement;
 	onConnect() {
+		const context = this.getAttribute('context');
+
 		this.eventsList.forEach((event) => events.on(...event));
-		this.breadcrumbHTMLElement = makeElement('span');
-		this.breadcrumbHTMLElement.id = 'breadcrumb';
+		this.breadcrumbHTMLElement = makeElement('span', 'breadcrumb');
+
+		if (context === 'desktop') {
+			return this.appendChild(this.breadcrumbHTMLElement);
+		}
+
 		const mobileHTMLElement = makeElement('span');
 		const openMenuHTMLElement = makeIconSpan('menu', 36);
 		const closeMenHTMLElement = makeIconSpan('menu_open', 36);
 		const hamburgerHTMLElement = makeElement('span');
 		const wrapperHTMLElement = makeElement('span', 'wrapper');
+
 		hamburgerHTMLElement.id = 'hamburger';
 		openMenuHTMLElement.classList.add('open');
 		closeMenHTMLElement.classList.add('close');

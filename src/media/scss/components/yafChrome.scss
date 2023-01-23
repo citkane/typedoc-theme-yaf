@@ -4,17 +4,12 @@ yaf-chrome-content {
 	display: block;
 	background: var(--color-canvas-default);
 }
-yaf-chrome-left,
+
 yaf-chrome-content {
 	overflow: scroll;
 	scroll-behavior: smooth;
 }
-yaf-chrome-left,
-yaf-chrome-right {
-	height: 100%;
-	//width: var(--dim-menu-width);
-	//left: 0;
-}
+
 yaf-chrome-left {
 	flex: 0 0 var(--dim-menu-width);
 	@import 'yafNavigation.scss';
@@ -24,21 +19,15 @@ yaf-chrome-right {
 	flex-direction: column;
 	flex: 2;
 }
-yaf-chrome-content,
-yaf-chrome-header {
-	//width: calc(100vw - var(--dim-menu-width));
-	//right: 0;
-}
 
 yaf-chrome-content {
-	height: calc(100vh - var(--dim-header-height));
-	right: 0;
-	top: var(--dim-header-height);
-
 	@import '../github-markdown.scss';
 	@import 'yafContent.scss';
 }
 
+yaf-chrome-header[context='mobile'] {
+	display: none;
+}
 yaf-chrome-header {
 	flex: 0 1 var(--dim-header-height);
 	background: var(--color-accent-fg);
@@ -64,7 +53,7 @@ yaf-chrome-header {
 			font-size: 1.2rem;
 		}
 	}
-	#breadcrumb {
+	.breadcrumb {
 		color: var(--color-canvas-subtle);
 		display: flex;
 		flex-wrap: wrap;

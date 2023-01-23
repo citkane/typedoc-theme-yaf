@@ -69,9 +69,8 @@ typedoc-theme-yaf {
 
 	@import 'components/yafWidget.scss';
 	@import 'components/yafChrome.scss';
-	@import 'mobile.scss';
 }
-
+@import 'mobile.scss';
 .material-icons-sharp {
 	&.md-18 {
 		font-size: 18px;

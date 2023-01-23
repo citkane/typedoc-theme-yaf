@@ -55,7 +55,10 @@ yaf-navigation-header {
 		}
 		.controls-drawers {
 			display: flex;
-			.button:last-child {
+			.open.button {
+				padding-left: 0.5rem;
+			}
+			.close.button {
 				padding-right: 0.5rem;
 			}
 		}

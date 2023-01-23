@@ -2,34 +2,71 @@
 	#projectTitle {
 		display: none !important;
 	}
-	#mobileNav {
-		display: flex !important;
-		padding: 0.5rem 0;
+	body {
+		width: 100vw;
+		height: 100vh;
+		overflow: hidden;
 	}
-	#hamburger {
-		display: flex !important;
-		align-items: center;
-		padding: 1rem;
-		.open {
-			display: flex;
-		}
-		.close {
-			display: none;
-		}
-	}
+	typedoc-theme-yaf {
+		display: grid;
+		grid-template-columns: 100vw;
+		grid-template-rows: auto 100fr;
 
-	.wrapper {
-		padding: 0.5rem 0;
-		padding-left: 1rem;
-		display: flex;
-		flex-direction: column;
-		align-content: stretch;
-		justify-content: center;
+		#hamburger {
+			display: flex !important;
+			align-items: center;
+			padding: 1rem;
+			.open {
+				display: flex;
+			}
+			.close {
+				display: none;
+			}
+		}
+
+		&.menuOpen {
+			yaf-chrome-left {
+				left: 0 !important;
+			}
+			#hamburger {
+				.open {
+					display: none;
+				}
+				.close {
+					display: flex;
+				}
+			}
+		}
+	}
+	yaf-chrome-header[context='mobile'] {
+		display: flex !important;
+		grid-column: 1 / 2;
+		grid-row: 1 / 2;
+
+		#mobileNav {
+			display: flex !important;
+			padding: 0.5rem 0;
+		}
+
+		.wrapper {
+			padding: 0.5rem 0;
+			padding-left: 1rem;
+			display: flex;
+			flex-direction: column;
+			align-content: stretch;
+			justify-content: center;
+		}
+	}
+	yaf-chrome-header[context='desktop'] {
+		display: none;
 	}
 
 	yaf-chrome-left {
+		overflow: hidden;
+		position: relative;
+		grid-column: 1 / 2;
+		grid-row: 2 / 3;
 		transition: left var(--transition-drawer);
-		position: absolute;
 		z-index: 10;
 		box-shadow: 10px -1px 21px -9px var(--color-fg-default);
 		width: calc(100vw - 1rem);
@@ -43,24 +80,13 @@
 			}
 		}
 	}
-	&.menuOpen {
-		yaf-chrome-left {
-			left: 0 !important;
+
+	yaf-chrome-right {
+		overflow: hidden;
+		grid-column: 1 / 2;
+		grid-row: 2 / 3;
+		yaf-chrome-content {
+			height: 100%;
 		}
-		#hamburger {
-			.open {
-				display: none;
-			}
-			.close {
-				display: flex;
-			}
-		}
-	}
-	yaf-chrome-content,
-	yaf-chrome-header {
-		width: 100vw;
-	}
-	yaf-chrome-header {
-		z-index: 20;
 	}
 }

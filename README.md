@@ -4,7 +4,7 @@
 
 A theme that optimises deep project exploration, graphical clarity and a fluid end user experience.
 
-<a href="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg"><img src="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg" height="400px" width="auto"/></a>
+<a href="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg"><img src="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg" height="auto" width="500px"/></a>
 
 #### <a href="https://citkane.github.io/typedoc-theme-yaf/">Live Example</a>
 

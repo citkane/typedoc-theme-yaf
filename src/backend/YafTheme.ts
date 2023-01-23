@@ -22,6 +22,8 @@ import { YafSerialiser } from './YafSerialiser';
 import { highlighter } from '../types/backendTypes';
 import { YafThemeRenderContext } from './YafThemeRenderContext';
 
+let count = 0;
+
 /**
  * This extends the TypeDoc default theme and provides a collection of overrides and methods to serialise and save data fragments
  * for consumption by the theme single page application (SPA) frontend.
@@ -73,6 +75,8 @@ export class YafTheme extends DefaultTheme {
 	 * @param output
 	 */
 	prepareYafTheme = (output: RendererEvent) => {
+		console.log('prepareYafTheme', count);
+		count++;
 		const context = this.getRenderContext();
 		const { saveYafThemeAssets } = YafTheme.fileFactory;
 		const docDir = this.application.options.getValue('out') || 'docs';
