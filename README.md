@@ -1,6 +1,6 @@
 # typedoc-theme-yaf
 
-**ALPHA:** This is not yet mobile or production ready.
+**ALPHA:** This is not production ready.
 
 A theme that optimises deep project exploration, graphical clarity and a fluid end user experience.
 
@@ -53,12 +53,12 @@ The theme does not (majorly) interfere with the default TypeDoc data constructio
 
 ## Contribution and Development
 
-Please let us know in the [issues](https://github.com/citkane/typedoc-theme-yaf/issues) if something wrong afoot when you render your project with this theme.
+Please let us know in the [issues](https://github.com/citkane/typedoc-theme-yaf/issues) if something breakingly wrong is afoot when you render your project with this theme.
 
 If you spot a gremlin, or want to suggest an enhancement, please use the Github [discussion](https://github.com/citkane/typedoc-theme-yaf/discussions) section.
 
 If you want to get involved in the code, please clone [the repo](https://github.com/citkane/typedoc-theme-yaf) and submit your pull requests.  
-You can spin up a local [hot development](https://github.com/citkane/typedoc-plugin-hot-dev) instance by running `npm run build` then `npx hot-dev` from your terminal after installing the repo. This is already installed as a theme dependency.
+You can spin up a local [hot development](https://github.com/citkane/typedoc-plugin-hot-dev) instance by running `npx hot-dev` from your terminal after installing the repo. This is already installed as a theme dependency.
 
 ## Roadmap
 ### Short Term

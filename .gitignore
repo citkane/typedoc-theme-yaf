@@ -8,6 +8,7 @@
 /*/
 /test/*/
 
+!/.vscode/
 !/.github/
 !/scripts/
 !/src/
