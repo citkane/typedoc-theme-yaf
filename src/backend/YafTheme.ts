@@ -23,6 +23,7 @@ import { highlighter } from '../types/backendTypes';
 import { YafThemeRenderContext } from './YafThemeRenderContext';
 
 let count = 0;
+let oldRenderer: Renderer;
 
 /**
  * This extends the TypeDoc default theme and provides a collection of overrides and methods to serialise and save data fragments
@@ -36,7 +37,8 @@ export class YafTheme extends DefaultTheme {
 	static highlighter: highlighter;
 
 	constructor(renderer: Renderer) {
-		super(renderer);
+		super(oldRenderer || renderer);
+
 		this.markedPlugin.getHighlighted = (text: string, lang?: string) =>
 			getHighlighted(YafTheme.highlighter, text, lang);
 
@@ -45,7 +47,13 @@ export class YafTheme extends DefaultTheme {
 			return 'foo';
 		};
 
-		this.application.renderer.on(RendererEvent.BEGIN, this.prepareYafTheme);
+		if (!oldRenderer) {
+			this.application.renderer.on(
+				RendererEvent.END,
+				this.prepareYafTheme
+			);
+			oldRenderer = renderer;
+		}
 	}
 
 	/**
