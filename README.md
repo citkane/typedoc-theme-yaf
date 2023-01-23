@@ -58,7 +58,7 @@ Please let us know in the [issues](https://github.com/citkane/typedoc-theme-yaf/
 If you spot a gremlin, or want to suggest an enhancement, please use the Github [discussion](https://github.com/citkane/typedoc-theme-yaf/discussions) section.
 
 If you want to get involved in the code, please clone [the repo](https://github.com/citkane/typedoc-theme-yaf) and submit your pull requests.  
-You can spin up a local [hot development](https://github.com/citkane/typedoc-plugin-hot-dev) instance by running `npx hot-dev` from your terminal after installing the repo. This is already installed as a theme dependency.
+You can spin up a local [hot development](https://github.com/citkane/typedoc-plugin-hot-dev) instance by running `npx hot-dev` from your terminal. This is already installed as a theme dependency. For the first run only, do `npm i && npm run build`.
 
 ## Roadmap
 ### Short Term
