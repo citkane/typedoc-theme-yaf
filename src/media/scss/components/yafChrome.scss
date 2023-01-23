@@ -8,16 +8,19 @@ yaf-chrome-content {
 yaf-chrome-content {
 	overflow: scroll;
 	scroll-behavior: smooth;
+	flex-grow: 1;
 }
 
 yaf-chrome-left {
 	flex: 0 0 var(--dim-menu-width);
 	@import 'yafNavigation.scss';
+	overflow: hidden;
 }
 yaf-chrome-right {
 	display: flex;
 	flex-direction: column;
 	flex: 2;
+	overflow: hidden;
 }
 
 yaf-chrome-content {
