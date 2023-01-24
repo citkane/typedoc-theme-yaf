@@ -30,10 +30,8 @@ export class YafSignatureBody extends YafHTMLElement<YafSignatureReflection> {
 			kind,
 			inheritedFrom,
 			overwrites,
-			name,
+			implementationOf,
 		} = this.props;
-
-		console.log(name, this.props);
 
 		const { factory } = YafSignatureBody;
 		const isCallSignature = YafSignature.isCallSignature(kind);
@@ -43,6 +41,7 @@ export class YafSignatureBody extends YafHTMLElement<YafSignatureReflection> {
 			factory.sources(this.props),
 			factory.typeParameters(typeParameter),
 			factory.parameters(parameters),
+			factory.modifier(implementationOf, 'Implementation of:'),
 			factory.modifier(inheritedFrom, 'Inherited from:'),
 			factory.modifier(overwrites, 'Overrides:'),
 			factory.returns(type, isCallSignature),

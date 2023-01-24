@@ -12,6 +12,7 @@
 //export * from './internals';
 
 export * from './reflection.js';
+export * from './classes.js';
 
 export namespace NamespaceA {
 	export interface InterfaceA {}
