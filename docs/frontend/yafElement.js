@@ -25,6 +25,8 @@ export const makeSymbolSpan = (text) => makeElement('span', 'symbol', text);
 export const makeNameSpan = (text) => makeElement('span', 'name', text);
 export const makeTypeSpan = (text) => makeElement('span', 'type', text);
 export const makeTitleSpan = (text) => makeElement('span', 'title', text);
+export const makeParameterSpan = (text) => makeElement('span', 'parameter', text);
+export const makeIntrinsicSpan = (text) => makeElement('span', 'intrinsic', text);
 export const makeKindSpan = (text) => makeElement('span', 'kind', text);
 export const makeValueSpan = (text) => makeElement('span', 'value', text);
 export const makeParametersSpan = (text) => makeElement('span', 'parameters', text);
@@ -87,7 +89,7 @@ export const getTransitionDuration = (drawer) => {
 };
 export const scrollToAnchor = (container, anchor) => {
     if (typeof anchor === 'number')
-        return container.scrollTo(0, 0);
+        return (container.scrollTop = 0);
     const targetElement = document.getElementById(anchor);
     if (targetElement) {
         const drawerParents = YafElementDrawers.findParentDrawers(targetElement);
@@ -96,6 +98,7 @@ export const scrollToAnchor = (container, anchor) => {
                 behavior: 'smooth',
                 block: 'start',
             });
+            hackFixMobileScrolling();
             flashElementBackground(targetElement);
         }
         else if (drawerParents.length) {
@@ -105,12 +108,20 @@ export const scrollToAnchor = (container, anchor) => {
                     behavior: 'smooth',
                     block: 'start',
                 });
+                hackFixMobileScrolling();
                 flashElementBackground(targetElement);
             }, getTransitionDuration(drawerParents[0].drawers.drawer) / 2);
         }
     }
     else {
         return errorHandlers.notFound(`Could not find element for "#${anchor}"`);
+    }
+    function hackFixMobileScrolling() {
+        const containerHTMLElements = document.querySelectorAll('html, body, typedoc-theme-yaf, yaf-chrome-left, yaf-chrome-right');
+        [...containerHTMLElements].forEach((containerHTMLElement) => {
+            if (containerHTMLElement)
+                containerHTMLElement.scrollTop = 0;
+        });
     }
 };
 export const flashElementBackground = (element) => {

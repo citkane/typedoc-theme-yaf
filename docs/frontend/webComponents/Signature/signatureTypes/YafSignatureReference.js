@@ -1,23 +1,23 @@
 var _a;
 import appState from '../../../handlers/AppState.js';
-import { makeNameSpan, makeLinkElement, makeElement, } from '../../../yafElement.js';
+import { makeLinkElement, makeElement, makeTypeSpan, } from '../../../yafElement.js';
 import { YafHTMLElement } from '../../../index.js';
 /**
  *
  */
 export class YafSignatureReference extends YafHTMLElement {
     onConnect() {
-        const { externalUrl, id, name, typeArguments } = this.props;
+        const { externalUrl, id, name: typeName, typeArguments } = this.props;
         const { factory } = YafSignatureReference;
         const fileLink = id ? appState.reflectionMap[id] : undefined;
         const fileLinkName = fileLink ? fileLink.query : undefined;
-        const nameHTMLElement = externalUrl
-            ? factory.externalUrl(externalUrl, name)
+        const typeHTMLElement = externalUrl
+            ? factory.externalUrl(externalUrl, typeName)
             : fileLinkName
-                ? factory.fileLinkName(fileLinkName, name)
-                : makeNameSpan(name);
+                ? factory.fileLinkName(fileLinkName, typeName)
+                : makeTypeSpan(typeName);
         const HTMLElements = [
-            nameHTMLElement,
+            typeHTMLElement,
             factory.typeArguments(typeArguments),
         ];
         this.appendChildren(HTMLElements.flat());
@@ -29,15 +29,15 @@ YafSignatureReference.factory = {
         args,
         context: 'referenceTypeArgument',
     }),
-    externalUrl: (externalUrl, name) => {
+    externalUrl: (externalUrl, typeName) => {
         const linkHTMLElement = makeLinkElement(externalUrl);
         linkHTMLElement.setAttribute('target', '_blank');
-        linkHTMLElement.appendChild(makeNameSpan(name));
+        linkHTMLElement.appendChild(makeTypeSpan(typeName));
         return linkHTMLElement;
     },
-    fileLinkName: (fileLinkName, name) => {
+    fileLinkName: (fileLinkName, typeName) => {
         const linkHTMLElement = makeLinkElement(`?page=${fileLinkName}`);
-        linkHTMLElement.appendChild(makeNameSpan(name));
+        linkHTMLElement.appendChild(makeTypeSpan(typeName));
         return linkHTMLElement;
     },
     typeArguments: (typeArguments) => typeArguments && typeArguments.length

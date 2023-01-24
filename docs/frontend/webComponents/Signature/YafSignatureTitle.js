@@ -1,5 +1,5 @@
 import appState from '../../handlers/AppState.js';
-import { makeSymbolSpan, makeTitleSpan, makeElement, makeNameSpan, makeValueSpan, renderSignatureType, stringify, } from '../../yafElement.js';
+import { makeSymbolSpan, makeTitleSpan, makeElement, makeParameterSpan, makeValueSpan, renderSignatureType, stringify, } from '../../yafElement.js';
 import { YafSignature } from './YafSignature.js';
 import { YafHTMLElement } from '../../index.js';
 export class YafSignatureTitle extends YafHTMLElement {
@@ -29,7 +29,7 @@ export class YafSignatureTitle extends YafHTMLElement {
             const parameterWrapperHTMLElement = makeElement('span', 'wrapper');
             const paramterHTMLElements = [
                 isRest ? makeSymbolSpan('...') : undefined,
-                makeNameSpan(parameter.name),
+                makeParameterSpan(parameter.name),
                 isOptional ? makeSymbolSpan('?') : undefined,
                 defaultValue ? makeSymbolSpan('?') : undefined,
                 makeSymbolSpan(':'),
