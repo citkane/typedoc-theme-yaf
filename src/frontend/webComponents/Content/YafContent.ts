@@ -39,6 +39,8 @@ export class YafContent extends YafHTMLElement {
 		const url = new URL(window.location.href);
 		let page = url.searchParams.get('page');
 		page = decodeURIComponent(page || '');
+		const bodyHTMLElement = document.querySelector('body');
+		bodyHTMLElement?.classList.add('loading');
 
 		appState.getPageData(page || 'index').then((data) => {
 			this.id = String(data.id);
@@ -51,6 +53,7 @@ export class YafContent extends YafHTMLElement {
 			);
 
 			events.dispatch(action.content.breadcrumb(data.id));
+			bodyHTMLElement?.classList.remove('loading');
 		});
 	};
 	private renderPageContent(data: YAFDataObject) {

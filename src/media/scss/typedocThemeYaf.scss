@@ -16,6 +16,41 @@ html,
 body {
 	font-family: 'Roboto';
 	background-color: var(--color-canvas-default);
+	#loading {
+		position: fixed;
+		z-index: 10;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		pointer-events: none;
+		background: var(--color-accent-fg);
+		color: var(--color-canvas-subtle);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transition: opacity var(--transition-fades);
+	}
+}
+body.loading {
+	#loading {
+		opacity: 80%;
+		span {
+			animation-name: loading;
+			animation-duration: 1.2s;
+			animation-iteration-count: infinite;
+			animation-timing-function: linear;
+		}
+	}
+}
+@keyframes loading {
+	from {
+		rotate: 0deg;
+	}
+	to {
+		rotate: 360deg;
+	}
 }
 
 typedoc-theme-yaf {
