@@ -1,7 +1,6 @@
 import {
 	DeclarationHierarchy,
 	JSONOutput,
-	ParameterReflection,
 	ProjectReflection,
 	ReferenceType,
 	SignatureReflection,
@@ -82,15 +81,6 @@ export class YafSerialiser {
 			rootReflection?: serialiserReflection,
 			hashPrefix?: string
 		) => {
-			//console.log(Object.keys(reflection));
-			/*
-			console.log(
-				reflection.sources
-					? reflection.sources[0].fullFileName
-					: undefined
-			);
-			*/
-
 			const { mutateComment, mutateReadme } = this.mutationFactory;
 			const {
 				serialiseHierarchy,
@@ -111,6 +101,7 @@ export class YafSerialiser {
 				parentReflection
 			);
 
+			object.sources = reflection.sources;
 			object.parentId =
 				parentReflection && parentReflection.id
 					? parentReflection.id

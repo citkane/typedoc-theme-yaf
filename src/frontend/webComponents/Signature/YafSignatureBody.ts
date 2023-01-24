@@ -22,8 +22,18 @@ import appState from '../../handlers/AppState.js';
 
 export class YafSignatureBody extends YafHTMLElement<YafSignatureReflection> {
 	onConnect() {
-		const { text, typeParameter, parameters, type, kind, inheritedFrom } =
-			this.props;
+		const {
+			text,
+			typeParameter,
+			parameters,
+			type,
+			kind,
+			inheritedFrom,
+			overwrites,
+			name,
+		} = this.props;
+
+		console.log(name, this.props);
 
 		const { factory } = YafSignatureBody;
 		const isCallSignature = YafSignature.isCallSignature(kind);
