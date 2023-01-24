@@ -63,13 +63,13 @@ yaf-member {
 			color: var(--color-attention-subtle);
 		}
 	}
-
-	yaf-signature-title {
+	.inner > yaf-member-signatures > yaf-signature-title,
+	yaf-member-declaration > yaf-member-signatures > yaf-signature-title {
 		background: var(--color-canvas-subtle);
 		width: 100%;
 		display: block;
 		position: relative;
-		.wrapper {
+		& > .wrapper {
 			display: block;
 			margin-left: 1rem;
 		}

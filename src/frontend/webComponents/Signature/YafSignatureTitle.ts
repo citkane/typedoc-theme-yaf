@@ -8,7 +8,7 @@ import {
 	makeSymbolSpan,
 	makeTitleSpan,
 	makeElement,
-	makeNameSpan,
+	makeParameterSpan,
 	makeValueSpan,
 	renderSignatureType,
 	stringify,
@@ -60,7 +60,7 @@ export class YafSignatureTitle extends YafHTMLElement<yafSignatureTitleProps> {
 			const parameterWrapperHTMLElement = makeElement('span', 'wrapper');
 			const paramterHTMLElements = [
 				isRest ? makeSymbolSpan('...') : undefined,
-				makeNameSpan(parameter.name),
+				makeParameterSpan(parameter.name),
 				isOptional ? makeSymbolSpan('?') : undefined,
 				defaultValue ? makeSymbolSpan('?') : undefined,
 				makeSymbolSpan(':'),

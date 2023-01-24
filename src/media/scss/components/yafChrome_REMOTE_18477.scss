@@ -5,11 +5,10 @@ yaf-chrome-content {
 	background: var(--color-canvas-default);
 }
 
-
+yaf-chrome-left {
 	flex: 0 0 var(--dim-menu-width);
 	overflow: hidden;
 	@import 'yafNavigation.scss';
-	overflow: hidden;
 }
 yaf-chrome-right {
 	display: flex;

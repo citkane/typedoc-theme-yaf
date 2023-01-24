@@ -27,17 +27,24 @@ yaf-content {
 			padding-left: 1rem;
 		}
 		.name {
-			color: var(--color-prettylights-syntax-entity);
+			color: var(--color-prettylights-syntax-variable);
 		}
 		.title {
-			color: var(--color-accent-emphasis);
+			color: var(--color-prettylights-syntax-markup-heading);
+		}
+		.parameter {
+			color: var(--color-prettylights-syntax-keyword);
 		}
 		.symbol {
 			color: var(--color-prettylights-syntax-brackethighlighter-angle);
 		}
 		.type {
 			font-style: italic;
-			color: var(--color-prettylights-syntax-markup-italic);
+			color: var(--color-prettylights-syntax-entity);
+		}
+		.intrinsic {
+			font-style: italic;
+			color: var(--color-fg-muted);
 		}
 		.literal {
 			font-weight: 600;

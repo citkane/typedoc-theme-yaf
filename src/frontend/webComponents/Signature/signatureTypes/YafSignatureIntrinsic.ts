@@ -3,15 +3,15 @@ import { JSONOutput } from 'typedoc';
 
 import {
 	needsParenthesis,
-	makeTypeSpan,
+	makeIntrinsicSpan,
 	makeSymbolSpan,
 } from '../../../yafElement.js';
 import { YafHTMLElement } from '../../../index.js';
 
 export class YafContentSignatureIntrinsic extends YafHTMLElement<JSONOutput.IntrinsicType> {
 	onConnect() {
-		const { name } = this.props;
-		const HTMLElements = [makeTypeSpan(name)];
+		const { name: typeName } = this.props;
+		const HTMLElements = [makeIntrinsicSpan(typeName)];
 
 		if (needsParenthesis(this)) {
 			HTMLElements.unshift(makeSymbolSpan('('));

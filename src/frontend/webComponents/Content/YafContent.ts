@@ -43,11 +43,13 @@ export class YafContent extends YafHTMLElement {
 		appState.getPageData(page || 'index').then((data) => {
 			this.id = String(data.id);
 			this.renderPageContent(data);
+
 			events.dispatch(
 				action.content.scrollTo(
 					url.hash ? url.hash.replace('#', '') : 0
 				)
 			);
+
 			events.dispatch(action.content.breadcrumb(data.id));
 		});
 	};

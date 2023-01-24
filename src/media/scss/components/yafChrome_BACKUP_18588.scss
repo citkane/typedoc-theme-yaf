@@ -5,7 +5,16 @@ yaf-chrome-content {
 	background: var(--color-canvas-default);
 }
 
+<<<<<<< Updated upstream
+yaf-chrome-content {
+	overflow: scroll;
+	scroll-behavior: smooth;
+	flex-grow: 1;
+}
 
+=======
+>>>>>>> Stashed changes
+yaf-chrome-left {
 	flex: 0 0 var(--dim-menu-width);
 	overflow: hidden;
 	@import 'yafNavigation.scss';
@@ -14,6 +23,15 @@ yaf-chrome-content {
 yaf-chrome-right {
 	display: flex;
 	flex-direction: column;
+<<<<<<< Updated upstream
+	flex: 2;
+	overflow: hidden;
+}
+
+yaf-chrome-content {
+	@import '../github-markdown.scss';
+	@import 'yafContent.scss';
+=======
 	overflow: hidden;
 	flex-grow: 1;
 	yaf-chrome-content {
@@ -22,6 +40,7 @@ yaf-chrome-right {
 		@import '../github-markdown.scss';
 		@import 'yafContent.scss';
 	}
+>>>>>>> Stashed changes
 }
 
 yaf-chrome-header[context='mobile'] {

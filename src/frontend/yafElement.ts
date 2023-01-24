@@ -56,6 +56,12 @@ export const makeTypeSpan = (text: string) => makeElement('span', 'type', text);
 export const makeTitleSpan = (text: string) =>
 	makeElement('span', 'title', text);
 
+export const makeParameterSpan = (text: string) =>
+	makeElement('span', 'parameter', text);
+
+export const makeIntrinsicSpan = (text: string) =>
+	makeElement('span', 'intrinsic', text);
+
 export const makeKindSpan = (text: string) => makeElement('span', 'kind', text);
 
 export const makeValueSpan = (text: string) =>
@@ -176,7 +182,7 @@ export const scrollToAnchor = (
 	container: HTMLElement,
 	anchor: string | number
 ) => {
-	if (typeof anchor === 'number') return container.scrollTo(0, 0);
+	if (typeof anchor === 'number') return (container.scrollTop = 0);
 
 	const targetElement = document.getElementById(anchor);
 	if (targetElement) {
@@ -188,6 +194,7 @@ export const scrollToAnchor = (
 				behavior: 'smooth',
 				block: 'start',
 			});
+			hackFixMobileScrolling();
 			flashElementBackground(targetElement);
 		} else if (drawerParents.length) {
 			drawerParents.forEach((element) => element.drawers.openDrawer());
@@ -196,6 +203,7 @@ export const scrollToAnchor = (
 					behavior: 'smooth',
 					block: 'start',
 				});
+				hackFixMobileScrolling();
 				flashElementBackground(targetElement);
 			}, getTransitionDuration(drawerParents[0].drawers.drawer) / 2);
 		}
@@ -203,6 +211,14 @@ export const scrollToAnchor = (
 		return errorHandlers.notFound(
 			`Could not find element for "#${anchor}"`
 		);
+	}
+	function hackFixMobileScrolling() {
+		const containerHTMLElements = document.querySelectorAll(
+			'html, body, typedoc-theme-yaf, yaf-chrome-left, yaf-chrome-right'
+		);
+		[...containerHTMLElements].forEach((containerHTMLElement) => {
+			if (containerHTMLElement) containerHTMLElement.scrollTop = 0;
+		});
 	}
 };
 
