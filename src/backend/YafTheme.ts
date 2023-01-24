@@ -14,15 +14,14 @@ import {
 	Type,
 	TypeContext,
 	ReflectionType,
+	DefaultThemeRenderContext,
 } from 'typedoc';
 import * as typeClasses from 'typedoc';
 import { YAFDataObject, treeMenuRoot, YAFReflectionLink } from '../types/types';
 import { getHighlighted } from './highlighter';
 import { YafSerialiser } from './YafSerialiser';
 import { highlighter } from '../types/backendTypes';
-import { YafThemeRenderContext } from './YafThemeRenderContext';
 
-let count = 0;
 let oldRenderer: Renderer;
 
 /**
@@ -61,8 +60,8 @@ export class YafTheme extends DefaultTheme {
 	 * so override the default function.
 	 * @returns the theme render `context`
 	 */
-	override getRenderContext(): YafThemeRenderContext {
-		return new YafThemeRenderContext(this, this.application.options);
+	override getRenderContext(): DefaultThemeRenderContext {
+		return new DefaultThemeRenderContext(this, this.application.options);
 	}
 
 	/**
@@ -83,8 +82,6 @@ export class YafTheme extends DefaultTheme {
 	 * @param output
 	 */
 	prepareYafTheme = (output: RendererEvent) => {
-		console.log('prepareYafTheme', count);
-		count++;
 		const context = this.getRenderContext();
 		const { saveYafThemeAssets } = YafTheme.fileFactory;
 		const docDir = this.application.options.getValue('out') || 'docs';
@@ -121,7 +118,7 @@ export class YafTheme extends DefaultTheme {
 			docDir: string,
 			dataObjectArray: YafSerialiser['dataObjectArray'],
 			project: ProjectReflection,
-			context: YafThemeRenderContext
+			context: DefaultThemeRenderContext
 		) => {
 			const { copyThemeFiles, saveDataFile } = this.fileFactory;
 			const {
