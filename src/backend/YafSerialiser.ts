@@ -197,8 +197,10 @@ export class YafSerialiser {
 			if (
 				reflectionObject.inheritedFrom &&
 				ReflectionKind[reflectionObject.kind] !== 'Constructor'
-			)
+			) {
 				flags['isInherited'] = true;
+			}
+			if (reflectionObject.overwrites) flags['isOverride'] = true;
 
 			return flags;
 		},

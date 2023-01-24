@@ -43,7 +43,8 @@ export class YafSignatureBody extends YafHTMLElement<YafSignatureReflection> {
 			factory.sources(this.props),
 			factory.typeParameters(typeParameter),
 			factory.parameters(parameters),
-			factory.inherited(inheritedFrom),
+			factory.modifier(inheritedFrom, 'Inherited from:'),
+			factory.modifier(overwrites, 'Overrides:'),
 			factory.returns(type, isCallSignature),
 		];
 
@@ -97,12 +98,15 @@ export class YafSignatureBody extends YafHTMLElement<YafSignatureReflection> {
 
 			return [makeElement('h5', null, 'Returns:'), ulHTMLElement];
 		},
-		inherited: (inheritedFrom: YafSignatureReflection['inheritedFrom']) => {
-			if (!inheritedFrom) return undefined;
+		modifier: (
+			modifierData: { id?: number; name: string } | undefined,
+			modifierHeading: string
+		) => {
+			if (!modifierData) return undefined;
 
 			let data;
-			if (inheritedFrom.id) {
-				const reflection = appState.reflectionMap[inheritedFrom.id];
+			if (modifierData.id) {
+				const reflection = appState.reflectionMap[modifierData.id];
 				let name = reflection.name.split(' ').pop();
 				const refName = reflection.query.split('.').pop();
 				const isConstructor = name === refName;
@@ -117,12 +121,12 @@ export class YafSignatureBody extends YafHTMLElement<YafSignatureReflection> {
 						: `?page=${reflection.query}#${name}`,
 				};
 			} else {
-				data = { name: inheritedFrom.name, link: null };
+				data = { name: modifierData.name, link: null };
 			}
 			const headingEHTMLElement = makeElement(
 				'h5',
 				null,
-				'Inherited from:'
+				modifierHeading
 			);
 			const ulHTMLElement = makeElement('ul', 'references');
 			const liHTMLElement = makeElement(
