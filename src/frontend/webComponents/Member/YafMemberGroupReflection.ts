@@ -1,5 +1,6 @@
 import {
 	componentName,
+	yafHTMLExtension,
 	yafMemberGroupReflectionProps,
 } from '../../../types/frontendTypes.js';
 import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
@@ -11,9 +12,12 @@ import {
 	makeTitleSpan,
 	makeIconSpan,
 	normaliseFlags,
+	makeSymbolSpan,
 } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
 import { YafWidgetCounter, YafWidgetTagToggle } from '../Widget/index.js';
+import { events } from '../../handlers/index.js';
+const { action } = events;
 
 /**
  *
@@ -23,30 +27,28 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 
 	onConnect() {
 		const { title, children, pageId, nested, idPrefix } = this.props;
+
 		const { factory } = YafMemberGroupReflection;
 		this.id = `member_${pageId}_${title}`;
 
 		const drawerHTMLElement = makeElement(`ul`);
 		const drawerTriggerHTMLElement = makeElement('span', 'trigger');
 		const groupHeaderHTMLElement = makeElement(nested ? 'h3' : 'h2');
-		const groupTitleHTMLElement = !nested
-			? makeTitleSpan(`${title}`)
-			: factory.makeNestedTitleSpan(title);
-		const handleIconHTMLElement = makeIconSpan('expand_less');
-		const iconHTMLElement = makeElement('span', 'icon');
+		const groupTitleHTMLElement = factory.makeNestedTitleSpan(
+			title,
+			idPrefix,
+			this.pageId,
+			drawerTriggerHTMLElement
+		);
+
 		const groupCountHTMLElement = factory.counterWidget(children.length);
 		const drawerLiHTMLElements = factory.drawerListChildren(
 			children,
 			idPrefix
 		);
 
-		iconHTMLElement.appendChild(handleIconHTMLElement);
-		drawerTriggerHTMLElement.appendChildren([
-			iconHTMLElement,
-			groupTitleHTMLElement,
-		]);
 		groupHeaderHTMLElement.appendChildren([
-			drawerTriggerHTMLElement,
+			groupTitleHTMLElement,
 			groupCountHTMLElement,
 		]);
 		drawerHTMLElement.appendChildren(drawerLiHTMLElements);
@@ -64,14 +66,22 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 
 		/**
 		 * NOTE: `drawers.renderDrawers()` is called from `YafMemberDeclaration` or `YafContentMembers`.
-		 * That is the root of the drawer tree and propogates downwards to branches
+		 * That is the root of the drawer tree and propagates downwards to branches
 		 * from within the `renderDrawers` method itself.
 		 */
 	}
 	disconnectedCallback() {
 		this.drawers.drawerHasDisconnected();
 	}
-
+	get pageId() {
+		let id!: number;
+		events.dispatch(
+			action.content.getPageId((pageId) => {
+				id = pageId;
+			})
+		);
+		return id;
+	}
 	private static factory = {
 		drawerListChildren: (
 			children: Omit<YAFDataObject & YAFReflectionLink, 'query'>[],
@@ -115,9 +125,55 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 					count,
 				}
 			),
-		makeNestedTitleSpan: (titleString: string) => {
-			const fragments = titleString.split(':');
-			return makeTitleSpan(titleString);
+		makeNestedTitleSpan: (
+			titleString: string,
+			idPrefix: string | undefined,
+			pageId: number,
+			drawerTriggerHTMLElement: HTMLElement & yafHTMLExtension
+		) => {
+			const { makeDrawerToggle } = this.factory;
+
+			const wrapperHTMLElement = makeElement('span', 'wrapper');
+
+			if (!idPrefix) {
+				wrapperHTMLElement.appendChild(
+					makeDrawerToggle(titleString, drawerTriggerHTMLElement)
+				);
+				return wrapperHTMLElement;
+			}
+			const fragments = idPrefix.split('.');
+			const fragmentHTMLElements: HTMLElement[] = [];
+			fragments.forEach((fragment, i) => {
+				const linkHTMLElement = makeElement('a', undefined, fragment);
+				linkHTMLElement.setAttribute(
+					'href',
+					`#${fragments.slice(0, i + 1).join('.')}`
+				);
+				fragmentHTMLElements.push(linkHTMLElement);
+				if (i < fragments.length - 1)
+					fragmentHTMLElements.push(makeSymbolSpan(' : '));
+			});
+			wrapperHTMLElement.appendChildren([
+				...fragmentHTMLElements,
+				makeDrawerToggle(titleString, drawerTriggerHTMLElement),
+			]);
+
+			return wrapperHTMLElement;
+		},
+		makeDrawerToggle: (
+			title: string,
+			drawerTriggerHTMLElement: HTMLElement & yafHTMLExtension
+		) => {
+			const handleIconHTMLElement = makeIconSpan('expand_less');
+			const iconHTMLElement = makeElement('span', 'icon');
+			iconHTMLElement.appendChild(handleIconHTMLElement);
+
+			drawerTriggerHTMLElement.appendChildren([
+				iconHTMLElement,
+				makeTitleSpan(title),
+			]);
+
+			return drawerTriggerHTMLElement;
 		},
 	};
 

@@ -112,7 +112,7 @@ export class YafContent extends YafHTMLElement {
 	 */
 	private events: yafEventList = [
 		[trigger.content.setLocation, this.initPageData],
-		[trigger.get.pageContentId, this.returnPageId],
+		[trigger.content.getPageId, this.returnPageId],
 		['popstate', this.initPageData, window],
 	];
 

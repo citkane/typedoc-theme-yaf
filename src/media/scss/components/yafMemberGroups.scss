@@ -82,6 +82,22 @@ yaf-member-group-link {
 	}
 }
 yaf-member-group-reflection {
+	h3 {
+		.wrapper {
+			display: flex;
+			a {
+				color: var(--color-accent-fg);
+				font-weight: 400;
+				padding: 0;
+			}
+			a:hover {
+				color: var(--color-fg-muted);
+			}
+			.symbol {
+				padding: 0 0.5rem;
+			}
+		}
+	}
 	yaf-member {
 		padding-left: 0.5rem;
 	}

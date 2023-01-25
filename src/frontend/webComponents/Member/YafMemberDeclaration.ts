@@ -69,12 +69,11 @@ export class YafMemberDeclaration extends YafHTMLElement<{
 			);
 			return (
 				serialisedGroups?.map((group) => {
-					const {makeNestedGroupTitle} = this.factory;
 					return makeElement<
 						YafMemberGroupReflection,
 						YafMemberGroupReflection['props']
 					>('yaf-member-group-reflection', null, null, {
-						title: `${makeNestedGroupTitle(parentId)}:${group.title}`,
+						title: group.title,
 						children: group.children,
 						pageId: String(id),
 						nested: true,
@@ -101,17 +100,6 @@ export class YafMemberDeclaration extends YafHTMLElement<{
 				signatures || [member as YafDeclarationReflection]
 			);
 		},
-		makeNestedGroupTitle: (id:number, crumbs: string[] = []): string => {
-			const {makeNestedGroupTitle} = this.factory;
-			const name = appState.reflectionMap[id].name;
-			const parent = appState.reflectionMap[id].parentId;
-			const hash = appState.reflectionMap[id].hash
-
-			//if(!hash) return crumbs.join(':');
-			crumbs.unshift(name);
-			if(parent && hash) return makeNestedGroupTitle(parent, crumbs);
-			return crumbs.join(':');
-		}
 	};
 }
 const yafMemberDeclaration: componentName = 'yaf-member-declaration';

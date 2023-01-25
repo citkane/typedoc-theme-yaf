@@ -15,13 +15,6 @@ export const trigger = {
 	drawers: {
 		resetHeight: 'yaf.drawer.resetHeight',
 	},
-	fetch: {
-		reflectionById: 'yaf.fetch.reflectionById',
-	},
-	get: {
-		reflectionLinkById: 'yaf.get.reflectionLinkById',
-		pageContentId: 'yaf.get.pageContentId',
-	},
 	options: {
 		display: 'yaf.options.display',
 	},
