@@ -8,20 +8,19 @@ import { events } from '../../handlers/index.js';
 export class YafNavigationLink extends YafHTMLElement {
 	aHTMLElement!: HTMLAnchorElement;
 	onConnect() {
-		const { factory } = YafNavigationLink;
+		//const { factory } = YafNavigationLink;
 		this.aHTMLElement = makeElement<HTMLAnchorElement>('a');
 		this.classList.forEach((className) => {
 			this.aHTMLElement.classList.add(className);
 			this.classList.remove(className);
 		});
 
-		if (this.getAttribute('href') === '/')
-			this.setAttribute('href', router.baseUrl);
+		const Href = this.getAttribute('href');
+		if (Href === '/') this.setAttribute('href', router.baseUrl);
 		let targetURL = router.getTargetURL(this);
 
-		if (factory.isNumberPath(targetURL.pathname)) {
-			const reflectionId = targetURL.pathname.replace(/^\//, '');
-			const reflectionLink = appState.reflectionMap[reflectionId];
+		if (!isNaN(Number(Href))) {
+			const reflectionLink = appState.reflectionMap[Href!];
 
 			if (!reflectionLink) return;
 
@@ -62,9 +61,11 @@ export class YafNavigationLink extends YafHTMLElement {
 			this.aHTMLElement
 		);
 	}
+	/*
 	private static factory = {
-		isNumberPath: (path: string) => /^\/\d+$/.test(path),
+		isNumberPath: (path: string) => /^\d+$/.test(path),
 	};
+	*/
 }
 const yafNavigationLink: componentName = 'yaf-navigation-link';
 customElements.define(yafNavigationLink, YafNavigationLink);
