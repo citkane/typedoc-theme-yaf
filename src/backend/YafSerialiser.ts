@@ -630,11 +630,6 @@ export class YafSerialiser {
 
 			if (!hasSignatures) return objectReflection;
 
-			console.log(
-				objectReflection.name,
-				ReflectionKind[objectReflection.kind]
-			);
-
 			const methodSignature =
 				hasSignatures.length === 1 &&
 				hasSignatures[0].kind === ReflectionKind.CallSignature
