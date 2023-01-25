@@ -5,7 +5,6 @@ import appState from '../../handlers/AppState.js';
 import { events } from '../../handlers/index.js';
 export class YafNavigationLink extends YafHTMLElement {
     onConnect() {
-        //const { factory } = YafNavigationLink;
         this.aHTMLElement = makeElement('a');
         this.classList.forEach((className) => {
             this.aHTMLElement.classList.add(className);
