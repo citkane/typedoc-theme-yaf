@@ -16,6 +16,9 @@ export class YafNavigationLink extends YafHTMLElement {
 
 		const Href = this.getAttribute('href');
 		if (Href === '/') this.setAttribute('href', router.baseUrl);
+		if (Href?.startsWith('#'))
+			this.setAttribute('href', window.location.search + Href);
+
 		let targetURL = router.getTargetURL(this);
 
 		if (!isNaN(Number(Href))) {

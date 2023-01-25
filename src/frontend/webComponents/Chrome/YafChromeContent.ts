@@ -1,5 +1,5 @@
 import { componentName, yafEventList } from '../../../types/frontendTypes.js';
-import { action, events } from '../../handlers/index.js';
+import { action, appState, events } from '../../handlers/index.js';
 import { YafHTMLElement } from '../../index.js';
 import { getHtmlTemplate, scrollToAnchor } from '../../yafElement.js';
 
@@ -15,7 +15,6 @@ export class YafChromeContent extends YafHTMLElement {
 	scrollTimer!: ReturnType<typeof setTimeout>;
 	onConnect() {
 		this.events.forEach((event) => events.on(...event));
-
 		this.appendChild(getHtmlTemplate(yafChromeContent));
 	}
 
@@ -26,7 +25,12 @@ export class YafChromeContent extends YafHTMLElement {
 	private focusContent = ({
 		detail,
 	}: CustomEvent<action['content']['scrollTo']>) => {
-		scrollToAnchor(this, detail.target);
+		const { target } = detail;
+
+		isNaN(Number(target))
+			? scrollToAnchor(this, detail.target)
+			: (this.scrollTop = Number(target));
+
 		events.dispatch(action.menu.toggle('close'));
 	};
 

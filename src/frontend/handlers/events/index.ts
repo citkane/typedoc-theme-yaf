@@ -11,7 +11,7 @@ export * as options from './actionsOptions.js';
  * @param context
  * @returns
  */
-export type scrollTo = { target: 0 | string };
+export type scrollTo = { target: number | string };
 export const scrollTo = (
 	context: 'menu' | 'content',
 	target: scrollTo['target']

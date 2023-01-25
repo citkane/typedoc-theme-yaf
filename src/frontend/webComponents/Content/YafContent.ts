@@ -22,7 +22,7 @@ import { YafTypeParameters } from '../Type/index.js';
 import appState from '../../handlers/AppState.js';
 import { makeElement } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
-import { events } from '../../handlers/index.js';
+import { action, events } from '../../handlers/index.js';
 
 const { trigger, action } = events;
 
@@ -43,16 +43,18 @@ export class YafContent extends YafHTMLElement {
 		bodyHTMLElement?.classList.add('loading');
 
 		appState.getPageData(page || 'index').then((data) => {
-			this.id = String(data.id);
-			this.renderPageContent(data);
+			const newId = String(data.id);
+			if (this.id !== newId) this.renderPageContent(data);
+			this.id = newId;
+
+			const scrollTop = appState.scrollTops[this.id] || 0;
 
 			events.dispatch(
 				action.content.scrollTo(
-					url.hash ? url.hash.replace('#', '') : 0
+					url.hash ? url.hash.replace('#', '') : scrollTop
 				)
 			);
 
-			events.dispatch(action.content.breadcrumb(data.id));
 			bodyHTMLElement?.classList.remove('loading');
 		});
 	};
@@ -102,8 +104,13 @@ export class YafContent extends YafHTMLElement {
 			this.appendChild(element);
 			if ('drawers' in element) element.drawers!.renderDrawers();
 		});
+		events.dispatch(action.content.breadcrumb(id));
 	}
-
+	private saveScrollTop = ({
+		detail,
+	}: CustomEvent<action['content']['scrollTop']>) => {
+		appState.setScrollTop(this.id, Number(detail.scrollTop));
+	};
 	private returnPageId = (e: ReturnType<typeof action.content.getPageId>) =>
 		e.detail.callBack(Number(this.id));
 
@@ -113,6 +120,7 @@ export class YafContent extends YafHTMLElement {
 	private events: yafEventList = [
 		[trigger.content.setLocation, this.initPageData],
 		[trigger.content.getPageId, this.returnPageId],
+		[trigger.content.scrollTop, this.saveScrollTop],
 		['popstate', this.initPageData, window],
 	];
 

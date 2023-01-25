@@ -32,7 +32,7 @@ yaf-member {
 	display: block;
 	margin-bottom: 3rem;
 	h3 {
-		yaf-navigation-link {
+		& > yaf-navigation-link {
 			display: flex;
 			position: relative;
 			align-items: center;

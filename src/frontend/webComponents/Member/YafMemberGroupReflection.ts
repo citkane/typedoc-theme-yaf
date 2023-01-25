@@ -13,6 +13,7 @@ import {
 	makeIconSpan,
 	normaliseFlags,
 	makeSymbolSpan,
+	makeLinkElement,
 } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
 import { YafWidgetCounter, YafWidgetTagToggle } from '../Widget/index.js';
@@ -144,11 +145,18 @@ export class YafMemberGroupReflection extends YafHTMLElement<yafMemberGroupRefle
 			const fragments = idPrefix.split('.');
 			const fragmentHTMLElements: HTMLElement[] = [];
 			fragments.forEach((fragment, i) => {
-				const linkHTMLElement = makeElement('a', undefined, fragment);
+				const linkHTMLElement = makeLinkElement(
+					`#${fragments.slice(0, i + 1).join('.')}`,
+					undefined,
+					fragment
+				);
+				/*
+				makeElement('a', undefined, fragment);
 				linkHTMLElement.setAttribute(
 					'href',
 					`#${fragments.slice(0, i + 1).join('.')}`
 				);
+				*/
 				fragmentHTMLElements.push(linkHTMLElement);
 				if (i < fragments.length - 1)
 					fragmentHTMLElements.push(makeSymbolSpan(' : '));
