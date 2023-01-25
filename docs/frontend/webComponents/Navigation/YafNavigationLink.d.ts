@@ -3,5 +3,4 @@ export declare class YafNavigationLink extends YafHTMLElement {
     aHTMLElement: HTMLAnchorElement;
     onConnect(): void;
     disconnectedCallback(): void;
-    private static factory;
 }

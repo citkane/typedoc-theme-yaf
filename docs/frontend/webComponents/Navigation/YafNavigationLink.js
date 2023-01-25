@@ -5,18 +5,18 @@ import appState from '../../handlers/AppState.js';
 import { events } from '../../handlers/index.js';
 export class YafNavigationLink extends YafHTMLElement {
     onConnect() {
-        const { factory } = YafNavigationLink;
+        //const { factory } = YafNavigationLink;
         this.aHTMLElement = makeElement('a');
         this.classList.forEach((className) => {
             this.aHTMLElement.classList.add(className);
             this.classList.remove(className);
         });
-        if (this.getAttribute('href') === '/')
+        const Href = this.getAttribute('href');
+        if (Href === '/')
             this.setAttribute('href', router.baseUrl);
         let targetURL = router.getTargetURL(this);
-        if (factory.isNumberPath(targetURL.pathname)) {
-            const reflectionId = targetURL.pathname.replace(/^\//, '');
-            const reflectionLink = appState.reflectionMap[reflectionId];
+        if (!isNaN(Number(Href))) {
+            const reflectionLink = appState.reflectionMap[Href];
             if (!reflectionLink)
                 return;
             const { query, hash } = reflectionLink;
@@ -41,9 +41,6 @@ export class YafNavigationLink extends YafHTMLElement {
         events.off('click', (e) => router.route(this, e), this.aHTMLElement);
     }
 }
-YafNavigationLink.factory = {
-    isNumberPath: (path) => /^\/\d+$/.test(path),
-};
 const yafNavigationLink = 'yaf-navigation-link';
 customElements.define(yafNavigationLink, YafNavigationLink);
 //# sourceMappingURL=YafNavigationLink.js.map
