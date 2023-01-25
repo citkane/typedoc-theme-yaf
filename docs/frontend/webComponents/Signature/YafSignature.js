@@ -23,7 +23,7 @@ export class YafSignature extends YafHTMLElement {
     }
 }
 /**
- * Transforms a TypeDoc camelCased "type name" string into a hypen seperated lowercase string
+ * Transforms a TypeDoc camelCased "type name" string into a hyphen separated lowercase string
  *
  * @param name
  * @returns

@@ -10,7 +10,7 @@ import { YafHTMLElement } from '../../index.js';
 export declare class YafSignature extends YafHTMLElement<yafSignatureProps> {
     onConnect(): (HTMLElement & import("../../../types/frontendTypes.js").yafHTMLExtension) | undefined;
     /**
-     * Transforms a TypeDoc camelCased "type name" string into a hypen seperated lowercase string
+     * Transforms a TypeDoc camelCased "type name" string into a hyphen separated lowercase string
      *
      * @param name
      * @returns

@@ -10,11 +10,14 @@ export class YafContent extends YafHTMLElement {
             const url = new URL(window.location.href);
             let page = url.searchParams.get('page');
             page = decodeURIComponent(page || '');
+            const bodyHTMLElement = document.querySelector('body');
+            bodyHTMLElement === null || bodyHTMLElement === void 0 ? void 0 : bodyHTMLElement.classList.add('loading');
             appState.getPageData(page || 'index').then((data) => {
                 this.id = String(data.id);
                 this.renderPageContent(data);
                 events.dispatch(action.content.scrollTo(url.hash ? url.hash.replace('#', '') : 0));
                 events.dispatch(action.content.breadcrumb(data.id));
+                bodyHTMLElement === null || bodyHTMLElement === void 0 ? void 0 : bodyHTMLElement.classList.remove('loading');
             });
         };
         this.returnPageId = (e) => e.detail.callBack(Number(this.id));

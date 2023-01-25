@@ -5,7 +5,7 @@ import { YafHTMLElement } from '../../index.js';
 import appState from '../../handlers/AppState.js';
 export class YafSignatureBody extends YafHTMLElement {
     onConnect() {
-        const { text, typeParameter, parameters, type, kind, inheritedFrom } = this.props;
+        const { text, typeParameter, parameters, type, kind, inheritedFrom, overwrites, implementationOf, } = this.props;
         const { factory } = YafSignatureBody;
         const isCallSignature = YafSignature.isCallSignature(kind);
         const HTMLElements = [
@@ -13,7 +13,9 @@ export class YafSignatureBody extends YafHTMLElement {
             factory.sources(this.props),
             factory.typeParameters(typeParameter),
             factory.parameters(parameters),
-            factory.inherited(inheritedFrom),
+            factory.modifier(implementationOf, 'Implementation of:'),
+            factory.modifier(inheritedFrom, 'Inherited from:'),
+            factory.modifier(overwrites, 'Overrides:'),
             factory.returns(type, isCallSignature),
         ];
         this.appendChildren(HTMLElements.flat());
@@ -46,12 +48,12 @@ YafSignatureBody.factory = {
         ulHTMLElement.appendChild(liHTMLElement);
         return [makeElement('h5', null, 'Returns:'), ulHTMLElement];
     },
-    inherited: (inheritedFrom) => {
-        if (!inheritedFrom)
+    modifier: (modifierData, modifierHeading) => {
+        if (!modifierData)
             return undefined;
         let data;
-        if (inheritedFrom.id) {
-            const reflection = appState.reflectionMap[inheritedFrom.id];
+        if (modifierData.id) {
+            const reflection = appState.reflectionMap[modifierData.id];
             let name = reflection.name.split(' ').pop();
             const refName = reflection.query.split('.').pop();
             const isConstructor = name === refName;
@@ -66,9 +68,9 @@ YafSignatureBody.factory = {
             };
         }
         else {
-            data = { name: inheritedFrom.name, link: null };
+            data = { name: modifierData.name, link: null };
         }
-        const headingEHTMLElement = makeElement('h5', null, 'Inherited from:');
+        const headingEHTMLElement = makeElement('h5', null, modifierHeading);
         const ulHTMLElement = makeElement('ul', 'references');
         const liHTMLElement = makeElement('li', null, data.link ? '' : data.name);
         if (data.link)
