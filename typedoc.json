@@ -14,7 +14,7 @@
 	"excludeNotDocumented": false,
 	"logLevel": "Verbose",
 	"media": "./dist/src/media",
-	"plugin": ["typedoc-theme-yaf", "typedoc-plugin-hot-dev"],
+	"plugin": ["./dist", "typedoc-plugin-hot-dev"],
 	"theme": "yaf",
 	"hot-dev": {
 		"npmScripts": ["build:watch"]

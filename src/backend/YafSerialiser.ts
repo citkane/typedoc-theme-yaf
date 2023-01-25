@@ -140,11 +140,14 @@ export class YafSerialiser {
 		): dataLocation => {
 			if (!rootReflection) return { hash: '', query: 'index' };
 
-			const { isPage } = this.utilities;
-			const locationArray = `${rootReflection.getFriendlyFullName()}.${
-				reflection.name
-			}`.split('.');
-			const hash = !isPage(reflection.kind) ? locationArray.pop() : '';
+			const isPage = this.utilities.isPage(reflection.kind);
+
+			const locationString = isPage
+				? reflection.getFriendlyFullName()
+				: `${rootReflection.getFriendlyFullName()}.${reflection.name}`;
+
+			const locationArray = locationString.split('.');
+			const hash = !isPage ? locationArray.pop() : '';
 			const kindId = hash ? rootReflection.kind : reflection.kind;
 			const kind = ReflectionKind[kindId];
 
@@ -610,7 +613,7 @@ export class YafSerialiser {
 		},
 
 		/**
-		 * The standard TypeDoc declaration Reflection gets a `Property` kind, regardless if it has a call signature.
+		 * The default TypeDoc declaration Reflection gets a `Property` kind, regardless if it has a call signature.
 		 *
 		 * This function fixes the frontend data to be the correct kind.
 		 *
@@ -618,16 +621,26 @@ export class YafSerialiser {
 		 * @returns
 		 */
 		fixObjectCallKind: (objectReflection: YAFDataObject) => {
+			if (objectReflection.kind !== ReflectionKind.Property)
+				return objectReflection;
+
 			const hasSignatures = (
 				objectReflection.type as JSONOutput.ReflectionType
 			)?.declaration?.signatures;
+
 			if (!hasSignatures) return objectReflection;
+
+			console.log(
+				objectReflection.name,
+				ReflectionKind[objectReflection.kind]
+			);
 
 			const methodSignature =
 				hasSignatures.length === 1 &&
 				hasSignatures[0].kind === ReflectionKind.CallSignature
 					? hasSignatures[0]
 					: undefined;
+
 			if (methodSignature)
 				objectReflection.kind = ReflectionKind.CallSignature;
 
