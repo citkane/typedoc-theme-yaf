@@ -8,7 +8,6 @@ import { events } from '../../handlers/index.js';
 export class YafNavigationLink extends YafHTMLElement {
 	aHTMLElement!: HTMLAnchorElement;
 	onConnect() {
-		//const { factory } = YafNavigationLink;
 		this.aHTMLElement = makeElement<HTMLAnchorElement>('a');
 		this.classList.forEach((className) => {
 			this.aHTMLElement.classList.add(className);
@@ -61,11 +60,6 @@ export class YafNavigationLink extends YafHTMLElement {
 			this.aHTMLElement
 		);
 	}
-	/*
-	private static factory = {
-		isNumberPath: (path: string) => /^\d+$/.test(path),
-	};
-	*/
 }
 const yafNavigationLink: componentName = 'yaf-navigation-link';
 customElements.define(yafNavigationLink, YafNavigationLink);
