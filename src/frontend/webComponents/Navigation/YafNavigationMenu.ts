@@ -49,7 +49,7 @@ export class YafNavigationMenu extends YafHTMLElement {
 				const drawer = [...menuItem.children].find(
 					(child) => 'drawers' in child
 				);
-				(drawer as YafNavigationMenuBranch).drawers.renderDrawers();
+				(drawer as YafNavigationMenuBranch)?.drawers.renderDrawers();
 			}
 		);
 

@@ -39,7 +39,7 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 		this.classList.add(appState.reflectionKind[kind].toLowerCase());
 
 		const childCount = Object.keys(children).length;
-		const drawerHTMLElement = makeElement('ul');
+
 		const drawerTriggerHTMLElement = makeElement('span', 'trigger');
 		const drawerHeaderHTMLElement = factory.makeDrawerheader(
 			this.props.link,
@@ -47,29 +47,35 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 			drawerTriggerHTMLElement,
 			childCount
 		);
-		drawerHTMLElement.replaceChildren(
-			...factory.makeDrawerChildrenArray(
+		if (childCount) {
+			const drawerHTMLElement = makeElement('ul');
+			drawerHTMLElement.replaceChildren(
+				...factory.makeDrawerChildrenArray(
+					drawerTriggerHTMLElement,
+					childCount,
+					this
+				)
+			);
+			this.appendChildren([drawerHeaderHTMLElement, drawerHTMLElement]);
+			this.drawers = new YafElementDrawers(
+				this as unknown as DrawerElement,
+				drawerHTMLElement,
 				drawerTriggerHTMLElement,
-				childCount,
-				this
-			)
-		);
-		this.appendChildren([drawerHeaderHTMLElement, drawerHTMLElement]);
+				`menu_${id}`,
+				parentDrawerElement as unknown as DrawerElement
+			);
+			/**
+			 * NOTE: `drawers.renderDrawers()` is called from `YafNavigationMenu`.
+			 * That is the root of the menu tree and propagates downwards to branches
+			 * from within the `renderDrawers` method itself.
+			 */
 
-		this.drawers = new YafElementDrawers(
-			this as unknown as DrawerElement,
-			drawerHTMLElement,
-			drawerTriggerHTMLElement,
-			`menu_${id}`,
-			parentDrawerElement as unknown as DrawerElement
-		);
-		/**
-		 * NOTE: `drawers.renderDrawers()` is called from `YafNavigationMenu`.
-		 * That is the root of the menu tree and propogates downwards to branches
-		 * from within the `renderDrawers` method itself.
-		 */
-
-		drawerHTMLElement.prepend(factory.makeDrawerTagToggles(this.drawers));
+			drawerHTMLElement.prepend(
+				factory.makeDrawerTagToggles(this.drawers)
+			);
+		} else {
+			this.appendChild(drawerHeaderHTMLElement);
+		}
 
 		this.eventsList().forEach((event) => events.on(...event));
 	}
@@ -80,8 +86,8 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 	}
 
 	private eventsList = (): yafEventList => [
-		[trigger.menu.rollMenuDown, this.drawers.openDrawer],
-		[trigger.menu.rollMenuUp, this.drawers.closeDrawer],
+		[trigger.menu.rollMenuDown, this.drawers?.openDrawer],
+		[trigger.menu.rollMenuUp, this.drawers?.closeDrawer],
 	];
 	private static factory = {
 		makeDrawerChildrenArray: (
