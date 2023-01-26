@@ -71,3 +71,18 @@ yaf-chrome-header {
 		color: var(--color-canvas-subtle);
 	}
 }
+yaf-chrome-content {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+}
+yaf-chrome-footer {
+	display: flex;
+	border-top: 1px solid var(--color-border-default);
+	flex: 0 0 var(--dim-footer-height);
+	width: 100%;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.8rem;
+	color: var(--color-fg-muted);
+}

@@ -1,4 +1,5 @@
 import { Application } from 'typedoc';
+import { load as versionsLoad } from 'typedoc-plugin-versions';
 import { loadHighlighter } from './backend/highlighter';
 
 import { YafTheme } from './backend/YafTheme';
@@ -13,6 +14,8 @@ import { YafTheme } from './backend/YafTheme';
  * @param app
  */
 export function load(app: Application) {
+	versionsLoad(app);
+	console.log('Loaded plugin typedoc-plugin-versions');
 	loadHighlighter().then((higlighter) => {
 		YafTheme.highlighter = higlighter;
 		app.renderer.defineTheme('yaf', YafTheme);

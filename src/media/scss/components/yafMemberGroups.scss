@@ -61,7 +61,6 @@ yaf-member-group-link {
 			height: 100%;
 		}
 		li {
-			padding: 0.5rem;
 			margin: 0;
 			border: 1px solid var(--color-border-muted);
 			flex-grow: 1;
@@ -70,6 +69,9 @@ yaf-member-group-link {
 
 			background: var(--color-canvas-subtle);
 			transition: all var(--transition-fades);
+			a {
+				padding: 0.5rem;
+			}
 		}
 		li:hover {
 			background: var(--color-border-muted);

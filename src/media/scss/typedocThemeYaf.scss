@@ -3,7 +3,7 @@
 }
 :root {
 	--dim-header-height: 2.25rem;
-	--dim-footer-height: 1.5rem;
+	--dim-footer-height: 2.25rem;
 	--dim-menu-width: 450px;
 	--font: 'Roboto';
 	--transition-fades: 300ms;
@@ -43,6 +43,9 @@ body.loading {
 			animation-timing-function: linear;
 		}
 	}
+}
+.init #plugin-versions-select {
+	display: none;
 }
 @keyframes loading {
 	from {

@@ -13,12 +13,29 @@ export class TypedocThemeYaf extends YafHTMLElement {
 	onConnect() {
 		appState
 			.initCache()
-			.then(() => this.appendChild(getHtmlTemplate(typedocThemeYaf)));
+			.then(this.setTitle)
+			.then(() => this.appendChild(getHtmlTemplate(typedocThemeYaf)))
+			.then(this.initVersions);
 		this.events.forEach((event) => events.on(...event));
 	}
 	disconnectedCallback() {
 		this.events.forEach((event) => events.off(...event));
 	}
+	private setTitle = () => {
+		const titleHTMLElement = document.querySelector('title');
+		titleHTMLElement!.innerText = appState.projectName;
+	};
+	private initVersions = () => {
+		const versionHTMLElement = document.getElementById(
+			'plugin-versions-select'
+		);
+		const footerHTMLElement = document.querySelector(
+			'yaf-navigation-footer'
+		);
+
+		footerHTMLElement?.appendChild(versionHTMLElement!);
+		document.querySelector('body')!.classList.remove('init');
+	};
 	private toggleMenu = ({
 		detail,
 	}: CustomEvent<action['menu']['toggle']>) => {

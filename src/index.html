@@ -8,14 +8,17 @@
 			content="width=device-width, initial-scale=0.7, maximum-scale=1, minimum-scale=0.45, user-scalable=yes"
 		/>
 		<title>Document</title>
+		<link rel="icon" type="image/x-icon" href="media/favicon.ico" />
 		<link rel="stylesheet" href="media/index.css" />
 		<script src="frontend/index.js" type="module"></script>
+		<script src="media/versionsMenu.js" type="module"></script>
 	</head>
-	<body class="loading">
+	<body class="loading init">
 		<typedoc-theme-yaf />
 		<div id="loading">
 			<span class="material-icons-sharp md-48"> loop </span>
 		</div>
+		<select id="plugin-versions-select" name="versions"></select>
 	</body>
 	<template id="typedoc-theme-yaf">
 		<yaf-chrome-header context="mobile"></yaf-chrome-header>
@@ -27,13 +30,22 @@
 	</template>
 	<template id="yaf-chrome-content">
 		<yaf-content></yaf-content>
-		<yaf-chrome-footer></yaf-chrome-footer>
+		<yaf-chrome-footer
+			>Generated with&nbsp;
+			<a href="https://typedoc.org/" target="_blank">Typedoc</a>&nbsp;and
+			rendered with&nbsp;
+			<span class="material-icons-sharp md-18"> favorite_border </span
+			>&nbsp;by&nbsp;
+			<a
+				href="https://github.com/citkane/typedoc-theme-yaf"
+				target="_blank"
+				>typedoc-theme-yaf</a
+			></yaf-chrome-footer
+		>
 	</template>
 	<template id="yaf-chrome-left">
 		<yaf-navigation-header></yaf-navigation-header>
 		<yaf-navigation-menu></yaf-navigation-menu>
-		<yaf-navigation-footer
-			>@todo: yaf-plugin-versions</yaf-navigation-footer
-		>
+		<yaf-navigation-footer></yaf-navigation-footer>
 	</template>
 </html>

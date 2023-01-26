@@ -163,12 +163,16 @@ export class YafTheme extends DefaultTheme {
 			const frontendDest = path.join(outDir, 'frontend');
 			const indexSrc = path.join(rootDir, 'src', 'index.html');
 			const indexDest = path.join(outDir, 'index.html');
+			const assetsPath = path.join(outDir, 'assets');
 
 			fs.copySync(frontendSrc, frontendDest);
 			fs.copySync(mediaSrc, mediaDest);
 			fs.copySync(indexSrc, indexDest);
+			fs.copySync(
+				path.join(assetsPath, 'versionsMenu.js'),
+				path.join(mediaDest, 'versionsMenu.js')
+			);
 			setTimeout(() => {
-				const assetsPath = path.join(outDir, 'assets');
 				console.log(
 					`This theme no longer needs the default theme assets, so deleting: ${assetsPath}`
 				);
