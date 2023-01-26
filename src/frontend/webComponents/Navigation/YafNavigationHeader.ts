@@ -72,11 +72,7 @@ export class YafNavigationHeader extends YafHTMLElement {
 				'controls-navigation'
 			);
 			navigationControlsHTMLElement.appendChildren([
-				makeElement(
-					'yaf-navigation-searchbar',
-					undefined,
-					'@todo: search'
-				),
+				makeElement('yaf-navigation-searchbar'),
 				this.factory.menuRollControls(drawerTriggerHTMLElement),
 			]);
 			return navigationControlsHTMLElement;

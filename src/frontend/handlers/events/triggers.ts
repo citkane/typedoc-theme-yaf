@@ -11,6 +11,7 @@ export const trigger = {
 		rollMenuUp: 'yaf.menu.rollMenuUp',
 		scrollTo: 'yaf.menu.scrollTo',
 		toggle: 'yaf.menu.toggle',
+		search: 'yaf.menu.search',
 	},
 	drawers: {
 		resetHeight: 'yaf.drawer.resetHeight',

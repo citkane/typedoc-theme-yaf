@@ -11,6 +11,10 @@ export const toggle = (state?: toggle['state']) =>
 		detail: { state },
 	});
 
+export type search = { searchString: string };
+export const search = (searchString: search['searchString']) =>
+	new CustomEvent<search>(trigger.menu.search, { detail: { searchString } });
+
 export interface menu {
 	/**
 	 * Scrolls the main navigation menu to the given id.
@@ -28,4 +32,6 @@ export interface menu {
 	 * Toggle the open/close state of the main navigation menu in mobile views
 	 */
 	toggle: toggle;
+
+	search: search;
 }

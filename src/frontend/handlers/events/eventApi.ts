@@ -16,6 +16,7 @@ export class Events {
 			rollMenuUp: actions.menu.rollMenuUp,
 			scrollTo: actions.scrollTo.bind(null, 'menu'),
 			toggle: actions.menu.toggle,
+			search: actions.menu.search,
 		},
 		drawers: {
 			resetHeight: actions.drawers.resetDrawerHeight,

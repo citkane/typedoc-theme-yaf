@@ -2,6 +2,32 @@
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
+	yaf-navigation-search {
+		display: block;
+		opacity: 0;
+		transition: opacity var(--transition-fades);
+		z-index: 1;
+		position: absolute;
+	}
+	yaf-navigation-menu {
+		display: block;
+		opacity: 100%;
+		transition: opacity var(--transition-fades);
+		z-index: 2;
+		position: relative;
+	}
+}
+&.activeSearch {
+	yaf-navigation-search {
+		z-index: 2;
+		opacity: 100%;
+		position: relative;
+	}
+	yaf-navigation-menu {
+		opacity: 0;
+		z-index: 1;
+		position: absolute;
+	}
 }
 yaf-navigation-header {
 	#projectTitle {
@@ -33,9 +59,59 @@ yaf-navigation-header {
 		user-select: none;
 		height: 2rem;
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		yaf-navigation-searchbar {
+			flex-grow: 1;
+			display: flex;
+			height: 100%;
+			position: relative;
+			align-items: center;
 
+			input {
+				width: calc(100% - 8px);
+				height: calc(100% - 8px);
+				display: block;
+				border: none;
+				border-radius: 0;
+				padding-left: 1rem;
+				padding-right: 2em;
+				margin-left: 4px;
+				background-color: var(--color-canvas-subtle);
+			}
+			input:invalid {
+				color: var(--color-danger-fg);
+			}
+			.wrapper {
+				height: calc(100% - 8px);
+				aspect-ratio: 1/1;
+				position: absolute;
+				right: 4px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			.searchIcon,
+			.clearIcon {
+				color: var(--color-fg-muted);
+				width: 100%;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			.clearIcon {
+				display: none;
+				cursor: pointer;
+			}
+			&.focussed {
+				.clearIcon {
+					display: flex;
+				}
+				.searchIcon {
+					display: none;
+				}
+			}
+		}
 		.button,
 		.info {
 			display: flex;
@@ -102,13 +178,42 @@ yaf-navigation-header {
 		}
 	}
 }
+#menuWrapper {
+	flex-grow: 1;
 
+	border-right: 1px solid var(--color-border-default);
+	position: relative;
+	overflow: hidden;
+}
+yaf-navigation-search,
 yaf-navigation-menu {
 	overflow: scroll;
-	flex-grow: 1;
 	padding: 1rem;
+	width: 100%;
+	height: 100%;
+}
+yaf-navigation-search {
+	color: var(--color-canvas-subtle);
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: var(--color-accent-fg);
+		opacity: 80%;
+		z-index: 0;
+	}
+	.results {
+		position: relative;
+		z-index: 1;
+	}
+}
+yaf-navigation-menu {
 	--size: 1.5rem;
-	border-right: 1px solid var(--color-border-default);
+
 	.rendered {
 		.icon > span {
 			transition: all var(--transition-rotates);
@@ -246,9 +351,4 @@ yaf-navigation-footer {
 		background-color: var(--color-accent-fg);
 		color: var(--color-canvas-default);
 	}
-}
-
-yaf-navigation-searchbar {
-	padding-left: 1rem;
-	color: var(--color-fg-muted);
 }
