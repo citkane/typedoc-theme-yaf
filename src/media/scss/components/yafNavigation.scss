@@ -187,7 +187,6 @@ yaf-navigation-header {
 }
 yaf-navigation-search,
 yaf-navigation-menu {
-	overflow: scroll;
 	padding: 1rem;
 	width: 100%;
 	height: 100%;
@@ -212,17 +211,15 @@ yaf-navigation-search {
 	}
 }
 yaf-navigation-menu {
-	--size: 1.5rem;
-
 	.rendered {
 		.icon > span {
-			transition: all var(--transition-rotates);
+			transition: background-color var(--transition-rotates);
 		}
 	}
 	menu,
 	ul {
 		ul {
-			padding-left: 1rem;
+			padding: 0 0.5rem;
 			li:last-child {
 				padding-bottom: 1rem;
 			}
@@ -236,7 +233,9 @@ yaf-navigation-menu {
 			color: var(--color-fg-default);
 			text-decoration: none;
 			transition: color var(--transition-fades);
-			padding: 0.5rem 0;
+			.name {
+				padding: 0.5rem 0;
+			}
 		}
 		.yaf-drawer.show .hide a {
 			color: var(--color-fg-muted);
@@ -250,7 +249,6 @@ yaf-navigation-menu {
 			margin: 0.25rem 0;
 		}
 		.header {
-			//margin-bottom: calc(var(--size) / 2);
 			display: flex;
 			width: 100%;
 			align-items: center;
@@ -261,6 +259,27 @@ yaf-navigation-menu {
 				display: flex;
 				align-items: center;
 				flex-grow: 1;
+				position: relative;
+				overflow: hidden;
+				a {
+					display: block;
+					max-width: 100%;
+					position: relative;
+					overflow: hidden;
+					.name {
+						display: block;
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						padding-right: 0.5rem;
+					}
+				}
+			}
+			> yaf-navigation-link:hover {
+				a .name {
+					overflow: visible;
+					float: right;
+				}
 			}
 
 			.trigger {
@@ -269,6 +288,7 @@ yaf-navigation-menu {
 				align-items: center;
 				justify-content: flex-end;
 				align-self: flex-end;
+				flex: 0 0 auto;
 				.icon {
 					display: flex;
 					align-items: center;
@@ -279,6 +299,11 @@ yaf-navigation-menu {
 					height: var(--size);
 					margin-left: calc(var(--size) / 2);
 					transition: all var(--transition-fades);
+				}
+				yaf-widget-counter {
+					flex: 0 0 auto;
+					height: 100%;
+					padding-right: 0.5rem;
 				}
 			}
 			.trigger:hover {
@@ -319,7 +344,7 @@ yaf-navigation-menu {
 		> .header {
 			border-bottom-color: var(--color-accent-fg);
 			.name {
-				font-weight: 600;
+				font-weight: 550;
 			}
 			.icon {
 				border-color: var(--color-accent-fg);

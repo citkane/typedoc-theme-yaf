@@ -10,6 +10,7 @@
 	--transition-rotates: 600ms;
 	--transition-drawer: 600ms;
 	--media-max-width: 900px;
+	--scrollBarColor: #4384d1;
 }
 
 html,
@@ -62,6 +63,30 @@ typedoc-theme-yaf {
 	width: 100vw;
 	position: relative;
 	overflow: hidden;
+
+	.rendered .scroller {
+		scroll-behavior: smooth;
+	}
+	.scroller.vertical {
+		overflow-y: scroll;
+	}
+	.scroller.horizontal {
+		overflow-x: scroll;
+	}
+	.scroller {
+		scrollbar-color: var(--scrollBarColor) var(--color-canvas-default);
+	}
+	.scroller::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+		background-color: var(--color-canvas-default);
+	}
+	.scroller::-webkit-scrollbar-thumb {
+		background: var(--scrollBarColor);
+	}
+	.scroller::-webkit-scrollbar-track {
+		background: var(--color-canvas-default);
+	}
 	.yaf-drawer {
 		overflow: hidden;
 	}
@@ -123,10 +148,6 @@ typedoc-theme-yaf {
 	&.md-48 {
 		font-size: 48px;
 	}
-}
-
-yaf-member-group-reflection {
-	display: block;
 }
 
 @keyframes flash {

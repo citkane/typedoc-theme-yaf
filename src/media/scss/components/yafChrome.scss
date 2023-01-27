@@ -16,8 +16,6 @@ yaf-chrome-right {
 	overflow: hidden;
 	flex-grow: 1;
 	yaf-chrome-content {
-		overflow-y: scroll;
-		scroll-behavior: smooth;
 		@import '../github-markdown.scss';
 		@import 'yafContent.scss';
 	}

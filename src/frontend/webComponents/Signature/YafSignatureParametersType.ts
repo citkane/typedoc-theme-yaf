@@ -8,6 +8,10 @@ export class YafSignatureParametersType extends YafHTMLElement<
 > {
 	onConnect() {
 		if (!this.props) return;
+
+		this.classList.add('scroller');
+		this.classList.add('horizontal');
+
 		this.appendChild(makeElement('h5', null, 'Type Parameters:'));
 		const table = makeElement('table');
 		const thead = makeElement('thead');

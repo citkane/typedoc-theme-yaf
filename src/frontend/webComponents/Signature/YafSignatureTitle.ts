@@ -39,7 +39,7 @@ export class YafSignatureTitle extends YafHTMLElement<yafSignatureTitleProps> {
 
 		const HTMLElements = [];
 		const preHTMLElement = wrappedInPre
-			? makeElement('pre', 'highlight')
+			? makeElement('pre', 'highlight scroller horizontal pre')
 			: undefined;
 
 		if (!hideName) {
