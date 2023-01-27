@@ -1,5 +1,6 @@
 import {
 	drawerState,
+	flagCounts,
 	yafDisplayOptions,
 	yafEventList,
 	yafState,
@@ -211,7 +212,7 @@ export default class YafElementDrawers {
 	get isLeaf() {
 		return !this.childDrawerElements.length;
 	}
-	get flagCounts(): Record<keyof yafState['options']['display'], number> {
+	get flagCounts(): flagCounts {
 		return {
 			private: this.drawer.querySelectorAll(':scope > .private').length,
 			inherited: this.drawer.querySelectorAll(':scope > .inherited')

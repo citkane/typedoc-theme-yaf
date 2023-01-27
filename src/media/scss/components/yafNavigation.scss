@@ -185,6 +185,7 @@ yaf-navigation-header {
 	position: relative;
 	overflow: hidden;
 }
+
 yaf-navigation-search,
 yaf-navigation-menu {
 	padding: 1rem;
@@ -192,22 +193,30 @@ yaf-navigation-menu {
 	height: 100%;
 }
 yaf-navigation-search {
-	color: var(--color-canvas-subtle);
-
-	&:before {
-		content: '';
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		background-color: var(--color-accent-fg);
-		opacity: 80%;
-		z-index: 0;
-	}
 	.results {
 		position: relative;
 		z-index: 1;
+		li {
+			display: flex;
+			align-items: center;
+			padding: 0.5rem 0;
+			a {
+				display: flex;
+				flex-direction: column;
+				text-decoration: none;
+				.name {
+					color: var(--color-fg-default);
+				}
+				.symbol {
+					color: var(--color-fg-muted);
+					font-size: 0.8rem;
+					font-weight: 300;
+				}
+				.lit {
+					color: var(--color-accent-emphasis);
+				}
+			}
+		}
 	}
 }
 yaf-navigation-menu {

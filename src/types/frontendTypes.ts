@@ -30,6 +30,7 @@ export interface yafState {
 		};
 	};
 }
+export type flagCounts = Record<keyof yafState['options']['display'], number>;
 
 export type displayStates = 'show' | 'hide';
 export type yafDisplayOptions = keyof yafState['options']['display'];

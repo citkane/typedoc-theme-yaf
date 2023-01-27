@@ -23,6 +23,7 @@
 	"editor.formatOnSave": true,
 	"prettier.enable": true,
 	"cSpell.words": [
+		"debouncer",
 		"higlighter",
 		"optimised",
 		"optimises",

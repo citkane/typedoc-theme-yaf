@@ -214,7 +214,9 @@ export class YafNavigationMenuBranch extends YafHTMLElement<{
 			const toggleHTMLElement = makeElement<
 				YafWidgetTagToggle,
 				YafWidgetTagToggle['props']
-			>('yaf-widget-tag-toggle', 'tagtoggles', null, { drawers });
+			>('yaf-widget-tag-toggle', 'tagtoggles', null, {
+				flagCounts: drawers.flagCounts,
+			});
 			const liHTMLElement = makeElement('li');
 			liHTMLElement.appendChild(toggleHTMLElement);
 			return liHTMLElement;

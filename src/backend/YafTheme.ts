@@ -264,12 +264,14 @@ export class YafTheme extends DefaultTheme {
 				if (hasChildren) {
 					makeYafReflectionMap(objectReflection.children, map);
 				}
+
 				if (hasSignatures) {
 					makeYafReflectionMap(
 						objectReflection.signatures as YAFDataObject[],
 						map
 					);
 				}
+
 				if (hasDeclarations) {
 					makeYafReflectionMap(
 						(objectReflection.type as JSONOutput.ReflectionType)

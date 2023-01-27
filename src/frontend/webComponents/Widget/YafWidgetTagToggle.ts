@@ -1,18 +1,18 @@
 import {
 	displayStates,
+	flagCounts,
 	yafDisplayOptions,
 	yafEventList,
 } from '../../../types/frontendTypes.js';
 import { YafHTMLElement } from '../../index.js';
 import appState from '../../handlers/AppState.js';
 import { makeElement, flashElementBackground } from '../../yafElement.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
 import { action, events } from '../../handlers/index.js';
 
 const { action, trigger } = events;
 
 export class YafWidgetTagToggle extends YafHTMLElement<{
-	drawers: YafElementDrawers;
+	flagCounts: flagCounts;
 }> {
 	static get observedAttributes() {
 		return ['inherited', 'private'];
@@ -31,12 +31,11 @@ export class YafWidgetTagToggle extends YafHTMLElement<{
 			);
 	}
 	onConnect() {
-		const { drawers } = this.props;
 		const { factory } = YafWidgetTagToggle;
-		const counts = drawers.flagCounts;
+		const { flagCounts } = this.props;
 
-		(<yafDisplayOptions[]>Object.keys(counts)).forEach((flag) => {
-			const count = counts[flag];
+		(<yafDisplayOptions[]>Object.keys(flagCounts)).forEach((flag) => {
+			const count = flagCounts[flag];
 			if (!count) return;
 
 			let display: displayStates = appState.options.display[flag];

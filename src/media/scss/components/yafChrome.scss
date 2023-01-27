@@ -8,6 +8,9 @@ yaf-chrome-content {
 yaf-chrome-left {
 	flex: 0 0 var(--dim-menu-width);
 	overflow: hidden;
+	&.activeSearch #menuWrapper {
+		background: var(--color-neutral-muted);
+	}
 	@import 'yafNavigation.scss';
 }
 yaf-chrome-right {
