@@ -102,8 +102,9 @@ yaf-navigation-header {
 			.clearIcon {
 				display: none;
 				cursor: pointer;
+				color: var(--color-danger-fg);
 			}
-			&.focussed {
+			&.busy {
 				.clearIcon {
 					display: flex;
 				}

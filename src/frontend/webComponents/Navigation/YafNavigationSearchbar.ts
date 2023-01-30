@@ -1,9 +1,9 @@
-import { componentName } from '../../../types/frontendTypes.js';
-import { events } from '../../handlers/index.js';
+import { componentName, yafEventList } from '../../../types/frontendTypes.js';
+import { action, events } from '../../handlers/index.js';
 import { makeElement, makeIconSpan } from '../../yafElement.js';
 import YafHTMLElement from '../../YafHTMLElement.js';
 
-const { action } = events;
+const { action, trigger } = events;
 
 /**
  *
@@ -18,28 +18,41 @@ export class YafNavigationSearchbar extends YafHTMLElement {
 
 		searchHTMLInput.onfocus = this.focussed;
 		searchHTMLInput.onblur = this.blurred;
-		searchHTMLInput.oninput = this.changed;
+		searchHTMLInput.oninput = this.searchChanged;
 
 		iconsHTMLElement.appendChildren([
 			searchIcon(),
 			clearIcon(searchHTMLInput),
 		]);
 		this.appendChildren([searchHTMLInput, iconsHTMLElement]);
-		//this.eventsList.forEach((event) => events.on(...event));
+		this.eventsList.forEach((event) => events.on(...event));
 	}
 	disconnectedCallback() {
-		//this.eventsList.forEach((event) => events.off(...event));
+		this.eventsList.forEach((event) => events.off(...event));
 	}
+
 	private focussed = () => {
 		this.classList.add('focussed');
 	};
 	private blurred = () => {
 		this.classList.remove('focussed');
 	};
-	private changed = (e: Event) => {
-		const searchstring = (<HTMLInputElement>e.target).value;
-		events.dispatch(action.menu.search(searchstring));
+	private searchChanged = (e: Event) => {
+		const searchString = (<HTMLInputElement>e.target).value;
+		events.dispatch(action.menu.search(searchString));
 	};
+	private resetSearch = ({
+		detail,
+	}: CustomEvent<action['menu']['search']>) => {
+		const { searchString } = detail;
+		searchString.length > 0
+			? this.classList.add('busy')
+			: this.classList.remove('busy');
+	};
+
+	private eventsList: yafEventList = [
+		[trigger.menu.search, this.resetSearch],
+	];
 
 	private static factory = {
 		searchInput: () => {
