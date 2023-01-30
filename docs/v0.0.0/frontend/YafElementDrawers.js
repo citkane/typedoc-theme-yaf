@@ -4,7 +4,7 @@ const { trigger } = events;
 /**
  * Utility class for folding, hierarchical drawers
  */
-export default class YafElementDrawers {
+export class YafElementDrawers {
     constructor(drawerParent, drawer, drawerTrigger, id, parentDrawerElement) {
         this.debounceResize = null;
         this.isDrawer = true;

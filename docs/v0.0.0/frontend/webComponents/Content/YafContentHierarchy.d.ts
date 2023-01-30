@@ -1,5 +1,5 @@
 import { YafHTMLElement } from '../../index.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { yafContentHierarchyProps } from '../../../types/frontendTypes.js';
 export declare class YafContentHierarchy extends YafHTMLElement<yafContentHierarchyProps> {
     drawers?: YafElementDrawers;

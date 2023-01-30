@@ -1,5 +1,5 @@
 import { yafMemberGroupReflectionProps } from '../../../types/frontendTypes.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { YafHTMLElement } from '../../index.js';
 /**
  *

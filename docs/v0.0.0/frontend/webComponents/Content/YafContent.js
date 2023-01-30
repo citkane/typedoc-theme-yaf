@@ -10,8 +10,6 @@ export class YafContent extends YafHTMLElement {
             const url = new URL(window.location.href);
             let page = url.searchParams.get('page');
             page = decodeURIComponent(page || '');
-            const bodyHTMLElement = document.querySelector('body');
-            bodyHTMLElement === null || bodyHTMLElement === void 0 ? void 0 : bodyHTMLElement.classList.add('loading');
             appState.getPageData(page || 'index').then((data) => {
                 const newId = String(data.id);
                 if (this.id !== newId)
@@ -19,7 +17,6 @@ export class YafContent extends YafHTMLElement {
                 this.id = newId;
                 const scrollTop = appState.scrollTops[this.id] || 0;
                 events.dispatch(action.content.scrollTo(url.hash ? url.hash.replace('#', '') : scrollTop));
-                bodyHTMLElement === null || bodyHTMLElement === void 0 ? void 0 : bodyHTMLElement.classList.remove('loading');
             });
         };
         this.saveScrollTop = ({ detail, }) => {
@@ -38,7 +35,14 @@ export class YafContent extends YafHTMLElement {
     }
     onConnect() {
         this.events.forEach((event) => events.on(...event));
+        const bodyHTMLElement = document.querySelector('body');
+        bodyHTMLElement === null || bodyHTMLElement === void 0 ? void 0 : bodyHTMLElement.classList.remove('loaded');
+        bodyHTMLElement === null || bodyHTMLElement === void 0 ? void 0 : bodyHTMLElement.classList.add('loading');
         this.initPageData();
+        bodyHTMLElement === null || bodyHTMLElement === void 0 ? void 0 : bodyHTMLElement.classList.remove('loading');
+        setTimeout(() => {
+            bodyHTMLElement === null || bodyHTMLElement === void 0 ? void 0 : bodyHTMLElement.classList.add('loaded');
+        }, 600);
     }
     disconnectedCallback() {
         this.events.forEach((event) => events.off(...event));

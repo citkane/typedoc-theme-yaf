@@ -1,5 +1,5 @@
 import { treeMenuBranch, YAFReflectionLink } from '../../../types/types.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { YafHTMLElement } from '../../index.js';
 /**
  *

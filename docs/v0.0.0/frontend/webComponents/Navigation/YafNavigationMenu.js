@@ -14,8 +14,11 @@ export class YafNavigationMenu extends YafHTMLElement {
             appState.setScrollTop('menu', this.scrollTop);
         };
         this.focusIndex = ({ detail, }) => {
+            events.dispatch(action.menu.search(''));
             events.dispatch(action.menu.toggle('open'));
-            scrollToAnchor(this, `menu_${detail.target}`);
+            setTimeout(() => {
+                scrollToAnchor(this, `menu_${detail.target}`);
+            });
         };
         this.eventsList = [
             ['scroll', this.recordScrollTop, this],
@@ -67,8 +70,8 @@ YafNavigationMenu.treeBranchSort = (tree) => {
     })
         .filter((reflectionLink) => !!reflectionLink);
     const sortedBranchLinkList = branchLinkList
-        .sort((a, b) => b.name.localeCompare(a.name))
-        .sort((a, b) => (a.kind > b.kind ? -1 : 1));
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => (a.kind > b.kind ? -1 : a.kind === b.kind ? 0 : 1));
     return { links: sortedBranchLinkList, tree };
 };
 const yafNavigationMenu = 'yaf-navigation-menu';

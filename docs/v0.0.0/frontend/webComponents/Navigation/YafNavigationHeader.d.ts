@@ -1,4 +1,4 @@
-import YafElementDrawers from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { YafHTMLElement } from '../../index.js';
 /**
  *

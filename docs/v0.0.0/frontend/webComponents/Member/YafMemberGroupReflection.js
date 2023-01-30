@@ -1,5 +1,5 @@
 var _a;
-import YafElementDrawers from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { makeElement, makeTitleSpan, makeIconSpan, normaliseFlags, makeSymbolSpan, makeLinkElement, } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
 import { events } from '../../handlers/index.js';

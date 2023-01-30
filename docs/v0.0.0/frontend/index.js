@@ -4,7 +4,7 @@
  * @module frontend
  */
 export { default as YafHTMLElement } from './YafHTMLElement.js';
-export { default as YafElementDrawers } from './YafElementDrawers.js';
+export * from './YafElementDrawers.js';
 import * as yafElement_1 from './yafElement.js';
 export { yafElement_1 as yafElement };
 import * as handlers_1 from './handlers/index.js';

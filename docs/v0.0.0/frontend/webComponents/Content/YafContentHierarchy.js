@@ -1,7 +1,7 @@
 import { YafHTMLElement } from '../../index.js';
 import appState from '../../handlers/AppState.js';
 import { makeElement, makeIconSpan, makeLinkElement, } from '../../yafElement.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 export class YafContentHierarchy extends YafHTMLElement {
     constructor() {
         super(...arguments);

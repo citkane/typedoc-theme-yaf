@@ -1,6 +1,6 @@
 var _a;
 import appState from '../../handlers/AppState.js';
-import YafElementDrawers from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { makeIconSpan, makeElement, makeLinkElement, makeNameSpan, } from '../../yafElement.js';
 import { YafHTMLElement } from '../../index.js';
 import { events } from '../../handlers/index.js';

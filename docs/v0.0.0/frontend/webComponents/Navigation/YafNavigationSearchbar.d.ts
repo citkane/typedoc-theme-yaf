@@ -8,7 +8,7 @@ export declare class YafNavigationSearchbar extends YafHTMLElement {
     private focussed;
     private blurred;
     private searchChanged;
-    private resetSearch;
+    private setSearchState;
     private eventsList;
     private static factory;
 }

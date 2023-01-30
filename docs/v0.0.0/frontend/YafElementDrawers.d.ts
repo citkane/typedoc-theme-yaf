@@ -3,7 +3,7 @@ export type DrawerElement = HTMLElement & YafElementDrawers;
 /**
  * Utility class for folding, hierarchical drawers
  */
-export default class YafElementDrawers {
+export declare class YafElementDrawers {
     drawer: HTMLElement;
     drawerParent: DrawerElement;
     drawerTrigger: HTMLElement;
