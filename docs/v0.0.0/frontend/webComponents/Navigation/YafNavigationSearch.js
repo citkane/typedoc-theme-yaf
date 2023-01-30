@@ -24,11 +24,11 @@ export class YafNavigationSearch extends YafHTMLElement {
                 const resultHTMLListItems = results
                     .sort((a, b) => (a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0))
                     .map((result) => resultLink(result[1], searchString));
-                console.log(results);
                 this.resultsHTMLElement.replaceChildren();
                 this.resultsHTMLElement.appendChildren(resultHTMLListItems);
                 const tagToggleHTMLElement = tagToggles(this.resultsHTMLElement);
                 this.resultsHTMLElement.prepend(tagToggleHTMLElement);
+                this.scrollTop = 0;
             }, 600);
         };
         this.match = (results, searchString, reflection, target = 'name', offset = 0) => {

@@ -1,7 +1,7 @@
 import { events } from '../../handlers/index.js';
 import { makeElement, makeIconSpan } from '../../yafElement.js';
 import YafHTMLElement from '../../YafHTMLElement.js';
-const { action } = events;
+const { action, trigger } = events;
 /**
  *
  */
@@ -14,10 +14,19 @@ export class YafNavigationSearchbar extends YafHTMLElement {
         this.blurred = () => {
             this.classList.remove('focussed');
         };
-        this.changed = (e) => {
-            const searchstring = e.target.value;
-            events.dispatch(action.menu.search(searchstring));
+        this.searchChanged = (e) => {
+            const searchString = e.target.value;
+            events.dispatch(action.menu.search(searchString));
         };
+        this.resetSearch = ({ detail, }) => {
+            const { searchString } = detail;
+            searchString.length > 0
+                ? this.classList.add('busy')
+                : this.classList.remove('busy');
+        };
+        this.eventsList = [
+            [trigger.menu.search, this.resetSearch],
+        ];
     }
     onConnect() {
         const { searchInput, searchIcon, clearIcon } = YafNavigationSearchbar.factory;
@@ -25,16 +34,16 @@ export class YafNavigationSearchbar extends YafHTMLElement {
         const iconsHTMLElement = makeElement('span', 'wrapper');
         searchHTMLInput.onfocus = this.focussed;
         searchHTMLInput.onblur = this.blurred;
-        searchHTMLInput.oninput = this.changed;
+        searchHTMLInput.oninput = this.searchChanged;
         iconsHTMLElement.appendChildren([
             searchIcon(),
             clearIcon(searchHTMLInput),
         ]);
         this.appendChildren([searchHTMLInput, iconsHTMLElement]);
-        //this.eventsList.forEach((event) => events.on(...event));
+        this.eventsList.forEach((event) => events.on(...event));
     }
     disconnectedCallback() {
-        //this.eventsList.forEach((event) => events.off(...event));
+        this.eventsList.forEach((event) => events.off(...event));
     }
 }
 YafNavigationSearchbar.factory = {
