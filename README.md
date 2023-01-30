@@ -1,17 +1,15 @@
 # typedoc-theme-yaf
 
-**ALPHA:** This is not production ready.
-
 A theme that optimises deep project exploration, graphical clarity and a fluid end user experience.
 
 <a href="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg"><img src="https://raw.githubusercontent.com/citkane/typedoc-theme-yaf/assets/typedoc-theme-yaf.jpg" height="auto" width="500px"/></a>
 
-#### <a href="https://citkane.github.io/typedoc-theme-yaf/">Live Example</a>
+## <a href="https://citkane.github.io/typedoc-theme-yaf/">Live Example</a>
 
 ## Usage
-This theme couples and cross links your documentation content to a contextual menu tree.
+The documentation content and navigation is fully cross-linked with n-depth expanding drawers. Contexts are automatically expanded and highlighted in both directions, so there exists a singular DRY mechanism for the reader to know their context from.  
 
-The expanding menu contains links to all depths of information. Conversely, you can click on any content heading to expand, scroll and highlight your place in the documentation tree.
+
 ### Versioning
 This theme automatically creates a semantically versioned history of your documentation.\
 For more information, see [typedoc-plugin-version](https://github.com/citkane/typedoc-plugin-versions), which includes examples of how to set up a [Github CID](https://github.com/citkane/typedoc-plugin-versions) for your documentation.
