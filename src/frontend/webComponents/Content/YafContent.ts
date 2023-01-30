@@ -29,7 +29,15 @@ const { trigger, action } = events;
 export class YafContent extends YafHTMLElement {
 	onConnect() {
 		this.events.forEach((event) => events.on(...event));
+
+		const bodyHTMLElement = document.querySelector('body');
+		bodyHTMLElement?.classList.remove('loaded');
+		bodyHTMLElement?.classList.add('loading');
 		this.initPageData();
+		bodyHTMLElement?.classList.remove('loading');
+		setTimeout(() => {
+			bodyHTMLElement?.classList.add('loaded');
+		}, 600);
 	}
 	disconnectedCallback() {
 		this.events.forEach((event) => events.off(...event));
@@ -39,8 +47,6 @@ export class YafContent extends YafHTMLElement {
 		const url = new URL(window.location.href);
 		let page = url.searchParams.get('page');
 		page = decodeURIComponent(page || '');
-		const bodyHTMLElement = document.querySelector('body');
-		bodyHTMLElement?.classList.add('loading');
 
 		appState.getPageData(page || 'index').then((data) => {
 			const newId = String(data.id);
@@ -54,8 +60,6 @@ export class YafContent extends YafHTMLElement {
 					url.hash ? url.hash.replace('#', '') : scrollTop
 				)
 			);
-
-			bodyHTMLElement?.classList.remove('loading');
 		});
 	};
 	private renderPageContent(data: YAFDataObject) {

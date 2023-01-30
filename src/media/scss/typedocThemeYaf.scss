@@ -56,6 +56,14 @@ body.loading {
 		rotate: 360deg;
 	}
 }
+@media (prefers-reduced-motion: no-preference) {
+	.loaded .scroller {
+		scroll-behavior: smooth;
+	}
+}
+.scroller.instant {
+	scroll-behavior: auto;
+}
 
 typedoc-theme-yaf {
 	display: flex;
@@ -64,9 +72,6 @@ typedoc-theme-yaf {
 	position: relative;
 	overflow: hidden;
 
-	.rendered .scroller {
-		scroll-behavior: smooth;
-	}
 	.scroller.vertical {
 		overflow-y: scroll;
 	}

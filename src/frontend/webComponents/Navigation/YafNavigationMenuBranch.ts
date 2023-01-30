@@ -1,6 +1,6 @@
 import { treeMenuBranch, YAFReflectionLink } from '../../../types/types.js';
 import appState from '../../handlers/AppState.js';
-import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { componentName, yafEventList } from '../../../types/frontendTypes.js';
 import {
 	makeElement,
@@ -15,7 +15,7 @@ import {
 	YafWidgetKind,
 	YafWidgetTagToggle,
 } from '../Widget/index.js';
-import { YafHTMLElement } from '../../index.js';
+import { DrawerElement, YafHTMLElement } from '../../index.js';
 import { events } from '../../handlers/index.js';
 const { trigger } = events;
 

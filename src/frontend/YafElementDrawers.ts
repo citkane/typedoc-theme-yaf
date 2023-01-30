@@ -3,7 +3,6 @@ import {
 	flagCounts,
 	yafDisplayOptions,
 	yafEventList,
-	yafState,
 } from '../types/frontendTypes.js';
 import appState from './handlers/AppState.js';
 import { action, events } from './handlers/index.js';
@@ -13,7 +12,7 @@ const { trigger } = events;
 /**
  * Utility class for folding, hierarchical drawers
  */
-export default class YafElementDrawers {
+export class YafElementDrawers {
 	drawer!: HTMLElement;
 	drawerParent!: DrawerElement;
 	drawerTrigger!: HTMLElement;

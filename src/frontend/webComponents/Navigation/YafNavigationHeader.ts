@@ -1,5 +1,5 @@
 import appState from '../../handlers/AppState.js';
-import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import {
 	makeIconSpan,
 	makeElement,
@@ -7,7 +7,7 @@ import {
 	makeNameSpan,
 } from '../../yafElement.js';
 import { kindSymbols } from '../../../types/types.js';
-import { YafHTMLElement } from '../../index.js';
+import { DrawerElement, YafHTMLElement } from '../../index.js';
 import { YafWidgetKind } from '../Widget/index.js';
 import { events } from '../../handlers/index.js';
 const { action } = events;

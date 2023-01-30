@@ -1,4 +1,4 @@
-import { YafHTMLElement } from '../../index.js';
+import { DrawerElement, YafHTMLElement } from '../../index.js';
 import { hierarchy } from '../../../types/types';
 import appState from '../../handlers/AppState.js';
 import {
@@ -6,7 +6,7 @@ import {
 	makeIconSpan,
 	makeLinkElement,
 } from '../../yafElement.js';
-import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { yafContentHierarchyProps } from '../../../types/frontendTypes.js';
 
 export class YafContentHierarchy extends YafHTMLElement<yafContentHierarchyProps> {

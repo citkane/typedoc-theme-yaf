@@ -38,20 +38,26 @@ export class YafNavigationSearchbar extends YafHTMLElement {
 		this.classList.remove('focussed');
 	};
 	private searchChanged = (e: Event) => {
-		const searchString = (<HTMLInputElement>e.target).value;
+		const target = e.target as HTMLInputElement;
+		if (!target.validity.tooShort && target.validity.patternMismatch)
+			return;
+		const searchString = target.value;
+
 		events.dispatch(action.menu.search(searchString));
 	};
-	private resetSearch = ({
+	private setSearchState = ({
 		detail,
 	}: CustomEvent<action['menu']['search']>) => {
 		const { searchString } = detail;
-		searchString.length > 0
-			? this.classList.add('busy')
-			: this.classList.remove('busy');
+		searchString.length > 0 ? this.classList.add('busy') : clear(this);
+		function clear(self: HTMLElement) {
+			self.classList.remove('busy');
+			self.querySelector('input')!.value = '';
+		}
 	};
 
 	private eventsList: yafEventList = [
-		[trigger.menu.search, this.resetSearch],
+		[trigger.menu.search, this.setSearchState],
 	];
 
 	private static factory = {
@@ -64,8 +70,9 @@ export class YafNavigationSearchbar extends YafHTMLElement {
 				'Search the documents...'
 			);
 			searchHTMLInput.setAttribute('aria-label', 'Search the documents');
-
 			searchHTMLInput.setAttribute('minlength', '3');
+			searchHTMLInput.setAttribute('pattern', '^[a-z|A-Z|0-9|.|_|-]+$');
+
 			return searchHTMLInput;
 		},
 		searchIcon: () => {

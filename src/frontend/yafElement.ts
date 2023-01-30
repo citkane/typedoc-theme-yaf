@@ -11,7 +11,7 @@ import { YafNavigationLink } from './webComponents/Navigation/index.js';
 import { YafSignature } from './webComponents/Signature/index.js';
 
 import errorHandlers from './handlers/ErrorHandlers.js';
-import YafElementDrawers from './YafElementDrawers.js';
+import { YafElementDrawers } from './YafElementDrawers.js';
 import { YafWidgetFlags } from './webComponents/Widget/index.js';
 
 const iconClass = 'material-icons-sharp';
@@ -188,24 +188,20 @@ export const scrollToAnchor = (
 	if (targetElement) {
 		const drawerParents =
 			YafElementDrawers.findParentDrawers(targetElement);
-
-		if (!YafElementDrawers.hasClosedDrawers(drawerParents)) {
-			targetElement.scrollIntoView({
-				behavior: 'smooth',
-				block: 'start',
-			});
+		const scrollIntoView = () => {
+			container.scrollTop = targetElement.offsetTop;
 			hackFixMobileScrolling();
 			flashElementBackground(targetElement);
+		};
+
+		if (!YafElementDrawers.hasClosedDrawers(drawerParents)) {
+			scrollIntoView();
 		} else if (drawerParents.length) {
 			drawerParents.forEach((element) => element.drawers.openDrawer());
-			setTimeout(() => {
-				targetElement.scrollIntoView({
-					behavior: 'smooth',
-					block: 'start',
-				});
-				hackFixMobileScrolling();
-				flashElementBackground(targetElement);
-			}, getTransitionDuration(drawerParents[0].drawers.drawer) / 2);
+			setTimeout(
+				() => scrollIntoView(),
+				getTransitionDuration(drawerParents[0].drawers.drawer) / 2
+			);
 		}
 	} else {
 		return errorHandlers.notFound(

@@ -70,14 +70,24 @@ export class YafWidgetTagToggle extends YafHTMLElement<{
 	];
 
 	private static factory = {
-		handleClickAnimations: (e: MouseEvent) =>
+		handleClickAnimations: (e: MouseEvent) => {
 			setTimeout(() => {
-				(<HTMLElement>e.target).scrollIntoView({
-					behavior: 'smooth',
-					block: 'start',
-				});
+				const target = e.target as HTMLElement;
+				const container = getScrollContainer(target);
+
+				container.classList.add('instant');
+				container.scrollTop = target.offsetTop;
+				container.classList.remove('instant');
+
 				flashElementBackground(e.target as HTMLElement);
-			}),
+			});
+
+			function getScrollContainer(target: HTMLElement): HTMLElement {
+				return target.classList.contains('scroller')
+					? target
+					: getScrollContainer(target.parentElement!);
+			}
+		},
 	};
 }
 const yafWidgetTagToggle = 'yaf-widget-tag-toggle';

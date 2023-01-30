@@ -66,6 +66,22 @@ yaf-navigation-header {
 			height: 100%;
 			position: relative;
 			align-items: center;
+			input::-ms-clear {
+				display: none;
+				width: 0;
+				height: 0;
+			}
+			input::-ms-reveal {
+				display: none;
+				width: 0;
+				height: 0;
+			}
+			input::-webkit-search-decoration,
+			input::-webkit-search-cancel-button,
+			input::-webkit-search-results-button,
+			input::-webkit-search-results-decoration {
+				display: none;
+			}
 
 			input {
 				width: calc(100% - 8px);

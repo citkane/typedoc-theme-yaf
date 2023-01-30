@@ -66,8 +66,11 @@ export class YafNavigationMenu extends YafHTMLElement {
 	private focusIndex = ({
 		detail,
 	}: CustomEvent<action['menu']['scrollTo']>) => {
+		events.dispatch(action.menu.search(''));
 		events.dispatch(action.menu.toggle('open'));
-		scrollToAnchor(this, `menu_${detail.target}`);
+		setTimeout(() => {
+			scrollToAnchor(this, `menu_${detail.target}`);
+		});
 	};
 
 	private eventsList: yafEventList = [
@@ -87,8 +90,8 @@ export class YafNavigationMenu extends YafHTMLElement {
 			})
 			.filter((reflectionLink) => !!reflectionLink);
 		const sortedBranchLinkList = branchLinkList
-			.sort((a, b) => b.name.localeCompare(a.name))
-			.sort((a, b) => (a.kind > b.kind ? -1 : 1));
+			.sort((a, b) => a.name.localeCompare(b.name))
+			.sort((a, b) => (a.kind > b.kind ? -1 : a.kind === b.kind ? 0 : 1));
 
 		return { links: sortedBranchLinkList, tree };
 	};

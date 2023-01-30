@@ -4,7 +4,7 @@
  * @module frontend
  */
 export { default as YafHTMLElement } from './YafHTMLElement.js';
-export { default as YafElementDrawers } from './YafElementDrawers.js';
+export * from './YafElementDrawers.js';
 /**
  * A Yaf Theme factory for fetching, creating, manipulating, querying
  * and appending HTML Elements and Text.

@@ -32,7 +32,7 @@ Proceed with building your documentation.
 
 **Note:** the `index.html` output for the documentation build will be a SPA entry point, so very little will happen if you open it with your browser locally. You will have to serve it with a server application of your choice, eg. the VS-Code [Live Server](https://github.com/ritwickdey/vscode-live-server) plugin.
 
-## Frontend Strategy
+## Front-end Strategy
 The frontend decouples itself from the default TypeDoc theme `.html` fragment strategy and creates a single page application (SPA) which consumes `.json` data fragments.
 
 This facilitates a user experience where place-keeping while reading and navigating is maintained across document pages, page reloads and browser sessions.
@@ -45,7 +45,7 @@ The open/close state of these as well as the page scroll position is persisted, 
 The SPA is built with zero dependencies using [Web Components](https://en.wikipedia.org/wiki/Web_Components).
 
 
-## Backend Strategy
+## Back-end Strategy
 The backend takes as input the default TypeDoc [`ProjectReflection`](https://typedoc.org/api/classes/ProjectReflection.html) and [`JSONOutput.ProjectReflection`](https://typedoc.org/api/interfaces/JSONOutput.ProjectReflection.html) and outputs a collection of `.json` data files for consumption by the frontend.
 
 The theme does not (majorly) interfere with the default TypeDoc data construction flow, but rather post-serialises the standard Typedoc output into it's own needs.   
@@ -76,5 +76,5 @@ Before the first run only, do `npm i && npm run build`.
 - Main navigation menu extension, eg. `.md` defined tutorials and documentation with hierarchical chapters.
 ### Long term
 - Either or;
-  - collaborate with TypeDoc to normalise it's default JSON output, 
-  - or purpose build a TSDoc document parser and migrate this theme to be a standalone documentation product.
+  - collaborate with TypeDoc to normalise it's default JSON output to theme compatibility, 
+  - purpose build a TSDoc document parser back-end and migrate this theme to be a standalone documentation product.

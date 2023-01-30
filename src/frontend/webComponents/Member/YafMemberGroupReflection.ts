@@ -3,7 +3,7 @@ import {
 	yafHTMLExtension,
 	yafMemberGroupReflectionProps,
 } from '../../../types/frontendTypes.js';
-import YafElementDrawers, { DrawerElement } from '../../YafElementDrawers.js';
+import { YafElementDrawers } from '../../YafElementDrawers.js';
 import { YafMember } from './YafMember.js';
 import { YAFDataObject, YAFReflectionLink } from '../../../types/types.js';
 import { JSONOutput } from 'typedoc';
@@ -15,7 +15,7 @@ import {
 	makeSymbolSpan,
 	makeLinkElement,
 } from '../../yafElement.js';
-import { YafHTMLElement } from '../../index.js';
+import { DrawerElement, YafHTMLElement } from '../../index.js';
 import { YafWidgetCounter, YafWidgetTagToggle } from '../Widget/index.js';
 import { events } from '../../handlers/index.js';
 const { action } = events;
