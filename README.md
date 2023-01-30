@@ -7,7 +7,7 @@ A theme that optimises deep project exploration, graphical clarity and a fluid e
 ## <a href="https://citkane.github.io/typedoc-theme-yaf/">Live Example</a>
 
 ## Usage
-The documentation content and navigation is fully cross-linked with n-depth expanding drawers. During user navigation events, contexts are automatically expanded and highlighted in both directions, so there exists a singular DRY visual mechanism for the reader to keep their place from.  
+The documentation content and navigation is fully cross-linked with n-depth expanding drawers. During user navigation events, contexts are automatically expanded and highlighted in both directions, so there exists a singular DRY visual mechanism for the reader to keep their place within.  
 
 
 ### Versioning
