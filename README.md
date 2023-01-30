@@ -12,6 +12,9 @@ A theme that optimises deep project exploration, graphical clarity and a fluid e
 This theme couples and cross links your documentation content to a contextual menu tree.
 
 The expanding menu contains links to all depths of information. Conversely, you can click on any content heading to expand, scroll and highlight your place in the documentation tree.
+### Versioning
+This theme automatically creates a semantically versioned history of your documentation.\
+For more information, see [typedoc-plugin-version](https://github.com/citkane/typedoc-plugin-versions), which includes examples of how to set up a [Github CID](https://github.com/citkane/typedoc-plugin-versions) for your documentation.
 
 
 ### Installation
@@ -62,10 +65,10 @@ You can spin up a local [hot development](https://github.com/citkane/typedoc-plu
 
 ## Roadmap
 ### Short Term
-- Implement search functionality
-- Implement document versioning
+- ~~Implement search functionality~~ ✅
+- ~~Implement document versioning~~ ✅
 - ~~Implement reflection reference linkages across mono-repo workspaces~~ ✅
-- Write meaningful tests and pretend that this was always a test driven design process...
+- Write meaningful tests...
 ### Medium Term
 - Implement tabbed bookmarks
 - Implement end user sticky notes (using local storage)
@@ -73,4 +76,6 @@ You can spin up a local [hot development](https://github.com/citkane/typedoc-plu
 - Support diagrams in MarkDown
 - Main navigation menu extension, eg. `.md` defined tutorials and documentation with hierarchical chapters.
 ### Long term
-- Either collaborate with TypeDoc to normalise it's default JSON output, or purpose build a TSDoc document parser and migrate this theme to be a standalone documentation product.
+- Either or;
+  - collaborate with TypeDoc to normalise it's default JSON output, 
+  - or purpose build a TSDoc document parser and migrate this theme to be a standalone documentation product.
