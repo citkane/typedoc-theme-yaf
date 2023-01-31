@@ -1,9 +1,0 @@
-{
-	"extends": "@typedoc-theme-yaf/tsconfig/es6.json",
-	"include": ["./", "stubs"],
-	"compilerOptions": {
-		"outDir": "../../dist/frontend",
-		"moduleResolution": "node",
-		"module": "ESNext"
-	}
-}

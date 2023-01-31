@@ -1,0 +1,15 @@
+{
+	"$schema": "https://typedoc.org/schema.json",
+	"out": "./temp/docs",
+	"entryPoints": ["./examples"],
+	"externalPattern": ["**/node_modules/**"],
+	"excludeExternals": true,
+	"excludePrivate": false,
+	"excludeProtected": false,
+	"excludeNotDocumented": false,
+	"logLevel": "Verbose",
+	"plugin": ["../dist"],
+	"theme": "yaf",
+	"readme": "./examples/README.md",
+	"tsconfig": "./examples.tsconfig.json"
+}

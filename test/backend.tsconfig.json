@@ -1,0 +1,7 @@
+{
+	"extends": "@typedoc-theme-yaf/tsconfig/commonJs.json",
+	"include": ["./backend"],
+	"compilerOptions": {
+		"outDir": "./dist"
+	}
+}

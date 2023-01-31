@@ -1,6 +1,6 @@
 {
-	"name": "typedoc-theme-yaf",
-	"version": "0.0.0",
+	"name": "yaf-test-documentation",
+	"version": "0.0.1",
 	"description": "Typedoc custom theme for YAF-Scaffold",
 	"main": "./src/index",
 	"workspaces": [
@@ -9,8 +9,7 @@
 	"scripts": {
 		"test": "tsc --build && nyc mocha && wtr --playwright",
 		"test:backend": "npm run build && tsc --project ./test/backend.tsconfig.json && nyc mocha",
-		"test:frontend": "npm run build && tsc --project ./test/frontend.tsconfig.json && typedoc --options test/typedoc.json && wtr",
-		"test:frontend:update": "wtr --update-visual-baseline",
+		"test:frontend": "tsc --build && wtr --watch",
 		"docs": "typedoc",
 		"build": "tsc --build && node ./scripts/build.js && npm run build:css && npm run build:postcss",
 		"build:watch": "npm run build && npm run build:watch:cssAndPost",
@@ -40,7 +39,7 @@
 		"@typescript-eslint/parser": "^5.33.1",
 		"@web/test-runner": "^0.14.0",
 		"@web/test-runner-playwright": "^0.8.10",
-		"@web/test-runner-visual-regression": "^0.7.0",
+		"@web/test-runner-puppeteer": "^0.10.5",
 		"autoprefixer": "^10.4.13",
 		"chai": "^4.3.6",
 		"chai-as-promised": "^7.1.1",

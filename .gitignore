@@ -7,6 +7,7 @@
 
 /*/
 /test/*/
+/test/screenshots/Chromium/failed/
 
 !/.vscode/
 !/.github/
@@ -14,4 +15,7 @@
 !/src/
 !/tsconfig/
 !/test/
-!/test/src/
+!/test/backend/
+!/test/frontend/
+!/test/examples/
+!/test/screenshots/

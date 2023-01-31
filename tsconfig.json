@@ -3,10 +3,7 @@
 	"references": [
 		{ "path": "./src/tsconfig.backend.json" },
 		{ "path": "./src/tsconfig.frontend.json" },
-		{ "path": "./src/tsconfig.examples.json" },
 		{ "path": "./src/tsconfig.types.json" }
-		//{ "path": "./test/src/backend" },
-		//{ "path": "./test/src/frontend" }
 	],
 	"exclude": ["./"]
 }

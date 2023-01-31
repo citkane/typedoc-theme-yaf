@@ -24,4 +24,4 @@ fs.readdirSync(makeAllOsPath(mediaSrcPath)).forEach((fileName) => {
 copySync('src/index.html', 'dist/src/index.html');
 copySync('LICENSE', 'dist/LICENSE');
 copySync('package.json', 'dist/package.json');
-copySync('README.md', 'dist/README.md');
+//copySync('README.md', 'dist/README.md');
