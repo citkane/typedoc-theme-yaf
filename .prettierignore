@@ -5,9 +5,17 @@
 !.eslint*
 !.prettier*
 
-./dist
-./docs
-./node_modules
+/*/
 
-./test
-!./test/src
+!/src/
+!/scripts/
+!/tsconfig/
+!/.github/
+!/test/
+/test/*/
+!/test/backend/
+!/test/frontend/
+!/test/examples/
+
+
+

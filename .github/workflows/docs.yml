@@ -7,9 +7,7 @@ permissions:
     contents: write # allows the 'Commit' step without tokens
 
 jobs:
-
     build: # builds the distribution and then the documentation
-
         runs-on: ubuntu-latest
         steps:
             - name: Checkout src
