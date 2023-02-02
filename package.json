@@ -46,6 +46,7 @@
 		"chai-as-promised": "^7.1.1",
 		"chai-as-promised-esm": "npm:@esm-bundle/chai-as-promised@^7.1.1",
 		"chokidar": "^3.5.3",
+		"deep-equal-in-any-order": "^2.0.2",
 		"eslint": "^8.22.0",
 		"eslint-config-prettier": "^8.5.0",
 		"mocha": "^10.0.0",

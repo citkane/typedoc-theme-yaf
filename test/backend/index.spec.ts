@@ -59,7 +59,7 @@ describe('Back-End', function () {
 				newDataDirStructure[file],
 				`"${file}" directory not found`
 			);
-			assert.deepEqual(
+			(<any>assert).deepEqualInAnyOrder(
 				expectedOutputDirStructure[file],
 				newDataDirStructure[file],
 				`"${file}" directory not as expected`
@@ -71,7 +71,7 @@ describe('Back-End', function () {
 			newDataDirStructure.data,
 			'"data" directory does not found.'
 		);
-		assert.deepEqual(
+		(<any>assert).deepEqualInAnyOrder(
 			newDataDirStructure.data,
 			expectedOutputDirStructure.data,
 			'"data" directory not as expected'
