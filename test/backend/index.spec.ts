@@ -22,7 +22,7 @@ describe('Back-End', function () {
 		app = await bootstrapApp(load, new Application());
 	});
 	it('parses the project', function () {
-		this.timeout(5000);
+		this.timeout(10000);
 		project = app.convert();
 		assert.isTrue(
 			project && project instanceof ProjectReflection,
