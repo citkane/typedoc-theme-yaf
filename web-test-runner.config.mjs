@@ -41,6 +41,8 @@ export default {
 			// eslint-disable-next-line no-undef
 			update: process.argv.includes('--update-visual-baseline'),
 			baseDir: './test/screenshots',
+			failureThresholdType: 'percent',
+			failureThreshold: 0.001,
 		}),
 	],
 	manual: false,
