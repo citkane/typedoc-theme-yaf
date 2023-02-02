@@ -45,4 +45,10 @@ export default {
 	],
 	manual: false,
 	open: false,
+	TestFramework: {
+		config: {
+			bail: true,
+			retries: 3,
+		},
+	},
 };

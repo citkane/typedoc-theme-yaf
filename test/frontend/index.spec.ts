@@ -1,16 +1,15 @@
 import { visualDiff } from '@web/test-runner-visual-regression';
 import { setViewport } from '@web/test-runner-commands';
-import { doesNotMatch } from 'assert';
 
-type done = () => void;
+type callBack = (err?: any) => void;
 
 it('sets the viewport size', async function () {
 	await setViewport({ width: 1350, height: 2000 });
 });
-it('initial load', function (done: done) {
+it('initial load', function (done: callBack) {
 	screenShot(done, 'initialLoad');
 });
-it('expands the menu', function (done: done) {
+it('expands the menu', function (done: callBack) {
 	this.timeout(4000);
 	const button = document.querySelector(
 		'yaf-navigation-header .open.button'
@@ -27,7 +26,7 @@ it('expands the menu', function (done: done) {
 	}
 });
 it('loads all the links', async function () {
-	await setViewport({ width: 900, height: 2000 });
+	await setViewport({ width: 900, height: 1200 });
 	const items = <HTMLElement[]>[
 		...document.querySelectorAll(
 			'yaf-navigation-menu li.header, yaf-navigation-menu-branch'
@@ -37,71 +36,48 @@ it('loads all the links', async function () {
 		'yaf-chrome-content'
 	) as HTMLElement;
 
-	const time = items.length * 1500;
+	const time = items.length * 2000;
 	this.timeout(time);
 
 	for (let i = 0; i < items.length; i++) {
 		const item = items[i];
 		const id = item.id;
+		const imageName = `${i}_${id}`;
 		const link = item.querySelector(
 			item.nodeName === 'LI'
 				? 'a'
 				: ':scope > .header > yaf-navigation-link a'
 		) as HTMLElement;
+
 		link!.click();
-		await new Promise((resolve) =>
+		await new Promise((resolve, reject) => {
 			screenShot(
-				() => {
+				(err) => {
+					if (err) {
+						console.log(
+							`image ${i + 1} of ${items.length}: ${imageName}`
+						);
+						reject(err);
+					}
 					resolve(true);
 				},
-				id,
-				1000,
+				imageName,
+				1200,
 				container
-			)
-		);
+			);
+		});
 	}
 });
 
 function screenShot(
-	callBack: done,
+	callBack: callBack,
 	name: string,
 	time = 100,
 	element = document.body
 ) {
 	setTimeout(async () => {
-		await visualDiff(element, name);
-		callBack();
+		visualDiff(element, name)
+			.then(() => callBack())
+			.catch((err) => callBack(err));
 	}, time);
 }
-
-//import '../../../dist/src/frontend';
-
-/*
-import unitTestUtils from './lib/utils.spec';
-import unitTestEvents from './lib/events.spec';
-import unitTestYafElement from './YafElement.spec';
-
-describe('Frontend unit tests', function () {
-	this.beforeAll(function () {
-		makeFetchStub();
-	});
-	this.afterAll(function () {
-		(<fetchStub>window.fetch).restore();
-	});
-	unitTestUtils();
-	unitTestEvents();
-	unitTestYafElement();
-});
-
-import typedocThemeYaf from './webComponents/TypedocThemeYaf.spec';
-import { fetchStub, makeFetchStub } from './stubs/stubs';
-describe('Frontend component unit tests', function () {
-	this.beforeAll(function () {
-		makeFetchStub();
-	});
-	this.afterAll(function () {
-		(<fetchStub>window.fetch).restore();
-	});
-	typedocThemeYaf();
-});
-*/

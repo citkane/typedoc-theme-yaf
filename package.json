@@ -7,7 +7,7 @@
 		"tsconfig"
 	],
 	"scripts": {
-		"test": "tsc --build && nyc mocha && wtr --playwright",
+		"test": "npm run test:backend && npm run test:frontend",
 		"test:backend": "npm run build && tsc --project ./test/backend.tsconfig.json && nyc mocha",
 		"test:frontend": "npm run build && tsc --project ./test/frontend.tsconfig.json && typedoc --options test/typedoc.json && wtr",
 		"test:frontend:update": "wtr --update-visual-baseline",

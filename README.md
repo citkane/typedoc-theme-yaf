@@ -67,13 +67,14 @@ Before the first run only, do `npm i && npm run build`.
 - ~~Implement search functionality~~ ✅
 - ~~Implement document versioning~~ ✅
 - ~~Implement reflection reference linkages across mono-repo workspaces~~ ✅
-- Write meaningful tests...
+- ~~Write meaningful tests...~~ ✅
 ### Medium Term
 - Implement tabbed bookmarks
 - Implement end user sticky notes (using local storage)
 - Migrate code view from external links to local rendering. Enable bookmarks, notes for same.
 - Support diagrams in MarkDown
 - Main navigation menu extension, eg. `.md` defined tutorials and documentation with hierarchical chapters.
+- Unit testing
 ### Long term
 - Either or;
   - collaborate with TypeDoc to normalise it's default JSON output to theme compatibility, 
