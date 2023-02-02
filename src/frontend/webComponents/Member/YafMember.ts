@@ -7,11 +7,7 @@ import {
 import { YafMemberDeclaration } from './YafMemberDeclaration.js';
 import { YafMemberGetterSetter } from './YafMemberGetterSetter.js';
 import { YafMemberSignatures } from './YafMemberSignatures.js';
-import {
-	makeFlags,
-	makeElement,
-	makeLinkElement,
-} from '../../yafElement.js';
+import { makeFlags, makeElement, makeLinkElement } from '../../yafElement.js';
 import { yafReflectionGroup } from '../../../types/frontendTypes.js';
 import appState from '../../handlers/AppState.js';
 import errorHandlers from '../../handlers/ErrorHandlers.js';
