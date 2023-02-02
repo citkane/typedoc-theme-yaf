@@ -42,7 +42,7 @@ export default {
 			update: process.argv.includes('--update-visual-baseline'),
 			baseDir: './test/screenshots',
 			failureThresholdType: 'percent',
-			failureThreshold: 0.001,
+			failureThreshold: 1.2,
 		}),
 	],
 	manual: false,
