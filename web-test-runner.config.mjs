@@ -53,4 +53,5 @@ export default {
 			retries: 3,
 		},
 	},
+	testsFinishTimeout: 480000,
 };
