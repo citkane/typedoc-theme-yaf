@@ -47,7 +47,7 @@ export default {
 	],
 	manual: false,
 	open: false,
-	TestFramework: {
+	testFramework: {
 		config: {
 			bail: true,
 			retries: 3,

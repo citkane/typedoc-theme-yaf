@@ -27,7 +27,6 @@ it('expands the menu', function (done: callBack) {
 		screenShot(
 			(err) => {
 				done(err);
-				if (err) throw err;
 			},
 			'menuScrolled',
 			1000
