@@ -24,7 +24,14 @@ it('expands the menu', function (done: callBack) {
 			'yaf-navigation-menu'
 		) as HTMLElement;
 		menu!.scrollTop = menu!.scrollHeight;
-		screenShot(done, 'menuScrolled', 1000);
+		screenShot(
+			(err) => {
+				if (err) done(err);
+				done();
+			},
+			'menuScrolled',
+			1000
+		);
 	}
 });
 it('loads all the links', async function () {
