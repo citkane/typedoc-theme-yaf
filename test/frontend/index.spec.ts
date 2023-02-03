@@ -26,8 +26,8 @@ it('expands the menu', function (done: callBack) {
 		menu!.scrollTop = menu!.scrollHeight;
 		screenShot(
 			(err) => {
-				if (err) done(err);
-				done();
+				done(err);
+				if (err) throw err;
 			},
 			'menuScrolled',
 			1000
