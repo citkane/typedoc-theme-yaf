@@ -1,1 +1,10 @@
+# These files are binary and should be left untouched
+# (binary is macro for -text -diff)
+*.class         binary
+*.jar           binary
+*.gif           binary
+*.jpg           binary
+*.png           binary
+
+
 * text eol=lf
