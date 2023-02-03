@@ -15,7 +15,7 @@ it('expands the menu', function (done: callBack) {
 		'yaf-navigation-header .open.button'
 	) as HTMLElement;
 	button?.click();
-	console.log('click');
+
 	screenShot(menuScrolled, 'menuExpanded', 1000);
 
 	function menuScrolled(err: any) {
@@ -24,16 +24,10 @@ it('expands the menu', function (done: callBack) {
 			'yaf-navigation-menu'
 		) as HTMLElement;
 		menu!.scrollTop = menu!.scrollHeight;
-		screenShot(
-			(err) => {
-				done(err);
-			},
-			'menuScrolled',
-			1000
-		);
+		screenShot(done, 'menuScrolled', 1000);
 	}
 });
-it('loads all the links', async function () {
+it('loads all the links', async function (done: callBack) {
 	await setViewport({ width: 900, height: 1200 });
 	const items = <HTMLElement[]>[
 		...document.querySelectorAll(
@@ -58,14 +52,11 @@ it('loads all the links', async function () {
 		) as HTMLElement;
 
 		link!.click();
-		await new Promise((resolve, reject) => {
+		await new Promise((resolve) => {
 			screenShot(
 				(err) => {
 					if (err) {
-						console.log(
-							`image ${i + 1} of ${items.length}: ${imageName}`
-						);
-						reject(err);
+						done(err);
 					}
 					resolve(true);
 				},
@@ -75,6 +66,7 @@ it('loads all the links', async function () {
 			);
 		});
 	}
+	done();
 });
 
 function screenShot(
@@ -83,7 +75,6 @@ function screenShot(
 	time = 100,
 	element = document.body
 ) {
-	console.log(name, time);
 	setTimeout(async () => {
 		visualDiff(element, name)
 			.then(() => callBack())

@@ -50,7 +50,6 @@ export default {
 	testFramework: {
 		config: {
 			bail: true,
-			retries: 3,
 		},
 	},
 	testsFinishTimeout: 960000,
