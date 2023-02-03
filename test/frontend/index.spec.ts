@@ -18,7 +18,8 @@ it('expands the menu', function (done: callBack) {
 	console.log('click');
 	screenShot(menuScrolled, 'menuExpanded', 1000);
 
-	function menuScrolled() {
+	function menuScrolled(err) {
+		if (err) done(err);
 		const menu = document.querySelector(
 			'yaf-navigation-menu'
 		) as HTMLElement;
@@ -76,7 +77,7 @@ function screenShot(
 	time = 100,
 	element = document.body
 ) {
-	console.log(name);
+	console.log(name, time);
 	setTimeout(async () => {
 		visualDiff(element, name)
 			.then(() => callBack())
