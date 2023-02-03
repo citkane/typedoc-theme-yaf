@@ -330,17 +330,30 @@
 			"versionsMenu.js"
 		],
 		"fonts": {
-			"files": [
-				"OpenSans-Bold-webfont.woff",
-				"OpenSans-BoldItalic-webfont.woff",
-				"OpenSans-Italic-webfont.woff",
-				"OpenSans-Light-webfont.woff",
-				"OpenSans-LightItalic-webfont.woff",
-				"OpenSans-Regular-webfont.woff",
-				"OpenSans-Semibold-webfont.woff",
-				"OpenSans-SemiboldItalic-webfont.woff",
-				"fonts.css"
-			]
+			"roboto": {
+				"files": [
+					"Apache License.txt",
+					"Bold.woff",
+					"BoldItalic.woff",
+					"Light.woff",
+					"LightItalic.woff",
+					"Medium.woff",
+					"MediumItalic.woff",
+					"Regular.woff",
+					"RegularItalic.woff",
+					"Thin.woff",
+					"ThinItalic.woff",
+					"roboto.css"
+				]
+			},
+			"materialIcons": {
+				"files": [
+					"LICENSE",
+					"material-icons-sharp.woff",
+					"material-icons-sharp.woff2",
+					"sharp.css"
+				]
+			}
 		}
 	}
 }

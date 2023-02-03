@@ -17,7 +17,7 @@
 		"test": "prettier -c . && npm run test:backend && npm run test:frontend",
 		"test:backend": "npm run build && tsc --project ./test/backend.tsconfig.json && nyc mocha",
 		"test:frontend": "npm run build && tsc --project ./test/frontend.tsconfig.json && typedoc --options test/typedoc.json && wtr",
-		"test:frontend:update": "wtr --update-visual-baseline",
+		"test:frontend:update": "npm run build && tsc --project ./test/frontend.tsconfig.json && typedoc --options test/typedoc.json && wtr --update-visual-baseline",
 		"docs": "typedoc",
 		"build": "tsc --build && node ./scripts/build.js && npm run build:css && npm run build:postcss",
 		"build:watch": "npm run build && npm run build:watch:cssAndPost",
