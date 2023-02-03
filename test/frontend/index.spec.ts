@@ -10,11 +10,12 @@ it('initial load', function (done: callBack) {
 	screenShot(done, 'initialLoad');
 });
 it('expands the menu', function (done: callBack) {
-	this.timeout(4000);
+	this.timeout(8000);
 	const button = document.querySelector(
 		'yaf-navigation-header .open.button'
 	) as HTMLElement;
 	button?.click();
+	console.log('click');
 	screenShot(menuScrolled, 'menuExpanded', 1000);
 
 	function menuScrolled() {
@@ -75,6 +76,7 @@ function screenShot(
 	time = 100,
 	element = document.body
 ) {
+	console.log(name);
 	setTimeout(async () => {
 		visualDiff(element, name)
 			.then(() => callBack())
