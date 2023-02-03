@@ -29,6 +29,13 @@ jobs:
                   npm run build
                   npm run test
 
+            - name: Upload screenshot artifact
+              uses: actions/upload-artifact@v3
+              if: failure()
+              with:
+                  name: screenshots
+                  path: ./test/screenshots
+
             - name: Upload build artifact
               if: matrix.node-version == '16.x'
               uses: actions/upload-artifact@v3
