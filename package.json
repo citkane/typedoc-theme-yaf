@@ -1,6 +1,6 @@
 {
 	"name": "typedoc-theme-yaf",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "A fresh, opinionated and standalone front-end documentation application consuming Typedoc generated data.",
 	"keywords": [
 		"typedoc",
