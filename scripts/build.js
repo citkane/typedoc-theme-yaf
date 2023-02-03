@@ -21,7 +21,12 @@ fs.readdirSync(makeAllOsPath(mediaSrcPath)).forEach((fileName) => {
 	}
 });
 
-copySync('src/index.html', 'dist/src/index.html');
-copySync('LICENSE', 'dist/LICENSE');
-copySync('package.json', 'dist/package.json');
-//copySync('README.md', 'dist/README.md');
+['src/index.html', 'LICENSE', 'README.md', '.npmignore'].forEach((file) => {
+	copySync(file, `dist/${file}`);
+});
+
+const package = fs.readJSONSync('package.json');
+['devDependencies', 'mocha', 'workspaces', 'nyc', 'scripts'].forEach((prop) => {
+	delete package[prop];
+});
+fs.writeJSONSync('dist/package.json', package, { spaces: '\t' });

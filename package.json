@@ -1,7 +1,14 @@
 {
 	"name": "typedoc-theme-yaf",
-	"version": "0.0.0",
-	"description": "Typedoc custom theme for YAF-Scaffold",
+	"version": "0.0.0-alpha.1",
+	"description": "A fresh, opinionated and standalone front-end documentation application consuming Typedoc generated data.",
+	"keywords": [
+		"typedoc",
+		"typedoc-theme",
+		"typescript",
+		"documentation",
+		"theme"
+	],
 	"main": "./src/index",
 	"workspaces": [
 		"tsconfig"
@@ -26,6 +33,10 @@
 	},
 	"author": "Michael Jonker",
 	"license": "MIT",
+	"engines": {
+		"npm": ">=6.0.0",
+		"node": ">=14.0.0"
+	},
 	"devDependencies": {
 		"@esm-bundle/chai-as-promised": "^7.1.1",
 		"@open-wc/testing": "^3.0.0-next.5",
