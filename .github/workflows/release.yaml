@@ -1,0 +1,63 @@
+
+name: RELEASE AND PUBLISH
+on:
+    workflow_dispatch:
+jobs:
+    test:
+        uses: ./.github/workflows/test.yml
+
+    release:
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - run: mkdir -p ./dist
+
+            - name: Download the build artifact
+              uses: actions/download-artifact@v3
+              with:
+                  name: distribution
+                  path: ./dist
+
+            - name: Package the build artifact
+              run: npm pack ./dist
+
+            - name: Get Package Version
+              run: |
+                  echo "RELEASE_NAME=$(npm info ./ version)" >> $GITHUB_ENV
+            - name: Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  draft: false
+                  prerelease: false
+                  generate_release_notes: true
+                  tag_name: ${{ env.RELEASE_NAME }}
+                  files: typedoc-theme-yaf-*.tgz
+
+    publish:
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - run: mkdir -p ./dist
+
+            - name: Download the build artifact
+              uses: actions/download-artifact@v3
+              with:
+                  name: distribution
+                  path: ./dist
+
+            - name: Publish to npm
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '16.x'
+                  cache: 'npm'
+                  registry-url: 'https://registry.npmjs.org'
+            - run: npm ci
+            - run: npm publish ./dist
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    document:
+        needs: release
+        uses: ./.github/workflows/docs.yml
