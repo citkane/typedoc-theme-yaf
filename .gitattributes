@@ -1,2 +1,4 @@
-*       text eol=lf
-*.png   text=auto
+*           text eol=lf
+*.png       text=auto
+*.woff      text=auto
+*.woff2     text=auto
