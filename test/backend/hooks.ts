@@ -13,7 +13,6 @@ chai.use(deepEqualInAnyOrder);
 export const mochaHooks = {
 	async beforeAll(done: () => void) {
 		fs.removeSync(tmpDirTest);
-		//fs.ensureDirSync(tmpDirTest);
 		done();
 	},
 	beforeEach(done: () => void) {
