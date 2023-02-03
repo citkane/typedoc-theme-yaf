@@ -4,7 +4,7 @@ import { setViewport } from '@web/test-runner-commands';
 type callBack = (err?: any) => void;
 
 it('sets the viewport size', async function () {
-	await setViewport({ width: 1350, height: 1000 });
+	await setViewport({ width: 1350, height: 2000 });
 });
 it('initial load', function (done: callBack) {
 	screenShot(done, 'initialLoad');
@@ -24,7 +24,7 @@ it('expands the menu', function (done: callBack) {
 			'yaf-navigation-menu'
 		) as HTMLElement;
 		menu!.scrollTop = menu!.scrollHeight;
-		screenShot(done, 'menuScrolled', 2000);
+		screenShot(done, 'menuScrolled', 1000);
 	}
 });
 it('loads all the links', async function () {
