@@ -18,7 +18,7 @@ it('expands the menu', function (done: callBack) {
 	console.log('click');
 	screenShot(menuScrolled, 'menuExpanded', 1000);
 
-	function menuScrolled(err) {
+	function menuScrolled(err: any) {
 		if (err) done(err);
 		const menu = document.querySelector(
 			'yaf-navigation-menu'
