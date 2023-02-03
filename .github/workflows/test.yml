@@ -34,7 +34,7 @@ jobs:
               if: failure()
               with:
                   name: screenshots
-                  path: ./test/screenshots
+                  path: ./test
 
             - name: Upload build artifact
               if: matrix.node-version == '16.x'
