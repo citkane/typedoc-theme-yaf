@@ -27,7 +27,7 @@ it('expands the menu', function (done: callBack) {
 		screenShot(done, 'menuScrolled', 1000);
 	}
 });
-it('loads all the links', async function (done: callBack) {
+it('loads all the links', async function () {
 	await setViewport({ width: 900, height: 1200 });
 	const items = <HTMLElement[]>[
 		...document.querySelectorAll(
@@ -52,11 +52,11 @@ it('loads all the links', async function (done: callBack) {
 		) as HTMLElement;
 
 		link!.click();
-		await new Promise((resolve) => {
+		await new Promise((resolve, reject) => {
 			screenShot(
 				(err) => {
 					if (err) {
-						done(err);
+						reject(err);
 					}
 					resolve(true);
 				},
@@ -66,7 +66,6 @@ it('loads all the links', async function (done: callBack) {
 			);
 		});
 	}
-	done();
 });
 
 function screenShot(
