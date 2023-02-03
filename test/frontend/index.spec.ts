@@ -81,6 +81,9 @@ function screenShot(
 	setTimeout(async () => {
 		visualDiff(element, name)
 			.then(() => callBack())
-			.catch((err) => callBack(err));
+			.catch((err) => {
+				console.log('error:', name);
+				callBack(err);
+			});
 	}, time);
 }
