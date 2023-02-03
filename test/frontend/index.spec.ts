@@ -4,7 +4,7 @@ import { setViewport } from '@web/test-runner-commands';
 type callBack = (err?: any) => void;
 
 it('sets the viewport size', async function () {
-	await setViewport({ width: 1350, height: 2000 });
+	await setViewport({ width: 1350, height: 1000 });
 });
 it('initial load', function (done: callBack) {
 	screenShot(done, 'initialLoad');
@@ -16,7 +16,7 @@ it('expands the menu', function (done: callBack) {
 	) as HTMLElement;
 	button?.click();
 
-	screenShot(menuScrolled, 'menuExpanded', 2000);
+	screenShot(menuScrolled, 'menuExpanded', 1000);
 
 	function menuScrolled(err: any) {
 		if (err) done(err);
