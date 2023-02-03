@@ -16,7 +16,7 @@ it('expands the menu', function (done: callBack) {
 	) as HTMLElement;
 	button?.click();
 
-	screenShot(menuScrolled, 'menuExpanded', 1000);
+	screenShot(menuScrolled, 'menuExpanded', 2000);
 
 	function menuScrolled(err: any) {
 		if (err) done(err);
@@ -24,7 +24,7 @@ it('expands the menu', function (done: callBack) {
 			'yaf-navigation-menu'
 		) as HTMLElement;
 		menu!.scrollTop = menu!.scrollHeight;
-		screenShot(done, 'menuScrolled', 1000);
+		screenShot(done, 'menuScrolled', 2000);
 	}
 });
 it('loads all the links', async function () {
