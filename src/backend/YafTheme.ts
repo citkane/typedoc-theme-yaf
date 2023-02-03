@@ -85,7 +85,10 @@ export class YafTheme extends DefaultTheme {
 		const context = this.getRenderContext();
 		const { saveYafThemeAssets } = YafTheme.fileFactory;
 		const docDir = this.application.options.getValue('out') || 'docs';
-		const rootDir = path.join(__dirname, '..', '..', '../');
+		let distDir = path.join(__dirname, '..', '../');
+		const hackyDistDir = path.join(distDir, 'src');
+		/** to make npm published paths work... */
+		if (fs.existsSync(hackyDistDir)) distDir = hackyDistDir;
 
 		const project = output.project;
 
@@ -97,7 +100,7 @@ export class YafTheme extends DefaultTheme {
 		);
 
 		saveYafThemeAssets(
-			rootDir,
+			distDir,
 			docDir,
 			yafSerialiser.dataObjectArray,
 			project,
@@ -114,7 +117,7 @@ export class YafTheme extends DefaultTheme {
 		 * Copies / saves various theme assets and data files for consumption by the front-end.
 		 */
 		saveYafThemeAssets: (
-			rootDir: string,
+			distDir: string,
 			docDir: string,
 			dataObjectArray: YafSerialiser['dataObjectArray'],
 			project: ProjectReflection,
@@ -128,7 +131,7 @@ export class YafTheme extends DefaultTheme {
 				makeNeedsParenthesis,
 			} = this.factory;
 
-			copyThemeFiles(rootDir, docDir);
+			copyThemeFiles(distDir, docDir);
 			saveDataFile('yafNavigationMenu', docDir, makeNavTree(project));
 			saveDataFile(
 				'yafReflectionMap',
@@ -153,15 +156,15 @@ export class YafTheme extends DefaultTheme {
 
 		/**
 		 * Copies various theme resource files into the documentation target directory.
-		 * @param rootDir The absolute path to the project root
+		 * @param distDir The absolute path to the project root
 		 * @param outDir The absolute path to the root documentation out directory
 		 */
-		copyThemeFiles: (rootDir: string, outDir: string) => {
-			const mediaSrc = path.join(rootDir, 'dist', 'src', 'media');
+		copyThemeFiles: (distDir: string, outDir: string) => {
+			const mediaSrc = path.join(distDir, 'media');
 			const mediaDest = path.join(outDir, 'media');
-			const frontendSrc = path.join(rootDir, 'dist', 'src', 'frontend');
+			const frontendSrc = path.join(distDir, 'frontend');
 			const frontendDest = path.join(outDir, 'frontend');
-			const indexSrc = path.join(rootDir, 'src', 'index.html');
+			const indexSrc = path.join(distDir, 'index.html');
 			const indexDest = path.join(outDir, 'index.html');
 			const assetsPath = path.join(outDir, 'assets');
 
