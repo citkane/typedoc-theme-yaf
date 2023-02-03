@@ -1,4 +1,4 @@
-import { makeFlags, makeElement, makeLinkElement, } from '../../yafElement.js';
+import { makeFlags, makeElement, makeLinkElement } from '../../yafElement.js';
 import appState from '../../handlers/AppState.js';
 import errorHandlers from '../../handlers/ErrorHandlers.js';
 import { YafHTMLElement } from '../../index.js';
