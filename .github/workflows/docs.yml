@@ -19,6 +19,7 @@ jobs:
               run: |
                   mkdir -p ./docs
                   tar -cvf documentation.tar ./docs
+
             - name: create a document artifact
               uses: actions/upload-artifact@v3
               with:
@@ -26,18 +27,20 @@ jobs:
                   path: documentation.tar
 
     build: # builds the distribution and then the documentation
+        needs: get_history
         runs-on: ubuntu-latest
         steps:
             - name: Checkout src
               uses: actions/checkout@v3
 
             - run: mkdir -p ./docs
+
             - name: Download the existing documents artifact
               uses: actions/download-artifact@v3
               with:
                   name: documentation
             - run: tar -xf documentation.tar ./docs -C ./docs
-            
+
             - name: Build
               uses: actions/setup-node@v3
               with:
