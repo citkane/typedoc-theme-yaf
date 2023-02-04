@@ -4,6 +4,7 @@
 !.npmignore
 !.eslint*
 !.prettier*
+!*.json
 
 /*/
 
@@ -11,6 +12,7 @@
 !/scripts/
 !/tsconfig/
 !/.github/
+!/.vscode/
 !/test/
 /test/*/
 !/test/backend/

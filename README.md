@@ -13,11 +13,9 @@ The documentation content and navigation is fully cross-linked with n-depth expa
 ### Versioning
 
 This theme automatically creates a semantically versioned history of your documentation.\
-For more information, see [typedoc-plugin-versions](https://github.com/citkane/typedoc-plugin-versions), which includes examples of how to set up a [Github CID](https://github.com/citkane/typedoc-plugin-versions) for your documentation.
+For more information, see [typedoc-plugin-versions](https://github.com/citkane/typedoc-plugin-versions), which includes options and examples of how to set up a [Github CID](https://github.com/citkane/typedoc-plugin-versions#cid) for your documentation.
 
 ### Installation
-
-**ALPHA:** This is not yet on NPM, so until then, instead of the below, do a git clone, run the `build` script and then npm install from your build folder location.
 
 ```
 npm i -D typedoc-theme-yaf
