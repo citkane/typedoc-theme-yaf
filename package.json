@@ -63,7 +63,7 @@
 		"mocha": "^10.0.0",
 		"nyc": "^15.1.0",
 		"postcss-cli": "^10.1.0",
-		"prettier": "2.7.1",
+		"prettier": "^2.7.1",
 		"sass": "^1.53.0",
 		"sinon": "^14.0.0",
 		"source-map-support": "^0.5.21",

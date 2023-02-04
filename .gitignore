@@ -10,9 +10,12 @@
 /*/
 /test/*/
 /test/screenshots/Chromium/failed/
+/dist/*
 
 !/.vscode/
 !/.github/
+!/dist/
+!/dist/package.json
 !/scripts/
 !/src/
 !/tsconfig/
