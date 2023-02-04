@@ -68,7 +68,6 @@
 		"sinon": "^14.0.0",
 		"source-map-support": "^0.5.21",
 		"typedoc-plugin-hot-dev": "^0.0.12",
-		"typedoc-theme-yaf": "file:dist",
 		"typescript": "^4.7.4"
 	},
 	"dependencies": {
