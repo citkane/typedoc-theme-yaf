@@ -1,5 +1,5 @@
 import { Application, ProjectReflection } from 'typedoc';
-import { load } from '../../dist';
+import { load } from 'typedoc-theme-yaf';
 import { assert } from 'chai';
 import path from 'path';
 import fs from 'fs-extra';
