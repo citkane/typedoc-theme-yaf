@@ -98,6 +98,7 @@ export class YafElementDrawers {
 
 		appState.openDrawer = this.drawerId;
 	};
+
 	closeDrawer = () => {
 		if (this.drawerState === 'closed' || !this.hasContent) return;
 

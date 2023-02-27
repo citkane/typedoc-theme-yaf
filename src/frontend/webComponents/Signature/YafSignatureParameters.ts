@@ -71,10 +71,22 @@ export class YafSignatureParameters extends YafHTMLElement<
 
 		return td;
 	};
+	/**
+	 * Places parameter comments into the table cell. \
+	 * Because links in these comments are stringified by the BackEnd as `<a>` HTML elements, the string is regexed to replace `a` with `yaf-navigation-link` elements.
+	 *
+	 * @param parameter A meta example of `yaf-navigation-link` parsed correctly: {@link types.common.YafParameterReflection}
+	 * @returns
+	 */
 	makeComment = (parameter: YafParameterReflection) => {
 		const { text } = parameter;
 		const td = makeElement('td');
-		if (text?.comment) td.innerHTML = text.comment;
+		if (text?.comment) {
+			const comment = text.comment
+				.replace(/<a href=/g, '<yaf-navigation-link href=')
+				.replace(/<\/a>/g, '</yaf-navigation-link>');
+			td.innerHTML = comment;
+		}
 
 		return td;
 	};

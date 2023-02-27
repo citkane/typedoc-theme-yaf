@@ -10,24 +10,25 @@ export class YafMemberGetterSetter extends YafHTMLElement<YAFDataObject> {
 		const { factory } = YafMemberGetterSetter;
 
 		if (getSignature) {
-			const wrapperHTMLElement = makeElement('div', 'wrapper');
-			wrapperHTMLElement.appendChildren([
+			this.appendChildren([
 				factory.makeSignature('get', getSignature),
 				factory.makeBody(getSignature),
 			]);
-
-			this.appendChild(wrapperHTMLElement);
 		}
 
 		if (setSignature) {
-			const wrapperHTMLElement = makeElement('div', 'wrapper');
-			wrapperHTMLElement.appendChildren([
+			this.appendChildren([
 				factory.makeSignature('set', setSignature),
 				factory.makeBody(setSignature),
 			]);
-
-			this.appendChild(wrapperHTMLElement);
 		}
+
+		if (this.props.sources)
+			this.appendChild(
+				factory.makeBody({
+					sources: this.props.sources!,
+				} as YafSignatureReflection)
+			);
 	}
 
 	private static factory = {
