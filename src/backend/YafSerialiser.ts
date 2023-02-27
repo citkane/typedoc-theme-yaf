@@ -255,15 +255,7 @@ export class YafSerialiser {
 
 			if (hasVisibleComponent(object) && !!object.comment) {
 				object.text.comment = context.markdown(
-					object.comment.summary.map((part) => {
-						if ('tag' in part && part.tag === '@link') {
-							return {
-								kind: 'text',
-								text: `[${part.text}](${part.target})`,
-							};
-						}
-						return part;
-					}) as CommentDisplayPart[]
+					mapComment(object.comment.summary as CommentDisplayPart[])
 				) as htmlString;
 
 				object.comment.blockTags?.forEach((tag) => {
@@ -273,7 +265,7 @@ export class YafSerialiser {
 
 					object.text.comment += `<h5>${tagString}:</h5>`;
 					object.text.comment += context.markdown(
-						tag.content as CommentDisplayPart[]
+						mapComment(tag.content as CommentDisplayPart[])
 					);
 				});
 			}
@@ -282,6 +274,18 @@ export class YafSerialiser {
 				parameters.forEach((parameter) =>
 					mutateComment(parameter, context)
 				);
+
+			function mapComment(contentArray: CommentDisplayPart[]) {
+				return contentArray.map((part) => {
+					if ('tag' in part && part.tag === '@link') {
+						return {
+							kind: 'text',
+							text: `[${part.text}](${part.target})`,
+						};
+					}
+					return part;
+				}) as CommentDisplayPart[];
+			}
 		},
 	};
 	/**
