@@ -6,7 +6,8 @@ yaf-member-group-reflection yaf-member {
 	border-left: 3px solid var(--color-fg-subtle);
 }
 
-yaf-member-signatures {
+yaf-member-signatures,
+yaf-member-getter-setter {
 	position: relative;
 	display: block;
 	.flag {
@@ -21,16 +22,11 @@ yaf-member-signatures {
 	margin-bottom: 3rem;
 	border-bottom: 1px solid var(--color-fg-subtle);
 }
-yaf-member-getter-setter {
-	& > .wrapper {
-		margin-bottom: 2rem;
-		padding-bottom: 2rem;
-		border-bottom: 1px solid var(--color-border-muted);
-	}
-}
+
 yaf-member {
 	display: block;
 	margin-bottom: 3rem;
+
 	h3 {
 		& > yaf-navigation-link {
 			display: flex;
@@ -77,6 +73,11 @@ yaf-member {
 			position: relative;
 			left: -0.5rem;
 		}
+	}
+
+	yaf-member-getter-setter .highlight {
+		position: relative;
+		left: -0.5rem;
 	}
 
 	.header {
