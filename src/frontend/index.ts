@@ -28,7 +28,7 @@ export * as handlers from './handlers/index.js';
  * This library replicates (in principle) the semantics of the default TypeDoc theme backend templating into the frontend scope.
  * It tries to be semantically as close as possible to the default, but does depart in some details and sometimes takes it own tangent...
  *
- * All data to feed the frontend component logic is {@link backend!YafTheme#saveYafThemeAssets | generated at document build time} as .json fragments
+ * All data to feed the frontend component logic is generated at document build time as .json fragments
  * (instead of the default theme HTML pages) and loaded into the browser as required.
  */
 export * as webComponents from './webComponents/index.js';

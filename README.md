@@ -1,3 +1,7 @@
+
+| :zap:   This theme is pegged at Typedoc v0.23 due to [breaking API changes](https://github.com/TypeStrong/typedoc/releases/tag/v0.24.0) in v0.24 |
+|-----------------------------------------|
+
 # typedoc-theme-yaf
 
 A theme that optimises deep project exploration, graphical clarity and a fluid end user experience.
